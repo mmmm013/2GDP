@@ -78,6 +78,9 @@ const PLAYLISTS: Playlist[] = [
       { title: 'A Calm Evening', vocalist: 'Kleigh', src: '/pix/kleigh--a-calm-evening.mp3' },
       { title: 'Wanna Know You', vocalist: 'G Putnam Music', src: '/pix/wanna-know-you.mp3' },
       { title: 'Waterfall', vocalist: 'Kleigh', src: '/pix/kleigh--waterfall.mp3' },
+            { title: 'A Love Like That', vocalist: 'G Putnam Music', src: '/pix/a-love-like-that.mp3' },
+            { title: 'Forever & A Day', vocalist: 'G Putnam Music', src: '/pix/forever-and-a-day.mp3' },
+            { title: 'Be Mine Tonight', vocalist: 'KLEIGH', src: '/pix/be-mine-tonight.mp3' },
     ],
   },
 ];
