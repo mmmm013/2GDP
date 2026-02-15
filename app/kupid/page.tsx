@@ -4,62 +4,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import GlobalPlayer from '@/components/GlobalPlayer';
 import Link from 'next/link';
-
-const KUPID_TIERS = [
-  {
-    id: 'genesis',
-    name: 'K-KUTs Genesis Locket',
-    price: '$333',
-    description: 'Entry-level K-KUTs locket with curated music pairings. Discover the lock-and-key that unlocks your personal creative frequency.',
-    features: [
-      'Personal K-KUTs Genesis Locket',
-      'Curated music frequency pairing',
-      'Digital certificate of authenticity',
-      'Access to GPM Locket holder community',
-    ],
-    stripeLink: 'https://buy.stripe.com/28E14mgV08My41C2p84ow04',
-    color: 'from-amber-600 to-yellow-500',
-    borderColor: 'border-amber-500/40',
-    badge: 'GENESIS',
-  },
-  {
-    id: 'sovereign',
-    name: 'K-KUTs Sovereign Locket',
-    price: '$1,100',
-    description: 'The Sovereign-tier K-KUTs locket with expanded music library access and personal frequency calibration.',
-    features: [
-      'Sovereign K-KUTs Locket',
-      'Expanded frequency library',
-      'Personal calibration session',
-      'Priority access to new releases',
-      'Sovereign holder events',
-    ],
-    stripeLink: 'https://buy.stripe.com/eVq14mgV06Eq1Tu9RA4ow05',
-    color: 'from-amber-400 to-orange-500',
-    borderColor: 'border-orange-400/40',
-    badge: 'SOVEREIGN',
-    featured: true,
-  },
-  {
-    id: 'historic',
-    name: 'K-KUTs Historic Locket',
-    price: '$3,300',
-    description: 'This purchase makes history. 2 patent-pending inventions. 3 trademarks. The ultimate creative artifact with full archive access and legacy value.',
-    features: [
-      'Historic K-KUTs Locket',
-      'Full creative archive access',
-      'Lifetime frequency updates',
-      'VIP studio sessions',
-      'Historic holder inner circle',
-      'Locket delivery on/by March 31, 2026',
-      '2 patent-pending inventions included',
-    ],
-    stripeLink: 'https://buy.stripe.com/9B6aEW48ebYK0PqbZI4ow06',
-    color: 'from-yellow-300 to-amber-400',
-    borderColor: 'border-yellow-400/40',
-    badge: 'HISTORIC',
-  },
-];
+import { KUPID_TIERS } from '@/lib/kupid-protocol';
 
 export default function KupidPage() {
   const [isVDay, setIsVDay] = useState(false);
@@ -134,10 +79,10 @@ export default function KupidPage() {
             </span>
           </div>
           <Link
-            href="https://buy.stripe.com/9B6aEW48ebYK0PqbZI4ow06"
+                          href={KUPID_TIERS.find(t => t.id === 'historic')?.stripeLink || '#'}
             className="inline-block px-8 py-3 rounded-xl bg-gradient-to-r from-yellow-400 to-amber-500 text-black font-bold text-sm hover:from-yellow-300 hover:to-amber-400 transition-all shadow-lg shadow-yellow-500/20"
           >
-            Get HISTORIC Locket &mdash; $3,300
+                          Get HISTORIC Locket &mdash; {KUPID_TIERS.find(t => t.id === 'historic')?.price}
           </Link>
         </div>
       </section>
