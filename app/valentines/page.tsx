@@ -3,6 +3,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import type { Metadata } from 'next';
 import MakeupTracks from './MakeupTracks';
+import { LOCKET_OPTIONS } from '@/lib/kupid-protocol';
 
 export const metadata: Metadata = {
   title: "Valentine's Day Gifts | G Putnam Music",
@@ -41,31 +42,6 @@ const GIFT_OPTIONS = [
     href: '/gift',
     emoji: '💜',
     tag: 'Ultimate V-Day gift',
-  },
-];
-
-const LOCKET_OPTIONS = [
-  {
-    title: 'Genesis Locket',
-    price: '$333',
-    description: 'Entry-level K-KUTs locket with curated music pairings.',
-    href: '/kupid',
-    badge: 'GENESIS',
-  },
-  {
-    title: 'Sovereign Locket',
-    price: '$1,100',
-    description: 'Expanded library access + personal frequency calibration.',
-    href: '/kupid',
-    badge: 'SOVEREIGN',
-    featured: true,
-  },
-  {
-    title: 'Historic Locket',
-    price: '$3,300',
-    description: 'Makes history. 2 patent-pending inventions. 3 trademarks. The ultimate emotional artifact.',
-    href: '/kupid',
-    badge: 'HISTORIC',
   },
 ];
 
