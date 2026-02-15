@@ -37,6 +37,25 @@ export default function WhoPage() {
             that match your moment.
           </p>
         </div>
+
+                  {/* Artist Gallery */}
+          <div className="mt-12">
+            <h2 className="text-3xl font-black uppercase text-[#8B4513] mb-6 tracking-tight">Gallery</h2>
+            <div className="grid grid-cols-2 gap-4">
+                            <div className="relative w-full h-[280px] rounded-xl overflow-hidden">
+                <Image src="/IMG_7624.JPG" alt="Michael Scherer" fill className="object-cover" style={{ objectPosition: '30% center' }} />
+              </div>
+                            <div className="relative w-full h-[280px] rounded-xl overflow-hidden">
+                <Image src="/IMG_7720.JPG" alt="Michael Scherer" fill className="object-cover" style={{ objectPosition: '30% center' }} />
+              </div>
+                            <div className="relative w-full h-[280px] rounded-xl overflow-hidden">
+                <Image src="/assets/MC by Tree Looking Left.jpg" alt="Michael Scherer by tree" fill className="object-cover" style={{ objectPosition: 'center center' }} />
+              </div>
+                            <div className="relative w-full h-[280px] rounded-xl overflow-hidden">
+                <Image src="/assets/Front Pose.jpg" alt="Michael Scherer front pose" fill className="object-cover" style={{ objectPosition: 'center top' }} />
+              </div>
+                          </div>
+          </div>
       </section>
       <Footer />
       <GlobalPlayer />
