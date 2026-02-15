@@ -16,18 +16,14 @@ const supabase = createClient(
 );
 
 // Brand hero images for rotation
-// MOBILE FIX: Only render the ACTIVE image, not all 11 stacked
+// MOBILE FIX: Only render the ACTIVE image, not all 6 stacked
 // Each image has its own objectPosition for perfect framing
 const HERO_IMAGES: { src: string; objectPosition: string }[] = [
   { src: '/assets/hero.jpg', objectPosition: 'center center' },
   { src: '/k-hero.jpg', objectPosition: 'center center' },
   { src: '/k-hero-alternate.JPG', objectPosition: 'center center' },
   { src: '/IMG_7429.JPG', objectPosition: '30% center' },
-  { src: '/IMG_7624.JPG', objectPosition: '30% center' },
-  { src: '/IMG_7720.JPG', objectPosition: '30% center' },
   { src: '/assets/MC Agnst Stone Wall Knee Bent.jpg', objectPosition: 'center center' },
-  { src: '/assets/MC by Tree Looking Left.jpg', objectPosition: 'center center' },
-  { src: '/assets/Front Pose.jpg', objectPosition: 'center top' },
   { src: '/assets/Smoking 1.jpg', objectPosition: 'center center' },
 ];
 
