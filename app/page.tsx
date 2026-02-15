@@ -27,7 +27,7 @@ const HERO_IMAGES: { src: string; objectPosition: string }[] = [
   { src: '/IMG_7720.JPG', objectPosition: '30% center' },
   { src: '/assets/MC Agnst Stone Wall Knee Bent.jpg', objectPosition: 'center center' },
   { src: '/assets/MC by Tree Looking Left.jpg', objectPosition: 'center center' },
-  { src: '/assets/Front Pose.jpg', objectPosition: 'center center' },
+  { src: '/assets/Front Pose.jpg', objectPosition: 'center 30%' },
   { src: '/assets/Smoking 1.jpg', objectPosition: 'center center' },
 ];
 
