@@ -127,6 +127,7 @@ export default function Hero() {
         .neq('audio_url', 'EMPTY')
         .neq('audio_url', '')
         .not('audio_url', 'like', '%placeholder%')
+              .not('title', 'ilike', '%instro%')
         .eq('mood', activity.mood)
         .limit(10);
 
