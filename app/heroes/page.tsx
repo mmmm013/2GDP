@@ -1,6 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { Heart, Shield, CheckCircle, Star, Video, Award, Lock, Radio } from 'lucide-react';
+import { Heart, Shield, CheckCircle, Star, Video, Award, Lock, Radio, Zap } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer'; 
 import GlobalPlayer from '@/components/GlobalPlayer';
@@ -55,11 +55,11 @@ export default function HeroesPage() {
       <section className="py-12 bg-[#2a1f0f] text-center">
         <div className="container mx-auto px-4 max-w-3xl">
           <div className="inline-flex items-center gap-2 bg-[#3E2723] border border-[#C8A882]/30 px-4 py-1 rounded-full mb-6">
-            <Award size={14} className="text-[#C8A882]" />
+            <Zap size={14} className="text-[#C8A882]" />
             <span className="text-xs font-black text-[#C8A882] tracking-[0.2em] uppercase">MIP1 Priority Access</span>
           </div>
           
-                                            <h2 className="text-3xl md:text-4xl font-black text-[#FFD96A] mb-4 tracking-tight">MILITARY - FREE+</h2>
+                                            <h2 className="text-3xl md:text-4xl font-black text-[#FFD96A] mb-4 tracking-tight">MILITARY MARVELS - FREE+</h2>
                       <p className="text-sm text-[#f5e6c8]/60 mb-8">MIP1 designation grants priority free streaming access. Validate with your military email or service credentials.</p>
           
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-5">
@@ -81,7 +81,7 @@ export default function HeroesPage() {
             </div>
           </div>
           
-                      <p className="text-xs text-[#f5e6c8]/40">All branches and allied western military welcome. MIP1 = Most Important Person/Partner.</p>
+                      <p className="text-xs text-[#f5e6c8]/40">Dedicated to the US Military for steadfastly protecting ALL Americans and all our borders!</p>
         </div>
       </section>
 
@@ -94,7 +94,7 @@ export default function HeroesPage() {
             <span className="text-xs font-black text-[#C8A882] tracking-[0.2em] uppercase">MIP1 Priority Access</span>
           </div>
           
-          <h2 className="text-3xl md:text-4xl font-black text-[#FFD95A] mb-4 tracking-tight">ICU
+          <h2 className="text-3xl md:text-4xl font-black text-[#FFD95A] mb-4 tracking-tight">ICU ANGELS
             - FREE+</h2>          <p className="text-lg text-[#f5e6c8]/80 mb-2">Critical Care. Emergency. Trauma. ICU Staff.</p>
           <p className="text-sm text-[#f5e6c8]/60 mb-8">MIP1 designation grants priority free streaming access. Validate with your hospital or medical facility email.</p>
           
@@ -117,7 +117,7 @@ export default function HeroesPage() {
             </div>
           </div>
           
-          <p className="text-xs text-[#f5e6c8]/40">All critical care professionals welcome — you hold the line. MIP1 = Most Important Person/Partner.</p>
+                      <p className="text-xs text-[#f5e6c8]/40">You hold the line. Change for ALL starts with change for ONE.</p>
         </div>
       </section>
 
