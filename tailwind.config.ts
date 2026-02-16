@@ -7,6 +7,13 @@ const config: Config = {
     "./app/**/*.{js,ts,jsx,tsx,mdx}", // <--- THIS IS THE KEY LINE
         "./lib/**/*.{js,ts,jsx,tsx,mdx}",
   ],
+    safelist: [
+    'from-amber-600', 'to-yellow-500', 'from-yellow-300', 'to-amber-400',
+    'from-amber-400', 'to-orange-500', 'from-yellow-400', 'to-amber-500',
+    'bg-gradient-to-r', 'shadow-yellow-500/20',
+    'border-amber-500/40', 'border-orange-400/40', 'border-yellow-400/40',
+    'ring-yellow-400/50', 'from-yellow-900/10',
+  ],
   theme: {
     extend: {
       colors: {
