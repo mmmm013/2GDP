@@ -27,44 +27,22 @@ const HERO_IMAGES: { src: string; objectPosition: string }[] = [
   { src: '/assets/Smoking 1.jpg', objectPosition: 'center center' },
 ];
 
-// V-DAY PROMO: Auto-expires after Feb 15, 2026
-function isValentinesPromo(): boolean {
-  const now = new Date();
-  const cutoff = new Date('2026-02-15T23:59:59-06:00');
-  return now <= cutoff;
-}
-
-// T20: THE TOP 20 ACTIVITIES LISTENERS STREAM TO MOST
-const t20 = [
-  { id: 'focus', label: 'FOCUS', description: 'Deep Work & Study', emoji: '🎧', mood: 'Focus' },
-  { id: 'run', label: 'RUN', description: 'Cardio & Jogging', emoji: '🏃', mood: 'Energy' },
-  { id: 'chill', label: 'CHILL', description: 'Coffee Shop Hangs', emoji: '☕', mood: 'Chill' },
-  { id: 'party', label: 'PAR-T', description: 'Party Mode', emoji: '🎉', mood: 'Energy' },
-  { id: 'drive', label: 'KRUZE', description: 'Driving & Road Trips', emoji: '🚗', mood: 'Upbeat' },
-  { id: 'lift', label: 'LIFT', description: 'Weights & Training', emoji: '🏋️', mood: 'Energy' },
-  { id: 'romance', label: 'DATE', description: 'Date Night', emoji: '❤️', mood: 'Romantic' },
-  { id: 'cook', label: 'COOK', description: 'Kitchen Sessions', emoji: '🍳', mood: 'Chill' },
-  { id: 'create', label: 'CREATE', description: 'Art & Design', emoji: '🎨', mood: 'Focus' },
-  { id: 'read', label: 'READ', description: 'Books & Podcasts', emoji: '📖', mood: 'Reflective' },
-  { id: 'commute', label: 'COMMUTE', description: 'Daily Transit', emoji: '🚌', mood: 'Upbeat' },
-  { id: 'wind-down', label: 'WIND DN', description: 'Evening Unwind', emoji: '🌙', mood: 'Chill' },
-  { id: 'family', label: 'FAMILY', description: 'Kids & Home', emoji: '👨‍👩‍👧', mood: 'Upbeat' },
-  { id: 'social', label: 'SOCIAL', description: 'Friends & Gatherings', emoji: '👥', mood: 'Upbeat' },
-  { id: 'hustle', label: 'HUSTLE', description: 'Grind & Motivation', emoji: '💼', mood: 'Energy' },
-  { id: 'game', label: 'GAME', description: 'Gaming Sessions', emoji: '🎮', mood: 'Energy' },
-  { id: 'walkdog', label: 'WALK', description: 'Walking & Pets', emoji: '🐕', mood: 'Chill' },
-  { id: 'intimate', label: 'INTMT', description: 'Intimate Moments', emoji: '🔥', mood: 'Romantic' },
-  { id: 'code', label: 'CODE', description: 'Dev & Build', emoji: '💻', mood: 'Focus' },
-  { id: 'vibe', label: 'VIBE', description: 'Good Energy Only', emoji: '✨', mood: 'Upbeat' },
+// KLEIGH-BRANDED FP: 3 Congruent PIX — Continuous Loop
+const KLEIGH_FP_PIX = [
+  { src: '/k-hero.jpg', alt: 'KLEIGH — Artist Portrait' },
+  { src: '/k-hero-alternate.JPG', alt: 'KLEIGH — Alternate' },
+  { src: '/assets/Front Pose.jpg', alt: 'KLEIGH — Front Pose' },
 ];
+const FP_ROTATION_MS = 4000; // 4s per PIX — sleek cycle
 
 export default function Hero() {
-  const [activeActivity, setActiveActivity] = useState<string>('focus');
-  const [loadingActivity, setLoadingActivity] = useState<string | null>(null);
   const [heroIndex, setHeroIndex] = useState(0);
   const [heroFading, setHeroFading] = useState(false);
   const fadeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const [showVDay, setShowVDay] = useState(false);
+
+  // KLEIGH FP PIX state
+  const [fpIndex, setFpIndex] = useState(0);
+  const [fpFading, setFpFading] = useState(false);
 
   // MOBILE PERF: Detect mobile for lighter rendering
   const [isMobile, setIsMobile] = useState(false);
@@ -73,11 +51,6 @@ export default function Hero() {
     check();
     window.addEventListener('resize', check);
     return () => window.removeEventListener('resize', check);
-  }, []);
-
-  // Check V-Day promo on mount (client-side only)
-  useEffect(() => {
-    setShowVDay(isValentinesPromo());
   }, []);
 
   // Shuffle-based hero rotation
@@ -89,7 +62,6 @@ export default function Hero() {
     }
     let pos = 0;
     setHeroIndex(indices[0]);
-
     const interval = setInterval(() => {
       setHeroFading(true);
       fadeTimeoutRef.current = setTimeout(() => {
@@ -98,79 +70,31 @@ export default function Hero() {
         setHeroFading(false);
       }, 300);
     }, 8000);
-
     return () => {
       clearInterval(interval);
       if (fadeTimeoutRef.current) clearTimeout(fadeTimeoutRef.current);
     };
   }, []);
 
-  const activeAct = useMemo(
-    () => t20.find(a => a.id === activeActivity),
-    [activeActivity]
-  );
-
-  const handleActivityClick = useCallback(async (activityId: string) => {
-    try {
-      setLoadingActivity(activityId);
-      const activity = t20.find(a => a.id === activityId);
-      if (!activity) return;
-
-      const { data: tracks, error } = await supabase
-        .from('gpm_tracks')
-        .select('*')
-        .not('audio_url', 'is', null)
-        .neq('audio_url', 'EMPTY')
-        .neq('audio_url', '')
-        .not('audio_url', 'like', '%placeholder%')
-              .not('title', 'ilike', '%instro%')
-        .eq('mood', activity.mood)
-        .limit(10);
-
-      if (error) {
-        setLoadingActivity(null);
-        return;
-      }
-
-      if (!tracks || tracks.length === 0) {
-        setLoadingActivity(null);
-        return;
-      }
-
-      const randomIndex = Math.floor(Math.random() * tracks.length);
-      const track = tracks[randomIndex];
-
-      const playEvent = new CustomEvent('play-track', {
-        detail: {
-          title: track.title || 'Unknown Track',
-          vocalist: track.artist || 'G Putnam Music',
-          url: track.audio_url,
-          moodTheme: { primary: '#C8A882' }
-        }
-      });
-      window.dispatchEvent(playEvent);
-      setLoadingActivity(null);
-    } catch {
-      setLoadingActivity(null);
-    }
+  // KLEIGH FP: Continuous 3-PIX rotation loop — active until inactivated
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setFpFading(true);
+      setTimeout(() => {
+        setFpIndex(prev => (prev + 1) % KLEIGH_FP_PIX.length);
+        setFpFading(false);
+      }, 400);
+    }, FP_ROTATION_MS);
+    return () => clearInterval(interval);
   }, []);
 
   const heroImage = HERO_IMAGES[heroIndex];
-
-  // MOBILE PERF: Show only top 5 T20 activities on mobile
-  const displayT20 = isMobile ? t20.slice(0, 5) : t20;
+  const fpPix = KLEIGH_FP_PIX[fpIndex];
 
   return (
     <>
       <Header />
       <GlobalPlayer />
-
-      {/* V-DAY PROMO BANNER - auto-expires after Feb 15 */}
-      {showVDay && (
-        <Link href="/kupid" className="block bg-gradient-to-r from-pink-600 via-red-500 to-pink-600 text-white text-center py-2 px-4 text-sm font-medium hover:from-pink-500 hover:via-red-400 hover:to-pink-500 transition-all">
-          <span className="animate-pulse">💝</span> HISTORIC Valentine's — MAKES HISTORY — Patent-Pending Inventions <span className="hidden sm:inline">💕 2 New Inventions 💕</span> KUPID Locket™ <span className="animate-pulse">💝</span>
-        </Link>
-      )}
 
       {/* HERO SECTION */}
       <section className="relative w-full h-[60vh] md:h-[70vh] overflow-hidden">
@@ -192,42 +116,72 @@ export default function Hero() {
         </div>
       </section>
 
-      {/* T20 ACTIVITY SELECTOR */}
-      <section className="bg-black py-8 px-4">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-2xl md:text-3xl font-bold text-white mb-2">What Are You Doing?</h2>
-          <p className="text-[#C8A882] mb-6">T20 — Top {isMobile ? '5' : '20'} Activities Listeners Stream To Most</p>
-          
-          <div className="flex flex-wrap gap-3 justify-center">
-            {displayT20.map((act) => (
-              <button
-                key={act.id}
-                onClick={() => {
-                  setActiveActivity(act.id);
-                  handleActivityClick(act.id);
-                }}
-                className={`flex flex-col items-center justify-center min-w-[48px] min-h-[48px] p-2 rounded-lg transition-all duration-200 hover:scale-110 active:scale-95 ${
-                  activeActivity === act.id ? 'scale-105 bg-[#C8A882]/10' : ''
-                } ${
-                  loadingActivity === act.id ? 'animate-pulse' : ''
-                }`}
-                title={act.description}
-                aria-label={`${act.label} - ${act.description}`}
-              >
-                <span className="text-2xl">{act.emoji}</span>
-                <span className="text-xs text-white/70 mt-1">{act.label}</span>
-              </button>
-            ))}
+      {/* KLEIGH-BRANDED FLOATING PLAYER — 3 Congruent PIX */}
+      <section className="bg-black py-10 px-4">
+        <div className="max-w-4xl mx-auto">
+          {/* FP Visual Core */}
+          <div className="relative w-full aspect-[16/9] md:aspect-[21/9] rounded-2xl overflow-hidden shadow-2xl border border-white/10 bg-neutral-900">
+            <Image
+              key={fpPix.src}
+              src={fpPix.src}
+              alt={fpPix.alt}
+              fill
+              className={`object-cover transition-opacity duration-500 ${fpFading ? 'opacity-0' : 'opacity-100'}`}
+              sizes="(max-width: 768px) 100vw, 896px"
+            />
+            {/* KLEIGH brand overlay */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/30" />
+            <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8">
+              <p className="text-xs md:text-sm tracking-[0.3em] uppercase text-pink-300/80 font-bold mb-1">Now Streaming</p>
+              <h2 className="text-2xl md:text-4xl font-black text-white drop-shadow-lg">KLEIGH</h2>
+              <p className="text-white/60 text-sm mt-1">Songwriter / Singer / Musician</p>
+            </div>
+            {/* PIX indicator dots */}
+            <div className="absolute top-4 right-4 flex gap-1.5">
+              {KLEIGH_FP_PIX.map((_, i) => (
+                <div
+                  key={i}
+                  className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                    i === fpIndex ? 'bg-pink-400 scale-125' : 'bg-white/30'
+                  }`}
+                />
+              ))}
+            </div>
           </div>
 
-          {activeAct && (
-            <div className="mt-6 text-center">
-              <h3 className="text-xl text-white">{activeAct.label} — {activeAct.description}</h3>
-              <p className="text-white/60 mt-1">Streaming tracks matched to: <span className="text-[#C8A882]">{activeAct.mood}</span> vibe</p>
-            </div>
-          )}
+          {/* Stream CTA */}
+          <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-4">
+            <Link
+              href="/kleigh"
+              className="px-8 py-3 bg-gradient-to-r from-pink-600 to-purple-600 text-white font-bold text-sm tracking-wider rounded-full hover:brightness-110 transition shadow-lg"
+            >
+              STREAM KLEIGH
+            </Link>
+            <Link
+              href="/kupid"
+              className="px-8 py-3 border border-[#C8A882]/40 text-[#C8A882] font-bold text-sm tracking-wider rounded-full hover:bg-[#C8A882]/10 transition"
+            >
+              KUPID Locket\u2122
+            </Link>
+          </div>
 
-          <p className="text-center text-white/40 text-sm mt-6">1,000+ GPMC Catalog Tracks · T20 Activity Boxes · 2+ Hours No Repeats</p>
+          {/* Platform stats */}
+          <p className="text-center text-white/30 text-xs mt-6 tracking-wide">
+            1,000+ GPMC Catalog Tracks \u00b7 Continuous FP Streaming \u00b7 2+ Hours No Repeats
+          </p>
+        </div>
+      </section>
+
+      {/* SINGLE FOOTER LINK: All T20 Activities */}
+      <section className="bg-neutral-950 py-6 px-4 border-t border-white/5">
+        <div className="max-w-4xl mx-auto text-center">
+          <Link
+            href="/heroes"
+            className="inline-flex items-center gap-2 text-[#C8A882] hover:text-white text-sm font-medium tracking-wide transition-colors"
+          >
+            <span className="text-lg">\ud83c\udfa7</span>
+            Explore All 20 Activity Streams \u2192
+          </Link>
         </div>
       </section>
 
