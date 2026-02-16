@@ -12,6 +12,7 @@ export interface KupidTier {
   color: string;
   borderColor: string;
   badge: string;
+    buttonClass: string;
   featured?: boolean;
 }
 
@@ -31,6 +32,7 @@ export const KUPID_TIERS: KupidTier[] = [
     color: 'from-amber-600 to-yellow-500',
     borderColor: 'border-amber-500/40',
     badge: 'GENESIS',
+        buttonClass: 'bg-gradient-to-r from-amber-600 to-yellow-500 text-black hover:opacity-90',
   },
   {
     id: 'sovereign',
@@ -49,6 +51,7 @@ export const KUPID_TIERS: KupidTier[] = [
     borderColor: 'border-orange-400/40',
     badge: 'SOVEREIGN',
     featured: true,
+        buttonClass: 'bg-gradient-to-r from-amber-400 to-orange-500 text-black hover:opacity-90',
   },
   {
     id: 'historic',
@@ -68,6 +71,7 @@ export const KUPID_TIERS: KupidTier[] = [
     color: 'from-yellow-300 to-amber-400',
     borderColor: 'border-yellow-400/40',
     badge: 'HISTORIC',
+        buttonClass: 'bg-gradient-to-r from-yellow-400 to-amber-500 text-black hover:from-yellow-300 hover:to-amber-400 shadow-lg shadow-yellow-500/20',
   },
 ];
 
