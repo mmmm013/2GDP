@@ -12,6 +12,10 @@ import FPPixBar from '@/components/FPPixBar';
 export const metadata: Metadata = {
   title: 'G Putnam Music',
   description: 'Dream The Stream',
+    icons: {
+    icon: '/gpm_logo.jpg',
+    apple: '/gpm_logo.jpg',
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
