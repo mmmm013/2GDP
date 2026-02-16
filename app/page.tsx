@@ -161,13 +161,13 @@ export default function Hero() {
               href="/kupid"
               className="px-8 py-3 border border-[#C8A882]/40 text-[#C8A882] font-bold text-sm tracking-wider rounded-full hover:bg-[#C8A882]/10 transition"
             >
-              KUPID Locket\u2122
+              KUPID Locket™
             </Link>
           </div>
 
           {/* Platform stats */}
           <p className="text-center text-white/30 text-xs mt-6 tracking-wide">
-            1,000+ GPMC Catalog Tracks \u00b7 Continuous FP Streaming \u00b7 2+ Hours No Repeats
+            1,000+ GPMC Catalog Tracks · Continuous FP Streaming · 2+ Hours No Repeats
           </p>
         </div>
       </section>
@@ -179,8 +179,8 @@ export default function Hero() {
             href="/heroes"
             className="inline-flex items-center gap-2 text-[#C8A882] hover:text-white text-sm font-medium tracking-wide transition-colors"
           >
-            <span className="text-lg">\ud83c\udfa7</span>
-            Explore All 20 Activity Streams \u2192
+            <span className="text-lg">🎧</span>
+            Explore All 20 Activity Streams →
           </Link>
         </div>
       </section>
