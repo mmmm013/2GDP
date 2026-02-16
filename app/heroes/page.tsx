@@ -2,8 +2,7 @@
 import { useState } from 'react';
 import { Heart, Shield, CheckCircle, Lock, Zap, ArrowRight } from 'lucide-react';
 import Header from '@/components/Header';
-import Footer from '@/components/Footer'; 
-import GlobalPlayer from '@/components/GlobalPlayer';
+import Footer from '@/components/Footer';
 
 export default function HeroesPage() {
   const [step, setStep] = useState<'intro' | 'verifying' | 'approved'>('intro');
@@ -26,7 +25,6 @@ export default function HeroesPage() {
   return (
     <main className="min-h-screen bg-[#3E2723] text-[#f5e6c8] font-sans">
       <Header />
-      <GlobalPlayer />
 
       {/* DEDICATION & TRIBUTE SECTION */}
       <section className="relative pt-24 pb-16 text-center bg-[#2a1f0f] border-b border-[#C8A882]/10">
@@ -144,10 +142,10 @@ export default function HeroesPage() {
                   </p>
 
                   <a
-                    href="/stream"
+                    href="/gift"
                     className="block w-full bg-[#C8A882] text-[#3E2723] text-center font-black py-4 rounded-xl hover:scale-[1.02] transition uppercase tracking-widest"
                   >
-                    Enter Heroes Stream <ArrowRight className="inline ml-2" size={18} />
+                    Support the Mission <ArrowRight className="inline ml-2" size={18} />
                   </a>
                 </div>
               )}
