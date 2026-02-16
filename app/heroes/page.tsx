@@ -1,4 +1,4 @@
-LB=Legsal & Business'use client';
+'use client';
 import { useState, useEffect } from 'react';
 import { Heart, Shield, CheckCircle, Star, Video, Award, Lock, Radio } from 'lucide-react';
 import Header from '@/components/Header';
