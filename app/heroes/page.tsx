@@ -121,6 +121,61 @@ export default function HeroesPage() {
         </div>
       </section>
 
+                {/* FREE+ K-KND MONTHLY GIFTS */}
+          <section className="py-16 bg-gradient-to-b from-[#1a0f0a] to-[#2a1f0f] text-center border-t border-[#C8A882]/10">
+            <div className="container mx-auto px-4 max-w-3xl">
+              <div className="inline-flex items-center gap-2 bg-[#3E2723] border border-[#C8A882]/30 px-4 py-1 rounded-full mb-6">
+                <Radio size={14} className="text-[#C8A882]" />
+                <span className="text-xs font-black text-[#C8A882] tracking-[0.2em] uppercase">Monthly K-KND</span>
+              </div>
+
+              <h2 className="text-3xl md:text-4xl font-black text-[#FFD96A] mb-2 tracking-tight">FREE+</h2>
+              <p className="text-lg text-[#f5e6c8]/80 mb-2">Monthly Kindness Gifts for Every Hero.</p>
+              <p className="text-sm text-[#f5e6c8]/50 mb-10">No tricks. No corporate games. Just love from the studio to you.</p>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                <div className="bg-[#3E2723] rounded-xl p-6 border border-[#C8A882]/10">
+                  <Heart size={28} className="text-[#E91E63] mx-auto mb-3" />
+                  <p className="text-sm text-[#f5e6c8] font-black uppercase mb-1">3 Love Taps</p>
+                  <p className="text-xs text-[#f5e6c8]/50">Monthly encouragement pings from the GPM crew.</p>
+                </div>
+                <div className="bg-[#3E2723] rounded-xl p-6 border border-[#C8A882]/10">
+                  <Star size={28} className="text-[#FFD96A] mx-auto mb-3" />
+                  <p className="text-sm text-[#f5e6c8] font-black uppercase mb-1">1 Free KUT</p>
+                  <p className="text-xs text-[#f5e6c8]/50">A complimentary K-KUT drop from the vault each month.</p>
+                </div>
+                <div className="bg-[#3E2723] rounded-xl p-6 border border-[#C8A882]/10">
+                  <Award size={28} className="text-[#C8A882] mx-auto mb-3" />
+                  <p className="text-sm text-[#f5e6c8] font-black uppercase mb-1">K-KND Drops</p>
+                  <p className="text-xs text-[#f5e6c8]/50">Exclusive sketches, stems, and memos from Greg.</p>
+                </div>
+              </div>
+
+              <p className="text-xs text-[#f5e6c8]/30">Resets the 1st of every month. Verified Heroes only. MIP1 = Most Important Person/Partner.</p>
+            </div>
+          </section>
+
+          {/* FACE A MIRROR - OWNER MANIFESTO */}
+          <section className="py-16 bg-[#2a1f0f] text-center border-t border-[#C8A882]/10">
+            <div className="container mx-auto px-4 max-w-2xl">
+              <h2 className="text-2xl md:text-3xl font-black text-[#f5e6c8] mb-6 tracking-tight">FACE A MIRROR.</h2>
+              <div className="space-y-4 text-sm text-[#f5e6c8]/70 leading-relaxed text-left">
+                <p>I designed every piece of this app. No corp mandates, no constraints, no phone-game antics. Just me and folk all over this gorgeous globe.</p>
+                <p>We are hand-to-mouth as any. Large parts of income go directly to <span className="text-[#C8A882] font-bold">studio</span> and <span className="text-[#E91E63] font-bold">medical</span>. That is real.</p>
+                <p className="text-[#f5e6c8]/50 italic">Change for ALL starts within change for ONE.</p>
+              </div>
+              <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="/gift" className="inline-flex items-center gap-2 bg-[#3E2723] border border-[#C8A882]/30 text-[#C8A882] font-black text-xs uppercase tracking-widest px-6 py-3 rounded-full hover:bg-[#C8A882]/10 transition">
+                  <Heart size={14} /> Sponsor Us
+                </a>
+                <a href="/gift" className="inline-flex items-center gap-2 bg-[#3E2723] border border-[#C8A882]/30 text-[#C8A882] font-black text-xs uppercase tracking-widest px-6 py-3 rounded-full hover:bg-[#C8A882]/10 transition">
+                  <Star size={14} /> Leave a Tip
+                </a>
+              </div>
+              <p className="text-[10px] text-[#f5e6c8]/25 mt-6">100% Greg-designed. 100% independent. G Putnam Music LLC.</p>
+            </div>
+          </section>
+
       {/* SECURITY FORM SECTION */}
       <div className="container mx-auto px-4 py-20 relative z-20">
         <div className="max-w-2xl mx-auto bg-white border-4 border-[#3E2723] rounded-3xl p-1 shadow-[12px_12px_0px_0px_rgba(62,39,35,0.15)]">
