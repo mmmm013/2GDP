@@ -47,12 +47,12 @@ export default function HeroesPage() {
               He first enlisted in the Navy, then transferred to the Marines. Like many, he carried the weight of silence. We honor that silence with music—a place to heal, reflect, and feel.
           </p>
           
-          <div className="h-1 w-24 bg-[#3E2723] mx-auto rounded-full opacity-20"></div>
+          <div className="h-1 w-24 bg-[#5D4037] mx-auto rounded-full opacity-20"></div>
         </div>
       </section>
 
                 {/* MILITARY MIP1 - PRIORITY ACCESS */}
-              <section className="py-12 bg-[#2a1f0f] text-center relative overflow-hidden">
+                      <section className="py-12 bg-[#4E3524] text-center relative overflow-hidden">
                                     {/* LEFT: ICU/Medical Scene Watermark */}
           <div className="absolute left-0 bottom-0 top-0 w-1/2 pointer-events-none select-none opacity-[0.07]" aria-hidden="true">
             <svg viewBox="0 0 400 400" className="absolute bottom-0 left-4 h-[80%] w-auto" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -117,7 +117,7 @@ export default function HeroesPage() {
             </svg>
           </div>
         <div className="container mx-auto px-4 max-w-3xl">
-          <div className="inline-flex items-center gap-2 bg-[#3E2723] border border-[#C8A882]/30 px-4 py-1 rounded-full mb-6">
+          <div className="inline-flex items-center gap-2 bg-[#5D4037] border border-[#C8A882]/30 px-4 py-1 rounded-full mb-6">
             <Zap size={14} className="text-[#C8A882]" />
             <span className="text-xs font-black text-[#C8A882] tracking-[0.2em] uppercase">MIP1 Priority Access</span>
           </div>
@@ -126,19 +126,19 @@ export default function HeroesPage() {
                       <p className="text-sm text-[#f5e6c8]/60 mb-8">MIP1 designation grants priority free streaming access. Validate with your military email or service credentials.</p>
           
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-5">
-              <div className="bg-[#3E2723] rounded-lg p-4 border border-[#C8A882]/10">
+              <div className="bg-[#5D4037] rounded-lg p-4 border border-[#C8A882]/10">
                 <Shield size={24} className="text-[#C8A882] mx-auto mb-2" />
                             <p className="text-xs text-[#f5e6c8]/70 font-bold uppercase">Active Duty</p>
             </div>
-            <div className="bg-[#3E2723] rounded-lg p-4 border border-[#C8A882]/10">
+            <div className="bg-[#5D4037] rounded-lg p-4 border border-[#C8A882]/10">
               <Shield size={24} className="text-[#C8A882] mx-auto mb-2" />
                             <p className="text-xs text-[#f5e6c8]/70 font-bold uppercase">Veterans</p>
             </div>
-            <div className="bg-[#3E2723] rounded-lg p-4 border border-[#C8A882]/10">
+            <div className="bg-[#5D4037] rounded-lg p-4 border border-[#C8A882]/10">
               <Shield size={24} className="text-[#C8A882] mx-auto mb-2" />
                             <p className="text-xs text-[#f5e6c8]/70 font-bold uppercase">Reserves</p>
             </div>
-            <div className="bg-[#3E2723] rounded-lg p-4 border border-[#C8A882]/10">
+            <div className="bg-[#5D4037] rounded-lg p-4 border border-[#C8A882]/10">
               <Shield size={24} className="text-[#C8A882] mx-auto mb-2" />
                             <p className="text-xs text-[#f5e6c8]/70 font-bold uppercase">Allied Forces</p>
             </div>
@@ -150,7 +150,7 @@ export default function HeroesPage() {
 
       
       {/* US MILITARY MIP2 - PRIORITY ACCESS */}
-              <section className="py-12 bg-[#1a0f0a] text-center border-t border-[#C8A882]/10 relative overflow-hidden">
+              <section className="py-12 bg-[#3D2B1F] text-center border-t border-[#C8A882]/10 relative overflow-hidden">
                                     {/* LEFT: ICU Emergency Scene Watermark */}
           <div className="absolute left-0 bottom-0 top-0 w-1/2 pointer-events-none select-none opacity-[0.06]" aria-hidden="true">
             <svg viewBox="0 0 400 400" className="absolute bottom-0 left-4 h-[80%] w-auto" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -215,7 +215,7 @@ export default function HeroesPage() {
             </svg>
           </div>
         <div className="container mx-auto px-4 max-w-3xl">
-          <div className="inline-flex items-center gap-2 bg-[#3E2723] border border-[#C8A882]/30 px-4 py-1 rounded-full mb-6">
+          <div className="inline-flex items-center gap-2 bg-[#5D4037] border border-[#C8A882]/30 px-4 py-1 rounded-full mb-6">
             <Heart size={14} className="text-[#E91E63]" />
             <span className="text-xs font-black text-[#C8A882] tracking-[0.2em] uppercase">MIP1 Priority Access</span>
           </div>
@@ -225,19 +225,19 @@ export default function HeroesPage() {
           <p className="text-sm text-[#f5e6c8]/60 mb-8">MIP1 designation grants priority free streaming access. Validate with your hospital or medical facility email.</p>
           
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-            <div className="bg-[#3E2723] rounded-lg p-4 border border-[#E91E63]/20">
+            <div className="bg-[#5D4037] rounded-lg p-4 border border-[#E91E63]/20">
               <Heart size={24} className="text-[#E91E63] mx-auto mb-2" />
               <p className="text-xs text-[#f5e6c8]/70 font-bold uppercase">ICU Nurses</p>
             </div>
-            <div className="bg-[#3E2723] rounded-lg p-4 border border-[#E91E63]/20">
+            <div className="bg-[#5D4037] rounded-lg p-4 border border-[#E91E63]/20">
               <Heart size={24} className="text-[#E91E63] mx-auto mb-2" />
               <p className="text-xs text-[#f5e6c8]/70 font-bold uppercase">ER Doctors</p>
             </div>
-            <div className="bg-[#3E2723] rounded-lg p-4 border border-[#E91E63]/20">
+            <div className="bg-[#5D4037] rounded-lg p-4 border border-[#E91E63]/20">
               <Heart size={24} className="text-[#E91E63] mx-auto mb-2" />
               <p className="text-xs text-[#f5e6c8]/70 font-bold uppercase">Trauma Staff</p>
             </div>
-            <div className="bg-[#3E2723] rounded-lg p-4 border border-[#E91E63]/20">
+            <div className="bg-[#5D4037] rounded-lg p-4 border border-[#E91E63]/20">
               <Heart size={24} className="text-[#E91E63] mx-auto mb-2" />
               <p className="text-xs text-[#f5e6c8]/70 font-bold uppercase">CCU Teams</p>
             </div>
@@ -248,7 +248,7 @@ export default function HeroesPage() {
       </section>
 
           {/* FACE A MIRROR - OWNER MANIFESTO */}
-          <section className="py-16 bg-[#2a1f0f] text-center border-t border-[#C8A882]/10">
+          <section className="py-16 bg-[#4E3524] text-center border-t border-[#C8A882]/10">
             <div className="container mx-auto px-4 max-w-2xl">
               <h2 className="text-2xl md:text-3xl font-black text-[#f5e6c8] mb-6 tracking-tight">FACE A MIRROR.</h2>
               <div className="space-y-4 text-sm text-[#f5e6c8]/70 leading-relaxed text-left">
@@ -257,10 +257,10 @@ export default function HeroesPage() {
                 <p className="text-[#f5e6c8]/50 italic">Change for ALL starts within change for ONE.</p>
               </div>
               <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
-                <a href="/gift" className="inline-flex items-center gap-2 bg-[#3E2723] border border-[#C8A882]/30 text-[#C8A882] font-black text-xs uppercase tracking-widest px-6 py-3 rounded-full hover:bg-[#C8A882]/10 transition">
+                <a href="/gift" className="inline-flex items-center gap-2 bg-[#5D4037] border border-[#C8A882]/30 text-[#C8A882] font-black text-xs uppercase tracking-widest px-6 py-3 rounded-full hover:bg-[#C8A882]/10 transition">
                   <Heart size={14} /> Sponsor Us
                 </a>
-                <a href="/gift" className="inline-flex items-center gap-2 bg-[#3E2723] border border-[#C8A882]/30 text-[#C8A882] font-black text-xs uppercase tracking-widest px-6 py-3 rounded-full hover:bg-[#C8A882]/10 transition">
+                <a href="/gift" className="inline-flex items-center gap-2 bg-[#5D4037] border border-[#C8A882]/30 text-[#C8A882] font-black text-xs uppercase tracking-widest px-6 py-3 rounded-full hover:bg-[#C8A882]/10 transition">
                   <Star size={14} /> Leave a Tip
                 </a>
               </div>
@@ -314,7 +314,7 @@ export default function HeroesPage() {
 
                 <button
                   type="submit"
-                  className="w-full bg-[#3E2723] text-[#FFD95A] font-black uppercase tracking-widest py-4 rounded-xl hover:scale-[1.02] transition shadow-lg flex items-center justify-center gap-2"
+                  className="w-full bg-[#5D4037] text-[#FFD95A] font-black uppercase tracking-widest py-4 rounded-xl hover:scale-[1.02] transition shadow-lg flex items-center justify-center gap-2"
                 >
                   <Shield size={18} /> Initiate Security Check
                 </button>
@@ -332,9 +332,9 @@ export default function HeroesPage() {
                 <p className="text-xs text-[#E65100] font-mono mt-2 font-bold">
                   Checking Encryption: {scanProgress > 100 ? 100 : scanProgress}%
                 </p>
-                <div className="w-full h-2 bg-[#3E2723]/10 rounded-full mt-6 overflow-hidden">
+                <div className="w-full h-2 bg-[#5D4037]/10 rounded-full mt-6 overflow-hidden">
                   <div
-                    className="h-full bg-[#3E2723] transition-all duration-200"
+                    className="h-full bg-[#5D4037] transition-all duration-200"
                     style={{ width: `${scanProgress}%` }}
                   ></div>
                 </div>
@@ -403,7 +403,7 @@ export default function HeroesPage() {
 
                 <a
                   href="/uru"
-                  className="block w-full bg-[#3E2723] text-[#FFD95A] text-center font-black py-4 rounded-xl hover:scale-[1.02] transition uppercase tracking-widest shadow-lg"
+                  className="block w-full bg-[#5D4037] text-[#FFD95A] text-center font-black py-4 rounded-xl hover:scale-[1.02] transition uppercase tracking-widest shadow-lg"
                 >
                   Access The Music (URU Portal)
                 </a>
