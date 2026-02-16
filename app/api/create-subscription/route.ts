@@ -8,9 +8,9 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 // Pride tier pricing (cents/month)
 const TIER_AMOUNTS: Record<string, number> = {
   joey: 500,
-  climber: 1000,
+  climber: 1500,
   alpha: 2500,
-  elder: 10000,
+  elder: 2000,
 };
 
 const TIER_LABELS: Record<string, string> = {
