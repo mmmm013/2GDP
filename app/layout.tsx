@@ -2,13 +2,6 @@ import './globals.css';
 import type { Metadata, Viewport } from 'next';
 import { Analytics } from '@vercel/analytics/react';
 import FPPixBar from '@/components/FPPixBar';
-import MobileGate from '@/components/MobileGate';
-
-/**
- * DESKTOP-ONLY GATE ACTIVE
- * Mobile users see branded message to visit on desktop.
- * Remove MobileGate wrapper when mobile is ready.
- */
 
 export const metadata: Metadata = {
   title: 'G Putnam Music',
@@ -47,12 +40,10 @@ export default function RootLayout({
         className="bg-[#1a1207] text-[#F5e6c8] antialiased min-h-screen overflow-x-hidden"
         style={{ backgroundColor: '#1a1207', color: '#F5e6c8' }}
       >
-        <MobileGate>
-          <main className="relative w-full">
-            {children}
-          </main>
-          <FPPixBar />
-        </MobileGate>
+        <main className="relative w-full">
+          {children}
+        </main>
+        <FPPixBar />
         <Analytics />
       </body>
     </html>
