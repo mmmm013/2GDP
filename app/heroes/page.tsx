@@ -59,7 +59,7 @@ export default function HeroesPage() {
             <span className="text-xs font-black text-[#C8A882] tracking-[0.2em] uppercase">MIP1 Priority Access</span>
           </div>
           
-          <h2 className="text-3xl md:text-4xl font-black text-[#FFD95A] mb-4 tracking-tight"US MILITARY - FREE!/h2>
+          <h2 className="text-3xl md:text-4xl font-black text-[#FFD95A] mb-4 tracking-tight"USICU NURSES & DOCTORS MILITARY - FREE
           <p className="text-lg text-[#f5e6c8]/80 mb-2">Active Duty. Veterans. Reserves. Guard.</p>
           <p className="text-sm text-[#f5e6c8]/60 mb-8">MIP1 designation grants priority free streaming access. Validate with your .mil email or DD-214.</p>
           
@@ -86,7 +86,8 @@ export default function HeroesPage() {
         </div>
       </section>
 
-      {/* ICU NURSES & DOCTORS MIP1 - PRIORITY ACCESS */}
+      {/* 62
+      NURSES & DOCTORS MIP1 - PRIORITY ACCESS */}
       <section className="py-12 bg-[#1a0f0a] text-center border-t border-[#C8A882]/10">
         <div className="container mx-auto px-4 max-w-3xl">
           <div className="inline-flex items-center gap-2 bg-[#3E2723] border border-[#C8A882]/30 px-4 py-1 rounded-full mb-6">
