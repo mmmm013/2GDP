@@ -53,10 +53,68 @@ export default function HeroesPage() {
 
                 {/* MILITARY MIP1 - PRIORITY ACCESS */}
               <section className="py-12 bg-[#2a1f0f] text-center relative overflow-hidden">
-                          <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none overflow-hidden" aria-hidden="true">
-            <div className="text-[#C8A882]/[0.04] text-[10rem] font-black tracking-widest rotate-[-12deg] whitespace-nowrap leading-none">
-              ★ MILITARY ★
-            </div>
+                                    {/* LEFT: ICU/Medical Scene Watermark */}
+          <div className="absolute left-0 bottom-0 top-0 w-1/2 pointer-events-none select-none opacity-[0.07]" aria-hidden="true">
+            <svg viewBox="0 0 400 400" className="absolute bottom-0 left-4 h-[80%] w-auto" fill="none" xmlns="http://www.w3.org/2000/svg">
+              {/* Medical cross */}
+              <rect x="170" y="80" width="60" height="180" rx="4" fill="#C8A882" />
+              <rect x="110" y="140" width="180" height="60" rx="4" fill="#C8A882" />
+              {/* Heart monitor line */}
+              <polyline points="40,300 80,300 100,260 120,340 140,280 160,310 200,300 240,300" stroke="#C8A882" strokeWidth="4" fill="none" />
+              {/* Doctor figure left */}
+              <circle cx="80" cy="100" r="18" fill="#C8A882" />
+              <rect x="65" y="120" width="30" height="50" rx="6" fill="#C8A882" />
+              <line x1="65" y1="170" x2="55" y2="210" stroke="#C8A882" strokeWidth="6" strokeLinecap="round" />
+              <line x1="95" y1="170" x2="105" y2="210" stroke="#C8A882" strokeWidth="6" strokeLinecap="round" />
+              {/* Nurse figure right */}
+              <circle cx="320" cy="110" r="16" fill="#C8A882" />
+              <rect x="307" y="128" width="26" height="45" rx="5" fill="#C8A882" />
+              <line x1="307" y1="173" x2="297" y2="210" stroke="#C8A882" strokeWidth="5" strokeLinecap="round" />
+              <line x1="333" y1="173" x2="343" y2="210" stroke="#C8A882" strokeWidth="5" strokeLinecap="round" />
+              {/* IV drip stand */}
+              <line x1="320" y1="50" x2="320" y2="130" stroke="#C8A882" strokeWidth="3" />
+              <rect x="310" y="45" width="20" height="25" rx="3" fill="#C8A882" />
+              <line x1="300" y1="50" x2="340" y2="50" stroke="#C8A882" strokeWidth="3" />
+            </svg>
+          </div>
+          {/* RIGHT: Iwo Jima Flag-Raising Watermark */}
+          <div className="absolute right-0 bottom-0 top-0 w-1/2 pointer-events-none select-none opacity-[0.07]" aria-hidden="true">
+            <svg viewBox="0 0 400 500" className="absolute bottom-0 right-4 h-[85%] w-auto" fill="none" xmlns="http://www.w3.org/2000/svg">
+              {/* Flag pole - angled like the famous photo */}
+              <line x1="280" y1="40" x2="120" y2="420" stroke="#C8A882" strokeWidth="6" strokeLinecap="round" />
+              {/* Flag waving from top of pole */}
+              <path d="M280,40 L380,55 L370,90 L280,75 Z" fill="#C8A882" />
+              <path d="M280,75 L370,90 L365,120 L280,108 Z" fill="#C8A882" opacity="0.7" />
+              {/* Soldier 1 - front, arms up on pole */}
+              <circle cx="160" cy="280" r="14" fill="#C8A882" />
+              <rect x="150" y="296" width="20" height="40" rx="4" fill="#C8A882" />
+              <line x1="170" y1="300" x2="190" y2="260" stroke="#C8A882" strokeWidth="5" strokeLinecap="round" />
+              <line x1="150" y1="310" x2="140" y2="280" stroke="#C8A882" strokeWidth="5" strokeLinecap="round" />
+              <line x1="155" y1="336" x2="145" y2="380" stroke="#C8A882" strokeWidth="5" strokeLinecap="round" />
+              <line x1="165" y1="336" x2="175" y2="380" stroke="#C8A882" strokeWidth="5" strokeLinecap="round" />
+              {/* Soldier 2 - behind, pushing */}
+              <circle cx="200" cy="300" r="13" fill="#C8A882" />
+              <rect x="191" y="315" width="18" height="38" rx="4" fill="#C8A882" />
+              <line x1="209" y1="320" x2="220" y2="285" stroke="#C8A882" strokeWidth="5" strokeLinecap="round" />
+              <line x1="191" y1="325" x2="180" y2="300" stroke="#C8A882" strokeWidth="5" strokeLinecap="round" />
+              <line x1="195" y1="353" x2="185" y2="395" stroke="#C8A882" strokeWidth="5" strokeLinecap="round" />
+              <line x1="205" y1="353" x2="215" y2="395" stroke="#C8A882" strokeWidth="5" strokeLinecap="round" />
+              {/* Soldier 3 - reaching up */}
+              <circle cx="135" cy="310" r="12" fill="#C8A882" />
+              <rect x="127" y="324" width="16" height="36" rx="4" fill="#C8A882" />
+              <line x1="143" y1="328" x2="155" y2="295" stroke="#C8A882" strokeWidth="4" strokeLinecap="round" />
+              <line x1="127" y1="334" x2="115" y2="310" stroke="#C8A882" strokeWidth="4" strokeLinecap="round" />
+              <line x1="131" y1="360" x2="122" y2="400" stroke="#C8A882" strokeWidth="4" strokeLinecap="round" />
+              <line x1="139" y1="360" x2="148" y2="400" stroke="#C8A882" strokeWidth="4" strokeLinecap="round" />
+              {/* Soldier 4 - crouching support */}
+              <circle cx="230" cy="330" r="11" fill="#C8A882" />
+              <rect x="223" y="343" width="14" height="32" rx="3" fill="#C8A882" />
+              <line x1="237" y1="348" x2="245" y2="320" stroke="#C8A882" strokeWidth="4" strokeLinecap="round" />
+              <line x1="227" y1="375" x2="218" y2="410" stroke="#C8A882" strokeWidth="4" strokeLinecap="round" />
+              <line x1="233" y1="375" x2="242" y2="410" stroke="#C8A882" strokeWidth="4" strokeLinecap="round" />
+              {/* Rocky ground */}
+              <path d="M80,420 Q120,400 160,415 Q200,425 240,410 Q280,420 320,415 L320,450 L80,450 Z" fill="#C8A882" opacity="0.4" />
+            </svg>
           </div>
         <div className="container mx-auto px-4 max-w-3xl">
           <div className="inline-flex items-center gap-2 bg-[#3E2723] border border-[#C8A882]/30 px-4 py-1 rounded-full mb-6">
@@ -93,10 +151,68 @@ export default function HeroesPage() {
       
       {/* US MILITARY MIP2 - PRIORITY ACCESS */}
               <section className="py-12 bg-[#1a0f0a] text-center border-t border-[#C8A882]/10 relative overflow-hidden">
-                          <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none overflow-hidden" aria-hidden="true">
-            <div className="text-[#E91E63]/[0.03] text-[8rem] font-black tracking-widest rotate-[-12deg] whitespace-nowrap leading-none">
-              ⚕ ICU ANGELS ⚕
-            </div>
+                                    {/* LEFT: ICU Emergency Scene Watermark */}
+          <div className="absolute left-0 bottom-0 top-0 w-1/2 pointer-events-none select-none opacity-[0.06]" aria-hidden="true">
+            <svg viewBox="0 0 400 400" className="absolute bottom-0 left-4 h-[80%] w-auto" fill="none" xmlns="http://www.w3.org/2000/svg">
+              {/* Medical cross */}
+              <rect x="170" y="80" width="60" height="180" rx="4" fill="#E91E63" />
+              <rect x="110" y="140" width="180" height="60" rx="4" fill="#E91E63" />
+              {/* Heart monitor line */}
+              <polyline points="40,300 80,300 100,260 120,340 140,280 160,310 200,300 240,300" stroke="#E91E63" strokeWidth="4" fill="none" />
+              {/* Doctor figure */}
+              <circle cx="80" cy="100" r="18" fill="#E91E63" />
+              <rect x="65" y="120" width="30" height="50" rx="6" fill="#E91E63" />
+              <line x1="65" y1="170" x2="55" y2="210" stroke="#E91E63" strokeWidth="6" strokeLinecap="round" />
+              <line x1="95" y1="170" x2="105" y2="210" stroke="#E91E63" strokeWidth="6" strokeLinecap="round" />
+              {/* Nurse figure */}
+              <circle cx="320" cy="110" r="16" fill="#E91E63" />
+              <rect x="307" y="128" width="26" height="45" rx="5" fill="#E91E63" />
+              <line x1="307" y1="173" x2="297" y2="210" stroke="#E91E63" strokeWidth="5" strokeLinecap="round" />
+              <line x1="333" y1="173" x2="343" y2="210" stroke="#E91E63" strokeWidth="5" strokeLinecap="round" />
+              {/* IV drip stand */}
+              <line x1="320" y1="50" x2="320" y2="130" stroke="#E91E63" strokeWidth="3" />
+              <rect x="310" y="45" width="20" height="25" rx="3" fill="#E91E63" />
+              <line x1="300" y1="50" x2="340" y2="50" stroke="#E91E63" strokeWidth="3" />
+            </svg>
+          </div>
+          {/* RIGHT: Iwo Jima Flag-Raising Watermark */}
+          <div className="absolute right-0 bottom-0 top-0 w-1/2 pointer-events-none select-none opacity-[0.06]" aria-hidden="true">
+            <svg viewBox="0 0 400 500" className="absolute bottom-0 right-4 h-[85%] w-auto" fill="none" xmlns="http://www.w3.org/2000/svg">
+              {/* Flag pole - angled */}
+              <line x1="280" y1="40" x2="120" y2="420" stroke="#E91E63" strokeWidth="6" strokeLinecap="round" />
+              {/* Flag waving */}
+              <path d="M280,40 L380,55 L370,90 L280,75 Z" fill="#E91E63" />
+              <path d="M280,75 L370,90 L365,120 L280,108 Z" fill="#E91E63" opacity="0.7" />
+              {/* Soldier 1 */}
+              <circle cx="160" cy="280" r="14" fill="#E91E63" />
+              <rect x="150" y="296" width="20" height="40" rx="4" fill="#E91E63" />
+              <line x1="170" y1="300" x2="190" y2="260" stroke="#E91E63" strokeWidth="5" strokeLinecap="round" />
+              <line x1="150" y1="310" x2="140" y2="280" stroke="#E91E63" strokeWidth="5" strokeLinecap="round" />
+              <line x1="155" y1="336" x2="145" y2="380" stroke="#E91E63" strokeWidth="5" strokeLinecap="round" />
+              <line x1="165" y1="336" x2="175" y2="380" stroke="#E91E63" strokeWidth="5" strokeLinecap="round" />
+              {/* Soldier 2 */}
+              <circle cx="200" cy="300" r="13" fill="#E91E63" />
+              <rect x="191" y="315" width="18" height="38" rx="4" fill="#E91E63" />
+              <line x1="209" y1="320" x2="220" y2="285" stroke="#E91E63" strokeWidth="5" strokeLinecap="round" />
+              <line x1="191" y1="325" x2="180" y2="300" stroke="#E91E63" strokeWidth="5" strokeLinecap="round" />
+              <line x1="195" y1="353" x2="185" y2="395" stroke="#E91E63" strokeWidth="5" strokeLinecap="round" />
+              <line x1="205" y1="353" x2="215" y2="395" stroke="#E91E63" strokeWidth="5" strokeLinecap="round" />
+              {/* Soldier 3 */}
+              <circle cx="135" cy="310" r="12" fill="#E91E63" />
+              <rect x="127" y="324" width="16" height="36" rx="4" fill="#E91E63" />
+              <line x1="143" y1="328" x2="155" y2="295" stroke="#E91E63" strokeWidth="4" strokeLinecap="round" />
+              <line x1="127" y1="334" x2="115" y2="310" stroke="#E91E63" strokeWidth="4" strokeLinecap="round" />
+              <line x1="131" y1="360" x2="122" y2="400" stroke="#E91E63" strokeWidth="4" strokeLinecap="round" />
+              <line x1="139" y1="360" x2="148" y2="400" stroke="#E91E63" strokeWidth="4" strokeLinecap="round" />
+              {/* Soldier 4 */}
+              <circle cx="230" cy="330" r="11" fill="#E91E63" />
+              <rect x="223" y="343" width="14" height="32" rx="3" fill="#E91E63" />
+              <line x1="237" y1="348" x2="245" y2="320" stroke="#E91E63" strokeWidth="4" strokeLinecap="round" />
+              <line x1="227" y1="375" x2="218" y2="410" stroke="#E91E63" strokeWidth="4" strokeLinecap="round" />
+              <line x1="233" y1="375" x2="242" y2="410" stroke="#E91E63" strokeWidth="4" strokeLinecap="round" />
+              {/* Rocky ground */}
+              <path d="M80,420 Q120,400 160,415 Q200,425 240,410 Q280,420 320,415 L320,450 L80,450 Z" fill="#E91E63" opacity="0.4" />
+            </svg>
           </div>
         <div className="container mx-auto px-4 max-w-3xl">
           <div className="inline-flex items-center gap-2 bg-[#3E2723] border border-[#C8A882]/30 px-4 py-1 rounded-full mb-6">
