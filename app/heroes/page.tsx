@@ -63,7 +63,7 @@ export default function HeroesPage() {
           <p className="text-lg text-[#f5e6c8]/80 mb-2">Active Duty. Veterans. Reserves. Guard.</p>
           <p className="text-sm text-[#f5e6c8]/60 mb-8">MIP1 designation grants priority free streaming access. Validate with your .mil email or DD-214.</p>
           
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8&amp;
             <div className="bg-[#3E2723] rounded-lg p-4 border border-[#C8A882]/10">
               <Shield size={24} className="text-[#C8A882] mx-auto mb-2" />
               <p className="text-xs text-[#f5e6c8]/70 font-bold uppercase">Army</p>
@@ -87,7 +87,8 @@ export default function HeroesPage() {
       </section>
 
       {/* 62
-      NURSES & DOCTORS MIP1 - PRIORITY ACCESS */}
+      62
+      MIP1 - PRIORITY ACCESS */}!</h2>
       <section className="py-12 bg-[#1a0f0a] text-center border-t border-[#C8A882]/10">
         <div className="container mx-auto px-4 max-w-3xl">
           <div className="inline-flex items-center gap-2 bg-[#3E2723] border border-[#C8A882]/30 px-4 py-1 rounded-full mb-6">
@@ -95,7 +96,8 @@ export default function HeroesPage() {
             <span className="text-xs font-black text-[#C8A882] tracking-[0.2em] uppercase">MIP1 Priority Access</span>
           </div>
           
-          <h2 className="text-3xl md:text-4xl font-black text-[#FFD95A] mb-4 tracking-tight">ICU NURSES & DOCTORS - FREE!</h2>          <p className="text-lg text-[#f5e6c8]/80 mb-2">Critical Care. Emergency. Trauma. ICU Staff.</p>
+          <h2 className="text-3xl md:text-4xl font-black text-[#FFD95A] mb-4 tracking-tight">ICU 62
+            - FREE!</h2>          <p className="text-lg text-[#f5e6c8]/80 mb-2">Critical Care. Emergency. Trauma. ICU Staff.</p>
           <p className="text-sm text-[#f5e6c8]/60 mb-8">MIP1 designation grants priority free streaming access. Validate with your hospital or medical facility email.</p>
           
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
