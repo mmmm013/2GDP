@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { Heart, Shield, CheckCircle, Star, Video, Award, Lock, Radio } from 'lucide-react';
 import Header from '@/components/Header';
-import Footer from '@/components/Footer';
+import Footer from '@/components/Footer'; 
 import GlobalPlayer from '@/components/GlobalPlayer';
 
 export default function HeroesPage() {
