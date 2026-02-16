@@ -94,7 +94,7 @@ export default function HeroesPage() {
             <span className="text-xs font-black text-[#C8A882] tracking-[0.2em] uppercase">MIP1 Priority Access</span>
           </div>
           
-          <h2 className="text-3xl md:text-4xl font-black text-[#FFD95A] mb-4 tracking-tight">ICU 62
+          <h2 className="text-3xl md:text-4xl font-black text-[#FFD95A] mb-4 tracking-tight">ICU
             - FREE+</h2>          <p className="text-lg text-[#f5e6c8]/80 mb-2">Critical Care. Emergency. Trauma. ICU Staff.</p>
           <p className="text-sm text-[#f5e6c8]/60 mb-8">MIP1 designation grants priority free streaming access. Validate with your hospital or medical facility email.</p>
           
