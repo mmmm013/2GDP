@@ -126,11 +126,7 @@ export default function KupidPage() {
               </ul>
               <a
                 href={tier.stripeLink}
-                className={`w-full py-3 rounded-xl text-center font-bold text-sm transition-all ${
-                  tier.id === 'historic'
-                    ? 'bg-gradient-to-r from-yellow-400 to-amber-500 text-black hover:from-yellow-300 hover:to-amber-400 shadow-lg shadow-yellow-500/20'
-                    : `bg-gradient-to-r ${tier.color} text-black hover:opacity-90`
-                }`}
+                                className={`w-full py-3 rounded-xl text-center font-bold text-sm transition-all ${tier.buttonClass}`}
               >
                 Get {tier.badge} Locket
               </a>
