@@ -1,4 +1,4 @@
-'use client';
+LB=Legsal & Business'use client';
 import { useState, useEffect } from 'react';
 import { Heart, Shield, CheckCircle, Star, Video, Award, Lock, Radio } from 'lucide-react';
 import Header from '@/components/Header';
@@ -59,7 +59,7 @@ export default function HeroesPage() {
             <span className="text-xs font-black text-[#C8A882] tracking-[0.2em] uppercase">MIP1 Priority Access</span>
           </div>
           
-                                            <h2 className="text-3xl md:text-4xl font-black text-[#FFD96A] mb-4 tracking-tight">MILITARY - FREE!</h2>
+                                            <h2 className="text-3xl md:text-4xl font-black text-[#FFD96A] mb-4 tracking-tight">MILITARY - FREE+</h2>
                       <p className="text-sm text-[#f5e6c8]/60 mb-8">MIP1 designation grants priority free streaming access. Validate with your military email or service credentials.</p>
           
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-5">
@@ -95,7 +95,7 @@ export default function HeroesPage() {
           </div>
           
           <h2 className="text-3xl md:text-4xl font-black text-[#FFD95A] mb-4 tracking-tight">ICU 62
-            - FREE!</h2>          <p className="text-lg text-[#f5e6c8]/80 mb-2">Critical Care. Emergency. Trauma. ICU Staff.</p>
+            - FREE+</h2>          <p className="text-lg text-[#f5e6c8]/80 mb-2">Critical Care. Emergency. Trauma. ICU Staff.</p>
           <p className="text-sm text-[#f5e6c8]/60 mb-8">MIP1 designation grants priority free streaming access. Validate with your hospital or medical facility email.</p>
           
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
