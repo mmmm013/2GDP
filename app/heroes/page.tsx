@@ -83,9 +83,9 @@ export default function HeroesPage() {
         </div>
       </section>
 
-      {/* 6
+      
       {/* US MILITARY MIP2 - PRIORITY ACCESS */}
-      <section className="py-12 bg-[#1a0f0a] text-center border-t border-[#C8A882]/10">ion className="py-12 bg-[#1a0f0a] text-center border-t border-[#C8A882]/10">
+      <section className="py-12 bg-[#1a0f0a] text-center border-t border-[#C8A882]/10">
         <div className="container mx-auto px-4 max-w-3xl">
           <div className="inline-flex items-center gap-2 bg-[#3E2723] border border-[#C8A882]/30 px-4 py-1 rounded-full mb-6">
             <Heart size={14} className="text-[#E91E63]" />
