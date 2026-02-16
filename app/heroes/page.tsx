@@ -62,9 +62,7 @@ export default function HeroesPage() {
             <h2 className="text-3xl md:text-4xl font-black text-[#FFD96A] mb-4 tracking-tight">USING NURSES & DOCTORS MILITARY - FREE</h2>          <p className="text-lg text-[#f5e6c8]/80 mb-2">Active Duty. Veterans. Reserves. Guard.</p>
           <p className="text-sm text-[#f5e6c8]/60 mb-8">MIP1 designation grants priority free streaming access. Validate with your .mil email or DD-214.</p>
           
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8&amp;
-            <div className="bg-[#3E2723] rounded-lg p-4 border border-[#C8A882]/10">
-              <Shield size={24} className="text-[#C8A882] mx-auto mb-2" />
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-5">              <Shield size={24} className="text-[#C8A882] mx-auto mb-2" />
               <p className="text-xs text-[#f5e6c8]/70 font-bold uppercase">Army</p>
             </div>
             <div className="bg-[#3E2723] rounded-lg p-4 border border-[#C8A882]/10">
