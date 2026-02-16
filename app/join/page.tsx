@@ -101,7 +101,7 @@ export default function JoinPage() {
                   <div className="font-black text-xl text-[#3E2723]">ALPHA</div><div className="text-xs text-[#3E2723] opacity-60 font-bold uppercase">The Leader</div>
                 </div>
               </div>
-              <div className="text-right"><div className="font-black text-2xl text-[#3E2723]">$25</div><button onClick={() => handleJoin('alpha')} disabled={loading === 'alpha'} className="text-[10px] text-[#3E2723] font-bold underline hover:text-[#2E7D32] cursor-pointer disabled:opacity-50">{loading === 'alpha' ? 'LOADING...' : 'JOIN'}</button></div>
+              <div className="text-right"><div className="font-black text-2xl text-[#3E2723]">$15</div><button onClick={() => handleJoin('alpha')} disabled={loading === 'alpha'} className="text-[10px] text-[#3E2723] font-bold underline hover:text-[#2E7D32] cursor-pointer disabled:opacity-50">{loading === 'alpha' ? 'LOADING...' : 'JOIN'}</button></div>
             </div>
 
             {/* ELDER */}
@@ -112,7 +112,7 @@ export default function JoinPage() {
                   <div className="font-black text-xl text-[#3E2723]">ELDER</div><div className="text-xs text-[#3E2723] font-bold uppercase">The Patriarch</div>
                 </div>
               </div>
-              <div className="text-right"><div className="font-black text-2xl text-[#3E2723]">$100</div><button onClick={() => handleJoin('elder')} disabled={loading === 'elder'} className="text-[10px] text-[#3E2723] font-bold underline hover:text-white cursor-pointer disabled:opacity-50">{loading === 'elder' ? 'LOADING...' : 'JOIN'}</button></div>
+              <div className="text-right"><div className="font-black text-2xl text-[#3E2723]">$20</div><button onClick={() => handleJoin('elder')} disabled={loading === 'elder'} className="text-[10px] text-[#3E2723] font-bold underline hover:text-white cursor-pointer disabled:opacity-50">{loading === 'elder' ? 'LOADING...' : 'JOIN'}</button></div>
             </div>
           </div>
         </div>
