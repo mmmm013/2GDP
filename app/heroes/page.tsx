@@ -52,7 +52,12 @@ export default function HeroesPage() {
       </section>
 
                 {/* MILITARY MIP1 - PRIORITY ACCESS */}
-      <section className="py-12 bg-[#2a1f0f] text-center">
+              <section className="py-12 bg-[#2a1f0f] text-center relative overflow-hidden">
+                          <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none overflow-hidden" aria-hidden="true">
+            <div className="text-[#C8A882]/[0.04] text-[10rem] font-black tracking-widest rotate-[-12deg] whitespace-nowrap leading-none">
+              ★ MILITARY ★
+            </div>
+          </div>
         <div className="container mx-auto px-4 max-w-3xl">
           <div className="inline-flex items-center gap-2 bg-[#3E2723] border border-[#C8A882]/30 px-4 py-1 rounded-full mb-6">
             <Zap size={14} className="text-[#C8A882]" />
@@ -87,7 +92,12 @@ export default function HeroesPage() {
 
       
       {/* US MILITARY MIP2 - PRIORITY ACCESS */}
-      <section className="py-12 bg-[#1a0f0a] text-center border-t border-[#C8A882]/10">
+              <section className="py-12 bg-[#1a0f0a] text-center border-t border-[#C8A882]/10 relative overflow-hidden">
+                          <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none overflow-hidden" aria-hidden="true">
+            <div className="text-[#E91E63]/[0.03] text-[8rem] font-black tracking-widest rotate-[-12deg] whitespace-nowrap leading-none">
+              ⚕ ICU ANGELS ⚕
+            </div>
+          </div>
         <div className="container mx-auto px-4 max-w-3xl">
           <div className="inline-flex items-center gap-2 bg-[#3E2723] border border-[#C8A882]/30 px-4 py-1 rounded-full mb-6">
             <Heart size={14} className="text-[#E91E63]" />
