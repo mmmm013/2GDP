@@ -78,17 +78,17 @@ export default function KKKCreatorPage() {
       <div className="container mx-auto px-4 py-20 max-w-5xl">
         {/* KKK Hero Section */}
         <div className="text-center mb-12">
-          <div className="inline-flex items-center gap-2 bg-gradient-to-r from-[#FFD700]/20 to-[#C8A882]/20 border border-[#FFD700]/40 px-6 py-3 rounded-full mb-6 shadow-lg shadow-[#FFD700]/10">
-            <Zap size={18} className="text-[#FFD700] animate-pulse" />
-            <span className="text-sm font-black text-[#FFD700] tracking-[0.3em] uppercase">KKK</span>
-            <Sparkles size={18} className="text-[#FFD700] animate-pulse" />
+          <div className="inline-flex items-center gap-2 bg-gradient-to-r from-[#8B4513]/20 to-[#C8A882]/20 border border-[#8B4513]/40 px-6 py-3 rounded-full mb-6 shadow-lg shadow-[#8B4513]/10">
+            <Zap size={18} className="text-[#8B4513] animate-pulse" />
+            <span className="text-sm font-black text-[#8B4513] tracking-[0.3em] uppercase">KKK</span>
+            <Sparkles size={18} className="text-[#8B4513] animate-pulse" />
           </div>
           
-          <h1 className="text-5xl md:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-[#FFD95A] via-[#FFD700] to-[#FFA500] mb-4 tracking-tight">
+          <h1 className="text-5xl md:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-[#A0522D] via-[#8B4513] to-[#CD853F] mb-4 tracking-tight">
             K-KUT-Kreator
           </h1>
           <p className="text-lg text-[#F5E6D3]/80 max-w-2xl mx-auto mb-2">
-            Create sleek, shareable K-KUTs with <span className="text-[#FFD700] font-bold">6-character codes</span>
+            Create sleek, shareable K-KUTs with <span className="text-[#8B4513] font-bold">6-character codes</span>
           </p>
           <p className="text-sm text-[#F5E6D3]/50">
             Short links. Big impact. Easy to share.
@@ -101,8 +101,8 @@ export default function KKKCreatorPage() {
             onClick={() => setSelectedType('STI')}
             className={`px-6 py-3 rounded-full font-bold transition-all duration-300 flex items-center gap-2 ${
               selectedType === 'STI'
-                ? 'bg-gradient-to-r from-[#FFD700] to-[#FFA500] text-[#3E2723] shadow-lg shadow-[#FFD700]/30 scale-105'
-                : 'bg-[#3E2723] border border-[#C8A882]/30 text-[#F5E6D3] hover:border-[#FFD700]/50'
+                ? 'bg-gradient-to-r from-[#8B4513] to-[#CD853F] text-[#3E2723] shadow-lg shadow-[#8B4513]/30 scale-105'
+                : 'bg-[#3E2723] border border-[#C8A882]/30 text-[#F5E6D3] hover:border-[#8B4513]/50'
             }`}
           >
             <Music size={18} />
@@ -112,8 +112,8 @@ export default function KKKCreatorPage() {
             onClick={() => setSelectedType('BTI')}
             className={`px-6 py-3 rounded-full font-bold transition-all duration-300 flex items-center gap-2 ${
               selectedType === 'BTI'
-                ? 'bg-gradient-to-r from-[#FFD700] to-[#FFA500] text-[#3E2723] shadow-lg shadow-[#FFD700]/30 scale-105'
-                : 'bg-[#3E2723] border border-[#C8A882]/30 text-[#F5E6D3] hover:border-[#FFD700]/50'
+                ? 'bg-gradient-to-r from-[#8B4513] to-[#CD853F] text-[#3E2723] shadow-lg shadow-[#8B4513]/30 scale-105'
+                : 'bg-[#3E2723] border border-[#C8A882]/30 text-[#F5E6D3] hover:border-[#8B4513]/50'
             }`}
           >
             <Heart size={18} />
@@ -123,8 +123,8 @@ export default function KKKCreatorPage() {
             onClick={() => setSelectedType('FP')}
             className={`px-6 py-3 rounded-full font-bold transition-all duration-300 flex items-center gap-2 ${
               selectedType === 'FP'
-                ? 'bg-gradient-to-r from-[#FFD700] to-[#FFA500] text-[#3E2723] shadow-lg shadow-[#FFD700]/30 scale-105'
-                : 'bg-[#3E2723] border border-[#C8A882]/30 text-[#F5E6D3] hover:border-[#FFD700]/50'
+                ? 'bg-gradient-to-r from-[#8B4513] to-[#CD853F] text-[#3E2723] shadow-lg shadow-[#8B4513]/30 scale-105'
+                : 'bg-[#3E2723] border border-[#C8A882]/30 text-[#F5E6D3] hover:border-[#8B4513]/50'
             }`}
           >
             <Radio size={18} />
@@ -134,7 +134,7 @@ export default function KKKCreatorPage() {
 
         {/* Items List - Compact Cards */}
         <div className="bg-[#3E2723]/80 backdrop-blur rounded-2xl border border-[#C8A882]/20 p-6 mb-8">
-          <h2 className="text-xl font-bold text-[#FFD95A] mb-4 flex items-center gap-2">
+          <h2 className="text-xl font-bold text-[#A0522D] mb-4 flex items-center gap-2">
             {selectedType === 'STI' && <><Music size={20} /> Select a Track</>}
             {selectedType === 'BTI' && <><Heart size={20} /> Select a Story</>}
             {selectedType === 'FP' && <><Radio size={20} /> Select a Playlist</>}
@@ -147,8 +147,8 @@ export default function KKKCreatorPage() {
                 onClick={() => generateKUT(item.id, item.type)}
                 className={`w-full p-4 rounded-xl text-left transition-all duration-200 ${
                   selectedItem === item.id
-                    ? 'bg-gradient-to-r from-[#FFD700]/20 to-[#C8A882]/10 border-2 border-[#FFD700] shadow-lg shadow-[#FFD700]/10'
-                    : 'bg-[#2a1f0f]/50 border border-[#C8A882]/10 hover:border-[#FFD700]/30 hover:bg-[#2a1f0f]'
+                    ? 'bg-gradient-to-r from-[#8B4513]/20 to-[#C8A882]/10 border-2 border-[#8B4513] shadow-lg shadow-[#8B4513]/10'
+                    : 'bg-[#2a1f0f]/50 border border-[#C8A882]/10 hover:border-[#8B4513]/30 hover:bg-[#2a1f0f]'
                 }`}
               >
                 <div className="flex items-center justify-between">
@@ -160,7 +160,7 @@ export default function KKKCreatorPage() {
                   </div>
                   <div className={`text-xs font-black px-3 py-1 rounded-full ${
                     selectedItem === item.id
-                      ? 'bg-[#FFD700] text-[#3E2723]'
+                      ? 'bg-[#8B4513] text-[#3E2723]'
                       : 'bg-[#C8A882]/20 text-[#C8A882]'
                   }`}>
                     {item.type}
@@ -173,13 +173,13 @@ export default function KKKCreatorPage() {
 
         {/* Generated KUT - Clean Display */}
         {generatedKUT && (
-          <div className="bg-gradient-to-br from-[#FFD700]/5 via-[#C8A882]/5 to-[#FFD700]/5 rounded-2xl border-2 border-[#FFD700] p-8 shadow-2xl shadow-[#FFD700]/10">
+          <div className="bg-gradient-to-br from-[#8B4513]/5 via-[#C8A882]/5 to-[#8B4513]/5 rounded-2xl border-2 border-[#8B4513] p-8 shadow-2xl shadow-[#8B4513]/10">
             <div className="flex items-center gap-3 mb-6">
-              <div className="w-12 h-12 rounded-full bg-gradient-to-r from-[#FFD700] to-[#FFA500] flex items-center justify-center">
+              <div className="w-12 h-12 rounded-full bg-gradient-to-r from-[#8B4513] to-[#CD853F] flex items-center justify-center">
                 <Share2 className="text-[#3E2723]" size={24} />
               </div>
               <div>
-                <h2 className="text-2xl font-black text-[#FFD700]">Your K-KUT is Ready!</h2>
+                <h2 className="text-2xl font-black text-[#8B4513]">Your K-KUT is Ready!</h2>
                 <p className="text-sm text-[#F5E6D3]/60">6-character code for easy sharing</p>
               </div>
             </div>
@@ -189,7 +189,7 @@ export default function KKKCreatorPage() {
               <div className="flex items-center justify-between">
                 <div className="flex-1">
                   <p className="text-xs text-[#F5E6D3]/40 uppercase tracking-wider mb-2">Your K-KUT Link</p>
-                  <code className="text-2xl font-mono font-bold text-[#FFD95A] tracking-wider">
+                  <code className="text-2xl font-mono font-bold text-[#A0522D] tracking-wider">
                     {generatedKUT}
                   </code>
                 </div>
@@ -198,7 +198,7 @@ export default function KKKCreatorPage() {
                   className={`ml-4 px-6 py-3 rounded-xl font-bold transition-all duration-300 flex items-center gap-2 ${
                     copied
                       ? 'bg-green-500 text-white'
-                      : 'bg-gradient-to-r from-[#FFD700] to-[#FFA500] text-[#3E2723] hover:shadow-lg hover:shadow-[#FFD700]/30'
+                      : 'bg-gradient-to-r from-[#8B4513] to-[#CD853F] text-[#3E2723] hover:shadow-lg hover:shadow-[#8B4513]/30'
                   }`}
                 >
                   {copied ? (
@@ -221,7 +221,7 @@ export default function KKKCreatorPage() {
           <p className="text-sm text-[#F5E6D3]/40 mb-4">
             K-KUTs are permanent 6-character links. Each connects to one item on the G Putnam Music platform.
           </p>
-          <Link href="/kupid" className="inline-flex items-center gap-2 text-[#FFD700] hover:text-[#FFD700]/80 font-bold transition-colors">
+          <Link href="/kupid" className="inline-flex items-center gap-2 text-[#8B4513] hover:text-[#8B4513]/80 font-bold transition-colors">
             <span>←</span> Back to K-KUTs Lockets
           </Link>
         </div>
