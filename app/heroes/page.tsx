@@ -51,7 +51,7 @@ export default function HeroesPage() {
         </div>
       </section>
 
-      {/* US MILITARY MIP1 - PRIORITY ACCESS */}
+                {/* MILITARY MIP1 - PRIORITY ACCESS */}
       <section className="py-12 bg-[#2a1f0f] text-center">
         <div className="container mx-auto px-4 max-w-3xl">
           <div className="inline-flex items-center gap-2 bg-[#3E2723] border border-[#C8A882]/30 px-4 py-1 rounded-full mb-6">
@@ -59,29 +59,29 @@ export default function HeroesPage() {
             <span className="text-xs font-black text-[#C8A882] tracking-[0.2em] uppercase">MIP1 Priority Access</span>
           </div>
           
-                                <h2 className="text-3xl md:text-4xl font-black text-[#FFD96A] mb-4 tracking-tight">ICU NURSES & DOCTORS - FREE!</h2>
-          <p className="text-sm text-[#f5e6c8]/60 mb-8">MIP1 designation grants priority free streaming access. Validate with your .mil email or DD-214.</p>
+                                            <h2 className="text-3xl md:text-4xl font-black text-[#FFD96A] mb-4 tracking-tight">MILITARY - FREE!</h2>
+                      <p className="text-sm text-[#f5e6c8]/60 mb-8">MIP1 designation grants priority free streaming access. Validate with your military email or service credentials.</p>
           
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-5">
               <div className="bg-[#3E2723] rounded-lg p-4 border border-[#C8A882]/10">
                 <Shield size={24} className="text-[#C8A882] mx-auto mb-2" />
-              <p className="text-xs text-[#f5e6c8]/70 font-bold uppercase">Army</p>
+                            <p className="text-xs text-[#f5e6c8]/70 font-bold uppercase">Active Duty</p>
             </div>
             <div className="bg-[#3E2723] rounded-lg p-4 border border-[#C8A882]/10">
               <Shield size={24} className="text-[#C8A882] mx-auto mb-2" />
-              <p className="text-xs text-[#f5e6c8]/70 font-bold uppercase">Navy</p>
+                            <p className="text-xs text-[#f5e6c8]/70 font-bold uppercase">Veterans</p>
             </div>
             <div className="bg-[#3E2723] rounded-lg p-4 border border-[#C8A882]/10">
               <Shield size={24} className="text-[#C8A882] mx-auto mb-2" />
-              <p className="text-xs text-[#f5e6c8]/70 font-bold uppercase">Air Force</p>
+                            <p className="text-xs text-[#f5e6c8]/70 font-bold uppercase">Reserves</p>
             </div>
             <div className="bg-[#3E2723] rounded-lg p-4 border border-[#C8A882]/10">
               <Shield size={24} className="text-[#C8A882] mx-auto mb-2" />
-              <p className="text-xs text-[#f5e6c8]/70 font-bold uppercase">Marines</p>
+                            <p className="text-xs text-[#f5e6c8]/70 font-bold uppercase">Allied Forces</p>
             </div>
           </div>
           
-          <p className="text-xs text-[#f5e6c8]/40">Coast Guard, Space Force, and all branches welcome. MIP1 = Most Important Person/Partner.</p>
+                      <p className="text-xs text-[#f5e6c8]/40">All branches and allied western military welcome. MIP1 = Most Important Person/Partner.</p>
         </div>
       </section>
 
