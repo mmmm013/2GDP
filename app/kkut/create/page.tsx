@@ -3,9 +3,10 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { Share2, Copy, Check, Music, Radio, Heart, Sparkles } from 'lucide-react';
+import Header from '@/components/Header';
 
 // Sample data - Replace with actual Supabase queries
-[
+const TRACKS = [
   { id: '1', title: 'Reflections', artist: 'Kleigh', type: 'STI' },
   { id: '2', title: 'Best Nights of Our Lives', artist: 'Kleigh', type: 'STI' },
   { id: '3', title: 'I Need an Angel', artist: 'G Putnam Music', type: 'STI' },
