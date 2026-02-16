@@ -43,8 +43,8 @@ export default function HeroesPage() {
           </h1>
 
           <p className="text-lg text-[#3E2723] font-bold opacity-80 leading-relaxed mb-8 max-w-2xl mx-auto">
-            Dedicated to the Founder's Grandfather, a Navy Medic who served in the 1st Wave at Hacksaw Ridge.<br />
-            Like many, he carried the weight of silence. We honor that silence with music—a place to heal, reflect, and feel.
+                                                Dedicated to the Founder&#39;s Great-Grandfather, a Marine Medic who served in the 1st Wave at Hacksaw Ridge during the Battle of Okinawa, 1945.<br />
+              He first enlisted in the Navy, then transferred to the Marines. Like many, he carried the weight of silence. We honor that silence with music—a place to heal, reflect, and feel.
           </p>
           
           <div className="h-1 w-24 bg-[#3E2723] mx-auto rounded-full opacity-20"></div>
