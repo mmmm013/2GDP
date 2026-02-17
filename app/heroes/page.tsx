@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Heart, Shield, CheckCircle, Lock, Zap, ArrowRight } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import HeroesFeaturedPlayer from '@/components/HeroesFeaturedPlayer';
 
 export default function HeroesPage() {
   const [step, setStep] = useState<'intro' | 'verifying' | 'approved'>('intro');
@@ -25,6 +26,7 @@ export default function HeroesPage() {
   return (
     <main className="min-h-screen bg-[#3E2723] text-[#f5e6c8] font-sans">
       <Header />
+            <HeroesFeaturedPlayer />
 
       {/* DEDICATION & TRIBUTE SECTION */}
       <section className="relative pt-24 pb-16 text-center bg-[#2a1f0f] border-b border-[#C8A882]/10">
