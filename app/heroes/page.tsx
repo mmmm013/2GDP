@@ -161,7 +161,7 @@ export default function HeroesPage() {
         <div className="container mx-auto px-4 max-w-2xl">
           <h2 className="text-3xl font-black mb-8 tracking-tighter uppercase text-[#f5e6c8]">FACE A MIRROR.</h2>
           <div className="space-y-6 text-sm opacity-80 text-left leading-relaxed">
-            <p>I designed every piece of this app. No corporate mandates, no phone-game antics. Just me and folk all over this gorgeous globe.</p>
+                          <p>No training. No corporate hand. Just heart, determination, and a circle of songwriters called Wounded &amp; Willing — each carrying messages of Life &amp; Love. Every note original. Every voice independent. Just us, for you, across this gorgeous globe.</p>
             <p>I swear on my background directing Enterprise Risk Management: I will <span className="text-[#FFD96A] font-bold underline">NEVER SELL</span> your personal info to anyone. I don't seek grand profit. I answer to NO corporate giant.</p>
             <p>Revenue earned fuels the <span className="text-[#C8A882] font-black">Studio</span> and the <span className="text-[#C8A882] font-black">ICU Angels</span>. We are hand-to-mouth, but we are sovereign.</p>
           </div>
