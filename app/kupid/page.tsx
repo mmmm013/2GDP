@@ -31,10 +31,10 @@ export default function KupidPage() {
         </span>
         <h1 className="text-5xl md:text-7xl font-bold mb-2 text-[#C8A882]">K-KUTs</h1>
         <p className="text-xl md:text-2xl bg-gradient-to-r from-amber-400 to-orange-500 bg-clip-text text-transparent font-semibold">
-          Sovereign Locket
+          Own the Sweet Spot
         </p>
         <p className="mt-4 text-white/60 max-w-lg mx-auto">
-          The lock-and-key frequency device that pairs music to your creative energy. Three tiers. One invention.
+          Every track has a moment that moves you. K-KUTs capture that Sweet Spot &mdash; the curated highlight paired to a patent-pending locket or charm. It&apos;s almost like a hug, delivered through music.
         </p>
       </section>
 
@@ -186,15 +186,20 @@ export default function KupidPage() {
             </button>
             <h2 className="text-2xl font-bold text-amber-400 mb-4">What is K-KUTs?</h2>
             <p className="text-white/70 mb-4 text-sm leading-relaxed">
-              K-KUTs are the highlight &ldquo;spots&rdquo; of a track &mdash; curated 13-second music snippets captured at their most powerful moment. Each K-KUT is electronically paired to a patent-pending locket or charm, so the music lives with you.
+              Every track has a Sweet Spot &mdash; the moment the music hits hardest. K-KUTs capture that curated highlight and pair it to a patent-pending locket or charm, so the feeling lives with you.
             </p>
             <p className="text-white/70 mb-4 text-sm leading-relaxed">
-              Every piece comes pre-loaded with curated frequency pairings designed to amplify focus, creativity, and personal energy. It&apos;s more than jewelry &mdash; it&apos;s almost like a hug, delivered through music.
+              Each piece comes with 3 Optimum Sweet Spots to choose from: the power chorus, the delicate verse, or the bridge. Want something more personal? Custom K-KUTs let you pick your own highlight up to 1:30 in length &mdash; your personal hug, your way.
             </p>
             <p className="text-white/70 mb-4 text-sm leading-relaxed">
-              Born from 2 brand-new inventions and protected by 3 trademarks, K-KUTs represents a completely new form of emotional jewelry by G Putnam Music. Available as affordable charms, digital music links, or premium lockets up to gold &amp; diamond.
+              Pre-loaded with curated frequency pairings designed to amplify focus, creativity, and personal energy. It&apos;s more than jewelry &mdash; it&apos;s a new way to carry the music that moves you.
+            </p>
+            <p className="text-white/70 mb-4 text-sm leading-relaxed">
+              Born from 2 patent-pending inventions and protected by 3 trademarks, K-KUTs represents a completely new form of emotional jewelry by G Putnam Music. Available as affordable charms, digital music links, or premium lockets up to gold &amp; diamond.
             </p>
             <div className="flex flex-wrap justify-center gap-2 mt-6">
+              <span className="px-3 py-1 rounded-full text-xs font-semibold bg-violet-500/20 text-violet-300 border border-violet-500/30">3 Sweet Spots per Track</span>
+              <span className="px-3 py-1 rounded-full text-xs font-semibold bg-pink-500/20 text-pink-300 border border-pink-500/30">Custom up to 1:30</span>
               <span className="px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/30">Patent-Pending</span>
               <span className="px-3 py-1 rounded-full text-xs font-semibold bg-yellow-500/20 text-yellow-300 border border-yellow-500/30">3 Trademarks</span>
               <span className="px-3 py-1 rounded-full text-xs font-semibold bg-orange-500/20 text-orange-300 border border-orange-500/30">Emotional Jewelry</span>
