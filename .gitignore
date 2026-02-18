@@ -3,3 +3,8 @@ node_modules
 .DS_Store
 .env.local
 .env
+*.wav
+*.docx
+*.numbers
+*.csv
+~$*
