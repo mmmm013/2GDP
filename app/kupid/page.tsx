@@ -16,6 +16,8 @@ export default function KupidPage() {
     setIsVDay(m === 0 && d >= 20 || m === 1 && d <= 16);
   }, []);
 
+  const historicTier = KUPID_TIERS.find(t => t.id === 'historic');
+
   return (
     <main className="min-h-screen bg-gradient-to-b from-black via-gray-950 to-black text-white">
       <Header />
@@ -79,32 +81,27 @@ export default function KupidPage() {
             </span>
           </div>
           <Link
-                          href={KUPID_TIERS.find(t => t.id === 'historic')?.stripeLink || '#'}
+            href={KUPID_TIERS.find(t => t.id === 'historic')?.stripeLink || '#'}
             className="inline-block px-8 py-3 rounded-xl bg-gradient-to-r from-yellow-400 to-amber-500 text-black font-bold text-sm hover:from-yellow-300 hover:to-amber-400 transition-all shadow-lg shadow-yellow-500/20"
           >
-                          Get HISTORIC Locket &mdash; {KUPID_TIERS.find(t => t.id === 'historic')?.price}
+            Get HISTORIC Locket &mdash; {KUPID_TIERS.find(t => t.id === 'historic')?.price}
           </Link>
         </div>
       </section>
 
-      {/* Pricing Grid */}
+      {/* Pricing Grid — excludes Historic (rendered as bookend below) */}
       <section className="px-4 pb-12">
         <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
-          {KUPID_TIERS.map((tier) => (
+          {KUPID_TIERS.filter(t => t.id !== 'historic').map((tier) => (
             <div
               key={tier.id}
               className={`relative rounded-2xl border ${tier.borderColor} bg-white/5 p-6 flex flex-col ${
                 tier.featured ? 'md:-mt-4 md:mb-4 ring-2 ring-orange-400/40' : ''
-              } ${tier.id === 'historic' ? 'ring-2 ring-yellow-400/50 bg-gradient-to-b from-yellow-900/10 to-transparent' : ''}`}
+              }`}
             >
               {tier.featured && (
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full text-xs font-bold tracking-wider bg-orange-500 text-black">
                   MOST POPULAR
-                </div>
-              )}
-              {tier.id === 'historic' && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full text-xs font-bold tracking-wider bg-yellow-400 text-black">
-                  MAKES HISTORY
                 </div>
               )}
               <span className={`inline-block px-3 py-0.5 rounded text-[10px] font-bold tracking-widest bg-gradient-to-r ${tier.color} text-black w-fit mb-3`}>
@@ -126,7 +123,7 @@ export default function KupidPage() {
               </ul>
               <a
                 href={tier.stripeLink}
-                                className={`w-full py-3 rounded-xl text-center font-bold text-sm transition-all ${tier.buttonClass}`}
+                className={`w-full py-3 rounded-xl text-center font-bold text-sm transition-all ${tier.buttonClass}`}
               >
                 Get {tier.badge} Locket
               </a>
@@ -134,6 +131,38 @@ export default function KupidPage() {
           ))}
         </div>
       </section>
+
+      {/* HISTORIC BOOKEND — matches top Make History box */}
+      {historicTier && (
+        <section className="mx-4 mb-12">
+          <div className="max-w-3xl mx-auto bg-gradient-to-r from-yellow-900/30 via-amber-900/20 to-yellow-900/30 border border-yellow-500/30 rounded-2xl p-8 text-center">
+            <p className="text-xs font-bold tracking-[0.3em] uppercase text-yellow-400/80 mb-2">Makes History</p>
+            <h2 className="text-2xl md:text-3xl font-bold text-white mb-1">
+              {historicTier.name}
+            </h2>
+            <p className={`text-4xl md:text-5xl font-bold bg-gradient-to-r ${historicTier.color} bg-clip-text text-transparent mb-2`}>
+              {historicTier.price}
+            </p>
+            <p className="text-white/40 text-xs mb-4">one-time</p>
+            <p className="text-white/70 max-w-xl mx-auto mb-6">
+              {historicTier.description}
+            </p>
+            <div className="flex flex-wrap justify-center gap-3 mb-6">
+              {historicTier.features.map((f, i) => (
+                <span key={i} className="px-3 py-1 rounded-full text-xs font-semibold bg-yellow-500/20 text-yellow-300 border border-yellow-500/30">
+                  {f}
+                </span>
+              ))}
+            </div>
+            <Link
+              href={historicTier.stripeLink}
+              className="inline-block px-8 py-3 rounded-xl bg-gradient-to-r from-yellow-400 to-amber-500 text-black font-bold text-sm hover:from-yellow-300 hover:to-amber-400 transition-all shadow-lg shadow-yellow-500/20"
+            >
+              Get HISTORIC Locket &mdash; {historicTier.price}
+            </Link>
+          </div>
+        </section>
+      )}
 
       {/* Info Section */}
       <section className="px-4 pb-16">
