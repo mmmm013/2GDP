@@ -1,6 +1,14 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 
+// 4-BRAND SPLIT ENGINE: Map brand codes to their primary domains
+const BRAND_TO_DOMAIN: Record<string, string> = {
+  'GPM': 'gputnammusic.com',
+  'KLEIGH': '2kleigh.com',
+  'SCHERER': 'gputnammusic.com',
+  'KFS': 'kidsfunsongs.com',
+}
+
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
   const track_id = searchParams.get('track_id')
@@ -8,6 +16,10 @@ export async function GET(request: Request) {
   if (!track_id) {
     return NextResponse.json({ error: 'track_id required' }, { status: 400 })
   }
+
+  // Resolve brand from middleware header or default to GPM
+  const brand = request.headers.get('x-brand-domain') || 'GPM'
+  const domain = BRAND_TO_DOMAIN[brand] || 'gputnammusic.com'
 
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -25,11 +37,11 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: 'Track not found' }, { status: 404 })
   }
 
-  // Check if track is in current featured playlist
+  // Check if track is in current featured playlist for this domain
   const { data: rotation } = await supabase
     .from('featured_rotation')
     .select('current_playlist_id')
-    .eq('domain', 'gputnammusic.com')
+    .eq('domain', domain)
     .single()
 
   if (rotation) {
@@ -52,7 +64,8 @@ export async function GET(request: Request) {
         artist: track.artist,
         url: signedUrl?.signedUrl,
         access: 'free',
-        source: 'featured_playlist'
+        source: 'featured_playlist',
+        brand: brand
       })
     }
   }
@@ -63,6 +76,7 @@ export async function GET(request: Request) {
     title: track.title,
     artist: track.artist,
     access: 'purchase_required',
-    message: 'This track is not currently in the featured playlist'
+    message: 'This track is not currently in the featured playlist',
+    brand: brand
   }, { status: 403 })
 }
