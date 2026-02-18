@@ -13,7 +13,7 @@ const HERO_PILLARS = [
     title: 'MILITARY MARVELS ⚡',
     subtitle: 'Active Duty, Veterans, Reserves, and National Guard',
     borderColor: COLORS.AMBER,
-    text: 'Dedicated to the US military for steadfastly protecting ALL Americans and all our borders!'
+    text: 'Dedicated to the US military for steadfastly protecting ALL Americans and our borders!'
   },
   {
     id: 'medical-angels',
