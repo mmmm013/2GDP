@@ -7,9 +7,9 @@ import Link from 'next/link';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import GlobalPlayer from '@/components/GlobalPlayer';
-import WeeklyRace from '@/components/WeeklyRace';
+// import WeeklyRace from '@/components/WeeklyRace';
 import FeaturedPlaylists from '@/components/FeaturedPlaylists';
-import EmailCapture from '@/components/EmailCapture';
+// import EmailCapture from '@/components/EmailCapture';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL as string,
@@ -187,8 +187,8 @@ export default function Hero() {
       </section>
 
             <FeaturedPlaylists />
-      <EmailCapture />
-      <WeeklyRace />
+      {/* <EmailCapture /> */}
+      {/* <WeeklyRace /> */}
       <Footer />
     </>
   );
