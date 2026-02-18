@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { Pause, Play, AlertCircle, Radio, Volume2, VolumeX } from 'lucide-react';
+import { gpmET } from '@/lib/gpm-et';
 
 /**
  * GLOBAL PLAYER - BIC MC BOT Streaming Player
@@ -9,6 +10,7 @@ import { Pause, Play, AlertCircle, Radio, Volume2, VolumeX } from 'lucide-react'
  * QUALITY: Error handling with user-friendly messages
  * SATISFACTION: Smooth play/pause, loading states, mood colors, VOLUME control
  * SINGLE-SONG: Dispatches 'stop-all-audio' so only ONE player plays at a time
+ * GPM ET: Tracks play, pause, duration, and error events
  */
 
 // GPM Master Vault - Standardized bucket URL for all audio
@@ -46,6 +48,7 @@ export default function GlobalPlayer() {
   });
   const [pendingPlay, setPendingPlay] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const playStartRef = useRef<number>(0);
 
   // Keep volume in sync with audio element
   useEffect(() => {
@@ -61,6 +64,20 @@ export default function GlobalPlayer() {
       setIsLoading(true);
       setIsPlaying(false);
       setPendingPlay(true);
+
+      // GPM ET: track duration of previous track before switching
+      if (audioRef.current && playStartRef.current > 0) {
+        const elapsed = (Date.now() - playStartRef.current) / 1000;
+        if (elapsed > 1) {
+          gpmET.duration({
+            title: track.title,
+            vocalist: track.vocalist,
+            source: 'GlobalPlayer',
+            seconds: elapsed,
+          });
+        }
+        playStartRef.current = 0;
+      }
 
       // Pause current audio immediately for clean transition
       if (audioRef.current) {
@@ -90,7 +107,6 @@ export default function GlobalPlayer() {
 
     window.addEventListener('play-track', handleTrackSelect as EventListener);
     window.addEventListener('fp-play', handleStopAll);
-
     return () => {
       window.removeEventListener('play-track', handleTrackSelect as EventListener);
       window.removeEventListener('fp-play', handleStopAll);
@@ -117,10 +133,25 @@ export default function GlobalPlayer() {
         window.dispatchEvent(new CustomEvent('stop-all-audio', { detail: { source: 'global' } }));
         audio.volume = isMuted ? 0 : volume;
         audio.play()
-          .then(() => setIsPlaying(true))
+          .then(() => {
+            setIsPlaying(true);
+            // GPM ET: track play start
+            playStartRef.current = Date.now();
+            gpmET.play({
+              title: track.title,
+              vocalist: track.vocalist,
+              source: 'GlobalPlayer',
+            });
+          })
           .catch(() => {
             setError('Playback failed - tap play to try again');
             setIsPlaying(false);
+            gpmET.error({
+              title: track.title,
+              vocalist: track.vocalist,
+              source: 'GlobalPlayer',
+              errorMsg: 'Playback failed',
+            });
           });
       }
     };
@@ -130,19 +161,40 @@ export default function GlobalPlayer() {
       setIsPlaying(false);
       setPendingPlay(false);
       const mediaErr = audio.error;
+      let errMsg = 'Playback error';
       if (mediaErr) {
         switch (mediaErr.code) {
-          case 1: setError('Playback cancelled'); break;
-          case 2: setError('Network error - check connection'); break;
-          case 3: setError('Audio decode error'); break;
-          case 4: setError('Track unavailable'); break;
-          default: setError('Playback error');
+          case 1: errMsg = 'Playback cancelled'; break;
+          case 2: errMsg = 'Network error - check connection'; break;
+          case 3: errMsg = 'Audio decode error'; break;
+          case 4: errMsg = 'Track unavailable'; break;
+          default: errMsg = 'Playback error';
         }
+        setError(errMsg);
       }
+      gpmET.error({
+        title: track.title,
+        vocalist: track.vocalist,
+        source: 'GlobalPlayer',
+        errorMsg: errMsg,
+      });
     };
 
     const handleLoadStart = () => setIsLoading(true);
-    const handleEnded = () => setIsPlaying(false);
+    const handleEnded = () => {
+      setIsPlaying(false);
+      // GPM ET: track duration on natural end
+      if (playStartRef.current > 0) {
+        const elapsed = (Date.now() - playStartRef.current) / 1000;
+        gpmET.duration({
+          title: track.title,
+          vocalist: track.vocalist,
+          source: 'GlobalPlayer',
+          seconds: elapsed,
+        });
+        playStartRef.current = 0;
+      }
+    };
 
     audio.addEventListener('canplay', handleCanPlay);
     audio.addEventListener('error', handleError);
@@ -187,7 +239,6 @@ export default function GlobalPlayer() {
       }
       setIsPlaying(false);
     };
-
     window.addEventListener('stop-all-audio', handleStopAll as EventListener);
     return () => {
       window.removeEventListener('stop-all-audio', handleStopAll as EventListener);
@@ -200,9 +251,23 @@ export default function GlobalPlayer() {
       return;
     }
     setError('');
+
     if (!isPlaying) {
       // SINGLE-SONG: Stop all other audio before we play
       window.dispatchEvent(new CustomEvent('stop-all-audio', { detail: { source: 'global' } }));
+      playStartRef.current = Date.now();
+      gpmET.play({
+        title: track.title,
+        vocalist: track.vocalist,
+        source: 'GlobalPlayer',
+      });
+    } else {
+      // GPM ET: track pause
+      gpmET.pause({
+        title: track.title,
+        vocalist: track.vocalist,
+        source: 'GlobalPlayer',
+      });
     }
     setIsPlaying(!isPlaying);
   };
