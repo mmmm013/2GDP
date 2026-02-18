@@ -1,6 +1,7 @@
 'use client';
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { Play, Pause, SkipBack, SkipForward, Volume2, VolumeX, Repeat } from 'lucide-react';
+import { gpmET } from '@/lib/gpm-et';
 
 /**
  * HEROES FEATURED PLAYER - FP for Heroes Page
@@ -8,6 +9,7 @@ import { Play, Pause, SkipBack, SkipForward, Volume2, VolumeX, Repeat } from 'lu
  * SINGLE-SONG: Only ONE audio plays at a time (GPMD rule)
  * VISIBLE: ~20 PIX with full controls - play/stop, volume, skip, repeat
  * CROSS-PAGE: Stops if GlobalPlayer or other FP plays
+ * GPM ET: Tracks play, pause, skip, duration, autoPlay, repeat events
  */
 
 interface Track {
@@ -56,6 +58,7 @@ export default function HeroesFeaturedPlayer() {
   const [isMuted, setIsMuted] = useState(false);
   const [repeat, setRepeat] = useState(false);
   const [autoPlayTriggered, setAutoPlayTriggered] = useState(false);
+  const playStartRef = useRef<number>(0);
 
   const currentTrack = HEROES_PIX[currentIndex];
 
@@ -67,6 +70,13 @@ export default function HeroesFeaturedPlayer() {
         // GPMD RULE: Stop all other audio before playing
         window.dispatchEvent(new CustomEvent('stop-all-audio', { detail: { source: 'heroes-fp' } }));
         setIsPlaying(true);
+        // GPM ET: track auto-play
+        playStartRef.current = Date.now();
+        gpmET.autoPlay({
+          title: currentTrack.title,
+          vocalist: currentTrack.vocalist,
+          source: 'FeaturedPlayer',
+        });
       }
     }, 3000);
     return () => clearTimeout(timer);
@@ -96,15 +106,33 @@ export default function HeroesFeaturedPlayer() {
     const updateTime = () => setCurrentTime(audio.currentTime);
     const updateDuration = () => setDuration(audio.duration);
     const handleEnded = () => {
+      // GPM ET: track duration on end
+      if (playStartRef.current > 0) {
+        const elapsed = (Date.now() - playStartRef.current) / 1000;
+        gpmET.duration({
+          title: currentTrack.title,
+          vocalist: currentTrack.vocalist,
+          source: 'FeaturedPlayer',
+          seconds: elapsed,
+        });
+        playStartRef.current = 0;
+      }
       if (repeat) {
         audio.currentTime = 0;
         audio.play();
+        playStartRef.current = Date.now();
       } else {
         const nextIdx = (currentIndex + 1) % HEROES_PIX.length;
         setCurrentIndex(nextIdx);
       }
     };
     const handleError = () => {
+      gpmET.error({
+        title: currentTrack.title,
+        vocalist: currentTrack.vocalist,
+        source: 'FeaturedPlayer',
+        errorMsg: 'Track load error',
+      });
       const nextIdx = (currentIndex + 1) % HEROES_PIX.length;
       setCurrentIndex(nextIdx);
     };
@@ -138,19 +166,45 @@ export default function HeroesFeaturedPlayer() {
   const togglePlay = useCallback(() => {
     if (!isPlaying) {
       window.dispatchEvent(new CustomEvent('stop-all-audio', { detail: { source: 'heroes-fp' } }));
+      playStartRef.current = Date.now();
+      gpmET.play({
+        title: currentTrack.title,
+        vocalist: currentTrack.vocalist,
+        source: 'FeaturedPlayer',
+      });
+    } else {
+      gpmET.pause({
+        title: currentTrack.title,
+        vocalist: currentTrack.vocalist,
+        source: 'FeaturedPlayer',
+      });
     }
     setIsPlaying(!isPlaying);
-  }, [isPlaying]);
+  }, [isPlaying, currentTrack]);
 
   const skipNext = useCallback(() => {
+    gpmET.skip({
+      title: currentTrack.title,
+      vocalist: currentTrack.vocalist,
+      source: 'FeaturedPlayer',
+      direction: 'next',
+    });
     const nextIdx = (currentIndex + 1) % HEROES_PIX.length;
     setCurrentIndex(nextIdx);
-  }, [currentIndex]);
+    playStartRef.current = Date.now();
+  }, [currentIndex, currentTrack]);
 
   const skipPrev = useCallback(() => {
+    gpmET.skip({
+      title: currentTrack.title,
+      vocalist: currentTrack.vocalist,
+      source: 'FeaturedPlayer',
+      direction: 'prev',
+    });
     const prevIdx = currentIndex > 0 ? currentIndex - 1 : HEROES_PIX.length - 1;
     setCurrentIndex(prevIdx);
-  }, [currentIndex]);
+    playStartRef.current = Date.now();
+  }, [currentIndex, currentTrack]);
 
   const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
     const audio = audioRef.current;
@@ -167,107 +221,87 @@ export default function HeroesFeaturedPlayer() {
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto px-4 py-6" role="region" aria-label="Heroes Featured Player">
-      <div className="bg-[#2a1f0f] border-2 border-[#C8A882]/30 rounded-xl p-4">
-        {/* Now Playing */}
-        {currentTrack && (
-          <div className="mb-3">
-            <div className="flex items-center gap-2 mb-1">
-              <span className="text-[10px] uppercase tracking-wider text-[#C8A882]/70">
-                {isPlaying ? 'NOW STREAMING' : 'PAUSED'} - Heroes FP
-              </span>
-              <span className="text-[10px] text-[#C8A882]/50">
-                Track {currentIndex + 1} of {HEROES_PIX.length}
-              </span>
-            </div>
-            <div className="text-white font-bold text-base">
-              {currentTrack.title}
-              <span className="text-[#C8A882]/80 font-normal ml-2 text-sm">- {currentTrack.vocalist}</span>
-            </div>
-          </div>
-        )}
-
-        {/* Transport Controls */}
-        <div className="flex items-center gap-3 mb-3">
-          <button
-            onClick={skipPrev}
-            className="text-[#C8A882] hover:text-white p-2 min-h-[44px] min-w-[44px] flex items-center justify-center transition-colors"
-            aria-label="Previous track"
-          >
-            <SkipBack size={18} />
-          </button>
-          <button
-            onClick={togglePlay}
-            className="bg-[#C8A882] text-black rounded-full p-3 min-h-[44px] min-w-[44px] flex items-center justify-center hover:bg-[#D4A017] transition-colors"
-            aria-label={isPlaying ? 'Pause' : 'Play'}
-          >
-            {isPlaying ? <Pause size={20} fill="black" /> : <Play size={20} fill="black" />}
-          </button>
-          <button
-            onClick={skipNext}
-            className="text-[#C8A882] hover:text-white p-2 min-h-[44px] min-w-[44px] flex items-center justify-center transition-colors"
-            aria-label="Next track"
-          >
-            <SkipForward size={18} />
-          </button>
-
-          {/* Volume Control */}
-          <div className="flex items-center gap-2 ml-auto">
-            <button
-              onClick={() => setIsMuted(!isMuted)}
-              className="text-[#C8A882] hover:text-white p-2 min-h-[44px] min-w-[44px] flex items-center justify-center transition-colors"
-              aria-label={isMuted ? 'Unmute' : 'Mute'}
-            >
-              {isMuted || volume === 0 ? <VolumeX size={18} /> : <Volume2 size={18} />}
-            </button>
-            <input
-              type="range"
-              min="0"
-              max="1"
-              step="0.05"
-              value={isMuted ? 0 : volume}
-              onChange={handleVolumeChange}
-              className="w-20 h-1 rounded-full appearance-none cursor-pointer"
-              style={{
-                background: `linear-gradient(to right, #C8A882 ${(isMuted ? 0 : volume) * 100}%, #555 ${(isMuted ? 0 : volume) * 100}%)`
-              }}
-              aria-label="Volume"
-            />
-          </div>
-
-          {/* Repeat Button */}
-          <button
-            onClick={() => setRepeat(!repeat)}
-            className={`p-2 min-h-[44px] min-w-[44px] flex items-center justify-center transition-colors rounded ${
-              repeat ? 'bg-[#C8A882]/20 text-[#C8A882]' : 'text-[#C8A882]/40 hover:text-[#C8A882]'
-            }`}
-            aria-label={repeat ? 'Repeat on' : 'Repeat off'}
-          >
-            <Repeat size={18} />
-          </button>
+    <div className="w-full space-y-2">
+      {/* Now Playing */}
+      {currentTrack && (
+        <div className="text-center">
+          <p className="text-[10px] text-[#C8A882]/60 tracking-widest">
+            {isPlaying ? 'NOW STREAMING' : 'PAUSED'} - Heroes FP
+            &nbsp;&nbsp;Track {currentIndex + 1} of {HEROES_PIX.length}
+          </p>
+          <p className="text-sm text-white font-semibold truncate">
+            {currentTrack.title}
+            <span className="text-neutral-400 font-normal"> - </span>
+            <span className="text-[#C8A882]">{currentTrack.vocalist}</span>
+          </p>
         </div>
+      )}
 
-        {/* Seek Bar */}
-        <div className="flex items-center gap-2 text-xs text-[#C8A882]/60">
-          <span className="w-10 text-right">{formatTime(currentTime)}</span>
-          <input
-            type="range"
-            min="0"
-            max={duration || 0}
-            value={currentTime}
-            onChange={handleSeek}
-            className="flex-1 h-1 rounded-full appearance-none cursor-pointer"
-            style={{
-              background: `linear-gradient(to right, #C8A882 ${(currentTime / (duration || 1)) * 100}%, #555 ${(currentTime / (duration || 1)) * 100}%)`
-            }}
-            aria-label="Seek"
-          />
-          <span className="w-10">{formatTime(duration)}</span>
-        </div>
+      {/* Transport Controls */}
+      <div className="flex items-center justify-center gap-2">
+        <button onClick={skipPrev} className="text-[#C8A882] hover:text-white p-2 min-h-[44px] min-w-[44px] flex items-center justify-center transition-colors" aria-label="Previous track">
+          <SkipBack className="w-5 h-5" />
+        </button>
+
+        <button onClick={togglePlay} className="bg-[#C8A882] text-black rounded-full p-3 min-h-[44px] min-w-[44px] flex items-center justify-center hover:bg-[#d4b896] transition-colors" aria-label={isPlaying ? 'Pause' : 'Play'}>
+          {isPlaying ? <Pause className="w-5 h-5" fill="black" /> : <Play className="w-5 h-5" fill="black" />}
+        </button>
+
+        <button onClick={skipNext} className="text-[#C8A882] hover:text-white p-2 min-h-[44px] min-w-[44px] flex items-center justify-center transition-colors" aria-label="Next track">
+          <SkipForward className="w-5 h-5" />
+        </button>
+      </div>
+
+      {/* Volume Control */}
+      <div className="flex items-center justify-center gap-2">
+        <button onClick={() => setIsMuted(!isMuted)} className="text-[#C8A882] hover:text-white p-2 min-h-[44px] min-w-[44px] flex items-center justify-center transition-colors" aria-label={isMuted ? 'Unmute' : 'Mute'}>
+          {isMuted || volume === 0 ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
+        </button>
+        <input
+          type="range" min="0" max="1" step="0.05"
+          value={isMuted ? 0 : volume}
+          onChange={handleVolumeChange}
+          className="w-20 h-1 rounded-full appearance-none cursor-pointer"
+          style={{ background: `linear-gradient(to right, #C8A882 ${(isMuted ? 0 : volume) * 100}%, #555 ${(isMuted ? 0 : volume) * 100}%)` }}
+          aria-label="Volume"
+        />
+
+        {/* Repeat Button */}
+        <button
+          onClick={() => {
+            gpmET.repeat({
+              title: currentTrack.title,
+              vocalist: currentTrack.vocalist,
+              source: 'FeaturedPlayer',
+              enabled: !repeat,
+            });
+            setRepeat(!repeat);
+          }}
+          className={`p-2 min-h-[44px] min-w-[44px] flex items-center justify-center transition-colors rounded ${
+            repeat ? 'bg-[#C8A882]/20 text-[#C8A882]' : 'text-[#C8A882]/40 hover:text-[#C8A882]'
+          }`}
+          aria-label={repeat ? 'Repeat on' : 'Repeat off'}
+        >
+          <Repeat className="w-4 h-4" />
+        </button>
+      </div>
+
+      {/* Seek Bar */}
+      <div className="flex items-center gap-2 px-2">
+        <span className="text-[10px] text-neutral-500 w-8 text-right">{formatTime(currentTime)}</span>
+        <input
+          type="range" min="0" max={duration || 0}
+          value={currentTime}
+          onChange={handleSeek}
+          className="flex-1 h-1 rounded-full appearance-none cursor-pointer"
+          style={{ background: `linear-gradient(to right, #C8A882 ${(currentTime / (duration || 1)) * 100}%, #555 ${(currentTime / (duration || 1)) * 100}%)` }}
+          aria-label="Seek"
+        />
+        <span className="text-[10px] text-neutral-500 w-8">{formatTime(duration)}</span>
       </div>
 
       {/* Hidden audio element */}
-      <audio ref={audioRef} src={currentTrack?.src || ''} preload="none" />
+      <audio ref={audioRef} src={currentTrack?.src} preload="auto" />
     </div>
   );
 }
