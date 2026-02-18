@@ -78,7 +78,7 @@ export default function PrivacyPage() {
         <h2 className="text-xl font-semibold mb-3">8. Contact Us</h2>
         <p className="text-gray-300 leading-relaxed">
           G Putnam Music LLC<br />
-          Email: support@gputnammusic.com<br />
+          Email: reachus@gputnammusic.com<br />
           Website: gputnammusic.com
         </p>
       </section>
