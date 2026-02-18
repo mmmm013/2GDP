@@ -8,6 +8,7 @@ import { KUPID_TIERS } from '@/lib/kupid-protocol';
 
 export default function KupidPage() {
   const [isVDay, setIsVDay] = useState(false);
+  const [showInfo, setShowInfo] = useState(false);
 
   useEffect(() => {
     const now = new Date();
@@ -67,18 +68,10 @@ export default function KupidPage() {
             2 brand-new patent-pending inventions. 2 new trademarks making his 3rd. A jewelry product born from pure emotion &mdash; a completely new way to say what words can&apos;t. This purchase doesn&apos;t just buy a locket. It makes history.
           </p>
           <div className="flex flex-wrap justify-center gap-3 mb-4">
-            <span className="px-3 py-1 rounded-full text-xs font-semibold bg-yellow-500/20 text-yellow-300 border border-yellow-500/30">
-              2 Patent-Pending Inventions
-            </span>
-            <span className="px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/30">
-              3 Trademarks
-            </span>
-            <span className="px-3 py-1 rounded-full text-xs font-semibold bg-orange-500/20 text-orange-300 border border-orange-500/30">
-              Emotional Jewelry
-            </span>
-            <span className="px-3 py-1 rounded-full text-xs font-semibold bg-red-500/20 text-red-300 border border-red-500/30">
-              A New Way to Say It
-            </span>
+            <span className="px-3 py-1 rounded-full text-xs font-semibold bg-yellow-500/20 text-yellow-300 border border-yellow-500/30">2 Patent-Pending Inventions</span>
+            <span className="px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/30">3 Trademarks</span>
+            <span className="px-3 py-1 rounded-full text-xs font-semibold bg-orange-500/20 text-orange-300 border border-orange-500/30">Emotional Jewelry</span>
+            <span className="px-3 py-1 rounded-full text-xs font-semibold bg-red-500/20 text-red-300 border border-red-500/30">A New Way to Say It</span>
           </div>
           <Link
             href={KUPID_TIERS.find(t => t.id === 'historic')?.stripeLink || '#'}
@@ -89,7 +82,7 @@ export default function KupidPage() {
         </div>
       </section>
 
-      {/* Pricing Grid — excludes Historic (rendered as bookend below) */}
+      {/* Pricing Grid - excludes Historic (rendered as bookend below) */}
       <section className="px-4 pb-12">
         <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
           {KUPID_TIERS.filter(t => t.id !== 'historic').map((tier) => (
@@ -132,7 +125,7 @@ export default function KupidPage() {
         </div>
       </section>
 
-      {/* HISTORIC BOOKEND — matches top Make History box */}
+      {/* HISTORIC BOOKEND - matches top Make History box */}
       {historicTier && (
         <section className="mx-4 mb-12">
           <div className="max-w-3xl mx-auto bg-gradient-to-r from-yellow-900/30 via-amber-900/20 to-yellow-900/30 border border-yellow-500/30 rounded-2xl p-8 text-center">
@@ -164,29 +157,51 @@ export default function KupidPage() {
         </section>
       )}
 
-      {/* Info Section */}
+      {/* What is K-KUTs? - Trigger Button + Links */}
       <section className="px-4 pb-16">
         <div className="max-w-2xl mx-auto text-center">
-          <h2 className="text-2xl font-bold text-white mb-4">What is K-KUTs?</h2>
-          <p className="text-white/60 mb-3">
-            K-KUTs is a patent-pending music-frequency locket technology by G Putnam Music. Each locket is electronically paired to curated music frequencies designed to amplify focus, creativity, and personal energy.
-          </p>
-          <p className="text-white/60 mb-6">
-            Born from 2 brand-new inventions and protected by 3 trademarks, K-KUTs represents a completely new form of emotional jewelry &mdash; a personal, pure way to communicate through music and creative energy. The Historic tier makes you part of that story.
-          </p>
+          <button
+            onClick={() => setShowInfo(true)}
+            className="text-amber-400 hover:text-amber-300 text-sm font-semibold transition-colors underline underline-offset-4 mb-6 cursor-pointer"
+          >
+            What is K-KUTs? &rarr;
+          </button>
           <div className="flex flex-wrap justify-center gap-4">
-            <Link href="/gift" className="text-amber-400 hover:text-amber-300 text-sm transition-colors">
-              Heart-Tap Gifts &rarr;
-            </Link>
-            <Link href="/join" className="text-amber-400 hover:text-amber-300 text-sm transition-colors">
-              Join the Fleet &rarr;
-            </Link>
-            <Link href="/" className="text-amber-400 hover:text-amber-300 text-sm transition-colors">
-              Back to Home &rarr;
-            </Link>
+            <Link href="/gift" className="text-amber-400 hover:text-amber-300 text-sm transition-colors">Heart-Tap Gifts &rarr;</Link>
+            <Link href="/join" className="text-amber-400 hover:text-amber-300 text-sm transition-colors">Join the Fleet &rarr;</Link>
+            <Link href="/" className="text-amber-400 hover:text-amber-300 text-sm transition-colors">Back to Home &rarr;</Link>
           </div>
         </div>
       </section>
+
+      {/* What is K-KUTs? POPUP MODAL */}
+      {showInfo && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm" onClick={() => setShowInfo(false)}>
+          <div className="relative max-w-lg w-full bg-gray-900 border border-amber-500/30 rounded-2xl p-8 text-center max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+            <button
+              onClick={() => setShowInfo(false)}
+              className="absolute top-4 right-4 text-white/60 hover:text-white text-2xl font-bold transition-colors"
+            >
+              &times;
+            </button>
+            <h2 className="text-2xl font-bold text-amber-400 mb-4">What is K-KUTs?</h2>
+            <p className="text-white/70 mb-4 text-sm leading-relaxed">
+              K-KUTs are the highlight &ldquo;spots&rdquo; of a track &mdash; curated 13-second music snippets captured at their most powerful moment. Each K-KUT is electronically paired to a patent-pending locket or charm, so the music lives with you.
+            </p>
+            <p className="text-white/70 mb-4 text-sm leading-relaxed">
+              Every piece comes pre-loaded with curated frequency pairings designed to amplify focus, creativity, and personal energy. It&apos;s more than jewelry &mdash; it&apos;s almost like a hug, delivered through music.
+            </p>
+            <p className="text-white/70 mb-4 text-sm leading-relaxed">
+              Born from 2 brand-new inventions and protected by 3 trademarks, K-KUTs represents a completely new form of emotional jewelry by G Putnam Music. Available as affordable charms, digital music links, or premium lockets up to gold &amp; diamond.
+            </p>
+            <div className="flex flex-wrap justify-center gap-2 mt-6">
+              <span className="px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/30">Patent-Pending</span>
+              <span className="px-3 py-1 rounded-full text-xs font-semibold bg-yellow-500/20 text-yellow-300 border border-yellow-500/30">3 Trademarks</span>
+              <span className="px-3 py-1 rounded-full text-xs font-semibold bg-orange-500/20 text-orange-300 border border-orange-500/30">Emotional Jewelry</span>
+            </div>
+          </div>
+        </div>
+      )}
 
       <Footer />
     </main>
