@@ -1,3 +1,5 @@
+import Link from 'next/link';
+
 export const metadata = {
   title: 'Terms of Service | G Putnam Music',
   description: 'Terms of Service for G Putnam Music LLC',
@@ -98,6 +100,15 @@ export default function TermsPage() {
           G Putnam Music LLC<br />
           Email: support@gputnammusic.com<br />
           Website: gputnammusic.com
+        </p>
+      </section>
+
+      <section className="mt-12 pt-8 border-t border-gray-800">
+        <p className="text-gray-400 text-sm">
+          Please also review our{' '}
+          <Link href="/privacy" className="text-blue-400 underline hover:text-blue-300">
+            Privacy Policy
+          </Link>.
         </p>
       </section>
     </div>
