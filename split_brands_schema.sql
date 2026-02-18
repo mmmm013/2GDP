@@ -1,5 +1,5 @@
 -- 1. CLEANUP: Drop confusing tables (Safety check required in production)
--- DROP TABLE IF EXISTS songs; 
+-- DROP TABLE IF EXISTS songs;
 -- DROP TABLE IF EXISTS audio;
 
 -- 2. CREATE THE "ONE TRUTH" TABLE
@@ -8,10 +8,10 @@ CREATE TABLE IF NOT EXISTS tracks (
     title TEXT NOT NULL,
     artist TEXT NOT NULL,
     filename TEXT NOT NULL, -- The filename in the 'tracks' bucket
-    
-    -- THE 3-BRAND SPLIT ENGINE
-    brand_domain TEXT CHECK (brand_domain IN ('GPM', 'KLEIGH', 'SCHERER')) NOT NULL DEFAULT 'GPM',
-    
+
+    -- THE 4-BRAND SPLIT ENGINE
+    brand_domain TEXT CHECK (brand_domain IN ('GPM', 'KLEIGH', 'SCHERER', 'KFS')) NOT NULL DEFAULT 'GPM',
+
     -- METADATA
     moods TEXT[], -- Array of moods ['Happy', 'Calm']
     tempo TEXT,
