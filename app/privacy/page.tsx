@@ -1,3 +1,5 @@
+import Link from 'next/link';
+
 export const metadata = {
   title: 'Privacy Policy | G Putnam Music',
   description: 'Privacy Policy for G Putnam Music LLC',
@@ -78,6 +80,15 @@ export default function PrivacyPage() {
           G Putnam Music LLC<br />
           Email: support@gputnammusic.com<br />
           Website: gputnammusic.com
+        </p>
+      </section>
+
+      <section className="mt-12 pt-8 border-t border-gray-800">
+        <p className="text-gray-400 text-sm">
+          Please also review our{' '}
+          <Link href="/terms" className="text-blue-400 underline hover:text-blue-300">
+            Terms of Service
+          </Link>.
         </p>
       </section>
     </div>
