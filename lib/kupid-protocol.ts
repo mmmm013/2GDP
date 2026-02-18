@@ -12,7 +12,7 @@ export interface KupidTier {
   color: string;
   borderColor: string;
   badge: string;
-    buttonClass: string;
+  buttonClass: string;
   featured?: boolean;
 }
 
@@ -32,7 +32,7 @@ export const KUPID_TIERS: KupidTier[] = [
     color: 'from-amber-600 to-yellow-500',
     borderColor: 'border-amber-500/40',
     badge: 'GENESIS',
-        buttonClass: 'bg-gradient-to-r from-amber-600 to-yellow-500 text-black hover:opacity-90',
+    buttonClass: 'bg-gradient-to-r from-amber-600 to-yellow-500 text-black hover:opacity-90',
   },
   {
     id: 'sovereign',
@@ -51,7 +51,7 @@ export const KUPID_TIERS: KupidTier[] = [
     borderColor: 'border-orange-400/40',
     badge: 'SOVEREIGN',
     featured: true,
-        buttonClass: 'bg-gradient-to-r from-amber-400 to-orange-500 text-black hover:opacity-90',
+    buttonClass: 'bg-gradient-to-r from-amber-400 to-orange-500 text-black hover:opacity-90',
   },
   {
     id: 'historic',
@@ -71,7 +71,62 @@ export const KUPID_TIERS: KupidTier[] = [
     color: 'from-yellow-300 to-amber-400',
     borderColor: 'border-yellow-400/40',
     badge: 'HISTORIC',
-        buttonClass: 'bg-gradient-to-r from-yellow-400 to-amber-500 text-black hover:from-yellow-300 hover:to-amber-400 shadow-lg shadow-yellow-500/20',
+    buttonClass: 'bg-gradient-to-r from-yellow-400 to-amber-500 text-black hover:from-yellow-300 hover:to-amber-400 shadow-lg shadow-yellow-500/20',
+  },
+  // --- KidKUTs: Affordable Charm Line (Koala Tier) ---
+  {
+    id: 'kidkut-frequency',
+    name: 'My Frequency Enamel Charm',
+    price: '$7.99',
+    description: 'Collectible hard enamel charm (25mm) shaped like a music note with a frequency wave. 7 frequency moods to collect. QR code unlocks a curated music clip matching your frequency.',
+    features: [
+      'Hard enamel music note charm (25mm)',
+      '7 collectible frequency moods',
+      'QR code to curated music clip',
+      'Branded K-KUT backer card',
+      'PRE-ORDER: Full pay',
+    ],
+    stripeLink: '',
+    color: 'from-pink-400 to-purple-500',
+    borderColor: 'border-pink-400/40',
+    badge: 'KIDKUT',
+    buttonClass: 'bg-gradient-to-r from-pink-400 to-purple-500 text-white hover:opacity-90',
+  },
+  {
+    id: 'kidkut-sounddrop',
+    name: 'Sound Drop Clip-On Charm',
+    price: '$5.99',
+    description: 'Alloy clip-on charm (20mm) for backpacks, zippers, and shoes. Sound wave design in metallic finishes. Scratch-off code reveals your frequency match.',
+    features: [
+      'Universal clip-on charm (20mm)',
+      '4 metallic finishes available',
+      'Scratch-off frequency reveal code',
+      'Attaches to backpacks, zippers, shoes',
+      'PRE-ORDER: Full pay',
+    ],
+    stripeLink: '',
+    color: 'from-cyan-400 to-blue-500',
+    borderColor: 'border-cyan-400/40',
+    badge: 'KIDKUT',
+    buttonClass: 'bg-gradient-to-r from-cyan-400 to-blue-500 text-white hover:opacity-90',
+  },
+  {
+    id: 'kidkut-frequencylink',
+    name: 'Frequency Link 3-Pack',
+    price: '$9.99',
+    description: 'Italian-style modular flat charm links (9mm). 3-pack of different frequency wave designs. Compatible with standard Italian charm bracelets. Includes digital Frequency ID Card.',
+    features: [
+      '3 modular Italian-style charm links',
+      'K-KUT logo + frequency wave designs',
+      'Compatible with standard Italian bracelets',
+      'Digital Frequency ID Card included',
+      'PRE-ORDER: Full pay',
+    ],
+    stripeLink: '',
+    color: 'from-emerald-400 to-teal-500',
+    borderColor: 'border-emerald-400/40',
+    badge: 'KIDKUT',
+    buttonClass: 'bg-gradient-to-r from-emerald-400 to-teal-500 text-white hover:opacity-90',
   },
 ];
 
