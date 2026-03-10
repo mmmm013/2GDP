@@ -1,96 +1,64 @@
-import Link from 'next/link';
+import React from 'react';
 
-export const metadata = {
-  title: 'Privacy Policy | G Putnam Music',
-  description: 'Privacy Policy for G Putnam Music LLC',
-};
+// GPEx™ Component: Privacy Policy (Carrier Compliant)
+// Branding: Amber/Black (GPM Flagship Standard)
+// Logic: A2P 10DLC Hard-Bolt & Six Sigma Compliance
 
-export default function PrivacyPage() {
+export default function PrivacyPolicy() {
   return (
-    <div className="min-h-screen bg-black text-white px-6 py-12 max-w-3xl mx-auto">
-      <h1 className="text-3xl font-bold mb-8">Privacy Policy</h1>
-      <p className="text-sm text-gray-400 mb-6">Last updated: February 2026</p>
+    <div className="min-h-screen bg-black text-zinc-300 font-sans p-8 md:p-24">
+      <div className="max-w-3xl mx-auto">
+        <h1 className="text-4xl font-black text-amber-500 mb-12 uppercase tracking-tighter">
+          Privacy Policy | <span className="text-white">VEKTOR & G Putnam Music LLC</span>
+        </h1>
 
-      <section className="mb-8">
-        <h2 className="text-xl font-semibold mb-3">1. Introduction</h2>
-        <p className="text-gray-300 leading-relaxed">
-          G Putnam Music LLC (&quot;we&quot;, &quot;us&quot;, or &quot;our&quot;) operates gputnammusic.com. This Privacy Policy
-          explains how we collect, use, disclose, and safeguard your information when you visit our
-          website or use our services, including SMS messaging.
-        </p>
-      </section>
+        <section className="space-y-8 text-sm leading-relaxed">
+          
+          <div>
+            <h3 className="text-white font-bold uppercase mb-2 border-b border-zinc-800 pb-2">1. Neutral Harbor Policy & Data Collection</h3>
+            <p>
+              At <strong>G Putnam Music LLC</strong> (and our consulting division, <strong>VEKTOR</strong>), we adhere strictly to a Neutral Harbor Policy. Your data is isolated and unblended. We collect only the precise information necessary (such as name, email, and mobile number) to execute operations and facilitate secure ingestion within our ecosystem.
+            </p>
+          </div>
 
-      <section className="mb-8">
-        <h2 className="text-xl font-semibold mb-3">2. Information We Collect</h2>
-        <ul className="list-disc list-inside text-gray-300 space-y-2">
-          <li>Personal information you voluntarily provide (name, email, phone number)</li>
-          <li>Information collected automatically (IP address, browser type, device info)</li>
-          <li>Usage data and analytics</li>
-          <li>SMS opt-in data and messaging preferences</li>
-        </ul>
-      </section>
+          <div className="border-l-2 border-amber-500 pl-6 py-4 bg-zinc-900/50 my-8">
+            <h2 className="text-white font-black uppercase mb-2">2. CRITICAL: Mobile Information & SMS Data Disclosure</h2>
+            <p className="text-amber-200 font-medium">
+              No mobile information will be shared with third parties or affiliates for marketing or promotional purposes. All the above categories exclude text messaging originator opt-in data and consent; this information will not be shared with any third parties under any circumstances. We do not sell, rent, or share mobile or personal data with third parties for advertising or promotional use.
+            </p>
+          </div>
 
-      <section className="mb-8">
-        <h2 className="text-xl font-semibold mb-3">3. How We Use Your Information</h2>
-        <ul className="list-disc list-inside text-gray-300 space-y-2">
-          <li>To provide and maintain our services</li>
-          <li>To send transactional and promotional SMS messages (with consent)</li>
-          <li>To improve our platform and user experience</li>
-          <li>To communicate updates about our music platform</li>
-          <li>To comply with legal obligations</li>
-        </ul>
-      </section>
+          <div>
+            <h3 className="text-white font-bold uppercase mb-2 border-b border-zinc-800 pb-2">3. Opt-In, Consent, & Telemetry</h3>
+            <p>
+              Consent to receive automated SMS, A2P messages, or marketing telemetry is <strong>not a condition of purchase</strong> or service. If you opt-in to our communications, you maintain total authority over your terminal.
+            </p>
+            <ul className="list-disc pl-5 mt-2 space-y-1 text-zinc-400">
+              <li>To opt-out of SMS routing at any time, reply <strong>STOP</strong>.</li>
+              <li>For assistance, reply <strong>HELP</strong>.</li>
+              <li>Message and data rates may apply. Message frequency varies.</li>
+            </ul>
+          </div>
 
-      <section className="mb-8">
-        <h2 className="text-xl font-semibold mb-3">4. SMS Messaging</h2>
-        <p className="text-gray-300 leading-relaxed">
-          By opting in to our SMS service, you consent to receive text messages from G Putnam Music.
-          Message frequency varies. Message and data rates may apply. You can opt out at any time by
-          replying STOP. For help, reply HELP or contact us at the information below.
-        </p>
-      </section>
+          <div>
+            <h3 className="text-white font-bold uppercase mb-2 border-b border-zinc-800 pb-2">4. Data Security</h3>
+            <p>
+              All digital assets and telemetry data are maintained in secure, air-locked servers (The Warehouse / SB) with zero-defect tolerance. Access is strictly audited and limited to authorized personnel.
+            </p>
+          </div>
+          
+          <div>
+            <h3 className="text-white font-bold uppercase mb-2 border-b border-zinc-800 pb-2">5. Contact The Auditor</h3>
+            <p>
+              For inquiries regarding this policy or to request a data audit, please contact our administrative proxy at <strong>G Putnam Music LLC</strong>.
+            </p>
+          </div>
 
-      <section className="mb-8">
-        <h2 className="text-xl font-semibold mb-3">5. Data Sharing</h2>
-        <p className="text-gray-300 leading-relaxed">
-          We do not sell your personal information. We may share data with trusted service providers
-          who assist in operating our platform, subject to confidentiality agreements.
-        </p>
-      </section>
-
-      <section className="mb-8">
-        <h2 className="text-xl font-semibold mb-3">6. Data Security</h2>
-        <p className="text-gray-300 leading-relaxed">
-          We implement appropriate technical and organizational measures to protect your personal
-          information against unauthorized access, alteration, disclosure, or destruction.
-        </p>
-      </section>
-
-      <section className="mb-8">
-        <h2 className="text-xl font-semibold mb-3">7. Your Rights</h2>
-        <p className="text-gray-300 leading-relaxed">
-          You may request access to, correction of, or deletion of your personal data by contacting
-          us. You may also opt out of marketing communications at any time.
-        </p>
-      </section>
-
-      <section className="mb-8">
-        <h2 className="text-xl font-semibold mb-3">8. Contact Us</h2>
-        <p className="text-gray-300 leading-relaxed">
-          G Putnam Music LLC<br />
-          Email: reachus@gputnammusic.com<br />
-          Website: gputnammusic.com
-        </p>
-      </section>
-
-      <section className="mt-12 pt-8 border-t border-gray-800">
-        <p className="text-gray-400 text-sm">
-          Please also review our{' '}
-          <Link href="/terms" className="text-blue-400 underline hover:text-blue-300">
-            Terms of Service
-          </Link>.
-        </p>
-      </section>
+          <footer className="mt-24 pt-12 border-t border-zinc-800 text-[10px] uppercase tracking-widest text-zinc-600">
+            Verified Six Sigma Audit © 2026 | Principal Auditor: G. Putnam | Division: VEKTOR
+          </footer>
+        </section>
+      </div>
     </div>
   );
 }

@@ -1,4 +1,5 @@
 import React from 'react';
+import Link from 'next/link';
 
 // BRANDING CONSTANTS
 const COLORS = {
@@ -35,32 +36,48 @@ export default function HeroesPage() {
   return (
     <div className="min-h-screen bg-black text-white p-8 font-sans">
       <div className="max-w-5xl mx-auto">
-        <h1 className="text-4xl font-extrabold mb-4 tracking-tighter">HERO RECOGNITION</h1>
-        <p className="mb-12 text-lg opacity-80 uppercase">Accessing the Sovereign MIP1 Priority Stream.</p>
-        
+        {/* ONE-STOP BRANDING HEADER */}
+        <p className="mb-2 text-sm tracking-[0.25em] text-amber-400 uppercase">
+          One-Stop Original Sync & Streaming OS
+        </p>
+        <h1 className="text-4xl font-extrabold mb-2 tracking-tighter">
+          HERO RECOGNITION
+        </h1>
+        <p className="mb-12 text-lg opacity-80 uppercase">
+          Accessing the Sovereign MIP1 Priority Stream.
+        </p>
+
+        {/* MIP1 HERO PILLARS */}
         <div className="grid gap-8">
           {HERO_PILLARS.map((pillar) => (
-            <div 
+            <div
               key={pillar.id}
               className="border-l-8 p-8 bg-zinc-900 shadow-2xl transition-all hover:scale-[1.01]"
               style={{ borderLeftColor: pillar.borderColor }}
             >
               <h2 className="text-2xl font-bold mb-1">{pillar.title}</h2>
-              <h3 className="text-sm font-semibold opacity-60 mb-4 uppercase tracking-widest">{pillar.subtitle}</h3>
+              <h3 className="text-sm font-semibold opacity-60 mb-4 uppercase tracking-widest">
+                {pillar.subtitle}
+              </h3>
               <p className="text-lg leading-relaxed">{pillar.text}</p>
-              
-              <button className="mt-6 px-6 py-2 border font-bold hover:bg-white hover:text-black transition-colors uppercase">
-                MIP1 RECOGNITION FORM
-              </button>
+
+              {/* MIP1 RECOGNITION FORM CTA */}
+              <Link href="/mip1/form">
+                <button className="mt-6 px-6 py-2 border font-bold hover:bg-white hover:text-black transition-colors uppercase">
+                  MIP1 RECOGNITION FORM
+                </button>
+              </Link>
             </div>
           ))}
         </div>
 
-        {/* HELP US BUTTON */}
+        {/* HELP US BUTTON: route OR mailto */}
         <div className="fixed bottom-10 right-10">
-          <button className="bg-amber-500 text-black px-8 py-4 rounded-full font-black text-xl shadow-2xl hover:scale-110 transition-transform">
-            "HELP" US
-          </button>
+          <Link href="/help">
+            <button className="bg-amber-500 text-black px-8 py-4 rounded-full font-black text-xl shadow-2xl hover:scale-110 transition-transform">
+              HELP US
+            </button>
+          </Link>
         </div>
       </div>
     </div>
