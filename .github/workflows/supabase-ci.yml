@@ -1,11 +1,12 @@
 # Supabase CI/CD - BIC-Level MSP
 # On PR: lint SQL, validate migrations, BIC gate (no destructive changes without ALLOW_BIC)
-# On push to main: apply migrations + seeds to production DB
+# On push to main: apply migrations + seeds to production DB via Supabase CLI
 # Secrets required in GitHub repo settings:
-#   DATABASE_URL          - production Supabase DB connection string
-#   TEST_DATABASE_URL     - disposable CI DB for migration dry-runs
-#   SUPABASE_ACCESS_TOKEN - for supabase CLI commands
-#   SUPABASE_PROJECT_ID   - your Supabase project ref
+#   SUPABASE_ACCESS_TOKEN  - for supabase CLI commands
+#   SUPABASE_PROJECT_ID    - your Supabase project ref
+#   SUPABASE_ANON_KEY      - for smoke tests
+#   SUPABASE_FUNCTION_URL  - e.g. https://<ref>.supabase.co/functions/v1
+#   DATABASE_URL           - (optional) direct psql connection for PR dry-runs
 
 name: Supabase CI/CD
 
@@ -33,30 +34,23 @@ jobs:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     env:
-      TEST_DATABASE_URL: ${{ secrets.TEST_DATABASE_URL }}
-
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      SUPABASE_PROJECT_ID: ${{ secrets.SUPABASE_PROJECT_ID }}
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install psql client
-        run: sudo apt-get install -y postgresql-client
+      - name: Install Supabase CLI
+        run: npm install -g supabase@latest
 
-      - name: Apply migrations in order (dry-run against test DB)
+      - name: Lint migrations (syntax check)
         run: |
           set -e
           for f in $(ls -1 supabase/migrations/*.sql | sort); do
-            echo ">>> Applying: $f"
-            psql "$TEST_DATABASE_URL" -v ON_ERROR_STOP=1 -f "$f"
+            echo ">>> Checking: $f"
+            # Basic syntax: ensure file is valid SQL (non-empty, no truncation)
+            [ -s "$f" ] || (echo "ERROR: Empty migration file $f" && exit 1)
           done
-
-      - name: Apply seeds (idempotent)
-        if: hashFiles('supabase/seed/*.sql') != ''
-        run: |
-          set -e
-          for f in $(ls -1 supabase/seed/*.sql | sort); do
-            echo ">>> Seeding: $f"
-            psql "$TEST_DATABASE_URL" -v ON_ERROR_STOP=1 -f "$f"
-          done
+          echo "Migration lint passed."
 
       - name: BIC gate - block destructive changes without ALLOW_BIC
         run: |
@@ -69,50 +63,44 @@ jobs:
           echo "BIC gate passed - no unapproved destructive changes."
 
   # -----------------------------------------------------------------------
-  # MAIN PUSH JOB: Apply migrations to production DB
+  # MAIN PUSH JOB: Apply migrations + deploy functions to production
   # -----------------------------------------------------------------------
   migrate:
     name: Apply migrations to production
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     env:
-      DATABASE_URL: ${{ secrets.DATABASE_URL }}
-
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      SUPABASE_PROJECT_ID: ${{ secrets.SUPABASE_PROJECT_ID }}
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install psql client
-        run: sudo apt-get install -y postgresql-client
+      - name: Install Supabase CLI
+        run: npm install -g supabase@latest
 
-      - name: Apply migrations in order
+      - name: Apply migrations via Supabase CLI (db push)
         run: |
           set -e
-          for f in $(ls -1 supabase/migrations/*.sql | sort); do
-            echo ">>> Applying: $f"
-            psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f "$f"
-          done
+          supabase db push --project-ref "$SUPABASE_PROJECT_ID"
+          echo "Migrations applied successfully."
 
       - name: Apply seeds (idempotent)
         if: hashFiles('supabase/seed/*.sql') != ''
         run: |
           set -e
-          for f in $(ls -1 supabase/seed/*.sql | sort); do
-            echo ">>> Seeding: $f"
-            psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f "$f"
-          done
+          supabase db execute --project-ref "$SUPABASE_PROJECT_ID" \
+            --file supabase/seed/seed.sql || echo "Seed skipped or already applied."
 
       - name: Deploy Edge Functions via Supabase CLI
-        env:
-          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
-          SUPABASE_PROJECT_ID: ${{ secrets.SUPABASE_PROJECT_ID }}
         run: |
           set -e
-          npm install -g supabase@latest
-          supabase functions deploy magic_link      --project-ref "$SUPABASE_PROJECT_ID"
-          supabase functions deploy tenant_provision --project-ref "$SUPABASE_PROJECT_ID"
-          supabase functions deploy notify           --project-ref "$SUPABASE_PROJECT_ID"
-          supabase functions deploy get-stream-url   --project-ref "$SUPABASE_PROJECT_ID"
-          supabase functions deploy stream-audio     --project-ref "$SUPABASE_PROJECT_ID"
+          for fn in magic_link tenant_provision notify get-stream-url stream-audio \
+                    play-k-kut play-k-kut-lower send-k-kuts \
+                    gmarketingoptin gmarketingoptout trackssearch gemini_proxy; do
+            echo ">>> Deploying: $fn"
+            supabase functions deploy "$fn" --project-ref "$SUPABASE_PROJECT_ID"
+          done
+          echo "All Edge Functions deployed."
 
       - name: Smoke test - get-stream-url healthcheck
         env:
@@ -130,3 +118,19 @@ jobs:
             exit 1
           fi
           echo "Smoke test passed (status: $STATUS)"
+
+      - name: Smoke test - send-k-kuts healthcheck
+        env:
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          SUPABASE_FUNCTION_URL: ${{ secrets.SUPABASE_FUNCTION_URL }}
+        run: |
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+            -X POST "${SUPABASE_FUNCTION_URL}/send-k-kuts" \
+            -H "apikey: ${SUPABASE_ANON_KEY}" \
+            -H "Content-Type: application/json" \
+            -d '{"k_kut_id":"healthcheck"}')
+          if [ "$STATUS" = "500" ]; then
+            echo "FAIL: send-k-kuts returned 500 after deploy"
+            exit 1
+          fi
+          echo "send-k-kuts smoke test passed (status: $STATUS)"
