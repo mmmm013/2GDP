@@ -2,9 +2,10 @@
 # On PR: lint SQL, BIC gate (no destructive changes without ALLOW_BIC)
 # On push to main: apply migrations + deploy Edge Functions via Supabase CLI
 # Secrets required in GitHub repo settings:
-#   SUPABASE_ACCESS_TOKEN  - for supabase CLI commands (Settings > API > Service Role)
-#   SUPABASE_PROJECT_ID    - your Supabase project ref (e.g. abcdefghijklmnop)
-#   SUPABASE_ANON_KEY      - for smoke tests
+#   SUPABASE_ACCESS_TOKEN  - Personal access token from supabase.com/account/tokens
+#   SUPABASE_PROJECT_ID    - Project ref from supabase.com/dashboard/project/<ref>/settings/general
+#   SUPABASE_DB_PASSWORD   - Database password for linking
+#   SUPABASE_ANON_KEY      - For smoke tests
 #   SUPABASE_FUNCTION_URL  - e.g. https://<ref>.supabase.co/functions/v1
 
 name: Supabase CI/CD
@@ -70,10 +71,15 @@ jobs:
         with:
           version: latest
 
+      - name: Link Supabase project
+        run: |
+          supabase link --project-ref "${{ secrets.SUPABASE_PROJECT_ID }}" \
+            --password "${{ secrets.SUPABASE_DB_PASSWORD }}"
+
       - name: Apply migrations via Supabase CLI (db push)
         run: |
           set -e
-          supabase db push --project-ref "${{ secrets.SUPABASE_PROJECT_ID }}"
+          supabase db push
           echo "Migrations applied successfully."
 
       - name: Deploy Edge Functions via Supabase CLI
