@@ -1,12 +1,11 @@
 # Supabase CI/CD - BIC-Level MSP
-# On PR: lint SQL, validate migrations, BIC gate (no destructive changes without ALLOW_BIC)
-# On push to main: apply migrations + seeds to production DB via Supabase CLI
+# On PR: lint SQL, BIC gate (no destructive changes without ALLOW_BIC)
+# On push to main: apply migrations + deploy Edge Functions via Supabase CLI
 # Secrets required in GitHub repo settings:
-#   SUPABASE_ACCESS_TOKEN  - for supabase CLI commands
-#   SUPABASE_PROJECT_ID    - your Supabase project ref
+#   SUPABASE_ACCESS_TOKEN  - for supabase CLI commands (Settings > API > Service Role)
+#   SUPABASE_PROJECT_ID    - your Supabase project ref (e.g. abcdefghijklmnop)
 #   SUPABASE_ANON_KEY      - for smoke tests
 #   SUPABASE_FUNCTION_URL  - e.g. https://<ref>.supabase.co/functions/v1
-#   DATABASE_URL           - (optional) direct psql connection for PR dry-runs
 
 name: Supabase CI/CD
 
@@ -33,21 +32,14 @@ jobs:
     name: Validate migrations (PR)
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
-    env:
-      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
-      SUPABASE_PROJECT_ID: ${{ secrets.SUPABASE_PROJECT_ID }}
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install Supabase CLI
-        run: npm install -g supabase@latest
-
-      - name: Lint migrations (syntax check)
+      - name: Lint migrations (syntax check - non-empty files)
         run: |
           set -e
           for f in $(ls -1 supabase/migrations/*.sql | sort); do
             echo ">>> Checking: $f"
-            # Basic syntax: ensure file is valid SQL (non-empty, no truncation)
             [ -s "$f" ] || (echo "ERROR: Empty migration file $f" && exit 1)
           done
           echo "Migration lint passed."
@@ -71,25 +63,18 @@ jobs:
     runs-on: ubuntu-latest
     env:
       SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
-      SUPABASE_PROJECT_ID: ${{ secrets.SUPABASE_PROJECT_ID }}
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install Supabase CLI
-        run: npm install -g supabase@latest
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
 
       - name: Apply migrations via Supabase CLI (db push)
         run: |
           set -e
-          supabase db push --project-ref "$SUPABASE_PROJECT_ID"
+          supabase db push --project-ref "${{ secrets.SUPABASE_PROJECT_ID }}"
           echo "Migrations applied successfully."
-
-      - name: Apply seeds (idempotent)
-        if: hashFiles('supabase/seed/*.sql') != ''
-        run: |
-          set -e
-          supabase db execute --project-ref "$SUPABASE_PROJECT_ID" \
-            --file supabase/seed/seed.sql || echo "Seed skipped or already applied."
 
       - name: Deploy Edge Functions via Supabase CLI
         run: |
@@ -98,7 +83,7 @@ jobs:
                     play-k-kut play-k-kut-lower send-k-kuts \
                     gmarketingoptin gmarketingoptout trackssearch gemini_proxy; do
             echo ">>> Deploying: $fn"
-            supabase functions deploy "$fn" --project-ref "$SUPABASE_PROJECT_ID"
+            supabase functions deploy "$fn" --project-ref "${{ secrets.SUPABASE_PROJECT_ID }}"
           done
           echo "All Edge Functions deployed."
 
@@ -112,7 +97,6 @@ jobs:
             -H "apikey: ${SUPABASE_ANON_KEY}" \
             -H "Content-Type: application/json" \
             -d '{"track_id":"healthcheck"}')
-          # Expect 400 (missing asset) not 500 (crash) - proves function is up
           if [ "$STATUS" = "500" ]; then
             echo "FAIL: get-stream-url returned 500 after deploy"
             exit 1
