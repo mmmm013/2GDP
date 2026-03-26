@@ -37,10 +37,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className="bg-[#1a1207] text-[#F5e6c8] antialiased min-h-screen overflow-x-hidden"
+        className="bg-[#1a1207] text-[#F5e6c8] antialiased min-h-screen"
         style={{ backgroundColor: '#1a1207', color: '#F5e6c8' }}
       >
-        <main className="relative w-full">
+        <main className="relative w-full overflow-x-hidden">
           {children}
         </main>
         <FPPixBar />
