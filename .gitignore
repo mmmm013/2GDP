@@ -16,3 +16,4 @@ node_modules
 *.p8
 *.pem
 *.key
+*.tsbuildinfo
