@@ -6,9 +6,8 @@
 //   - k_kut_id: UUID of a K-KUT row (preferred for excerpt playback)
 //   - track_id: UUID or numeric ID of a tracks row (full track)
 //   - bucket: override bucket name (default: 'audio-stream')
-// Returns: { url: string, expires_in: 300, meta: { title, artist, kk_type?, ... } }
+// Returns: { url: string, expires_in: 300, meta: { title, artist, kk_type?, start_ms?, end_ms?, ... } }
 // File: supabase/functions/get-stream-url/index.ts
-
 import { supabaseAdmin } from "../_shared/supabaseClient.ts";
 import { bad, ok, preflight } from "../_shared/responses.ts";
 
@@ -34,7 +33,7 @@ Deno.serve(async (req: Request) => {
       // Try sb.k_kuts first (patent-protected excerpt table)
       const { data: kkut, error: kkErr } = await supabaseAdmin
         .from("k_kuts")
-        .select("id, title, artist, kk_type, file_path, track_id, is_exact_excerpt")
+        .select("id, title, artist, kk_type, file_path, track_id, is_exact_excerpt, start_ms, end_ms")
         .eq("id", body.k_kut_id)
         .single();
 
@@ -57,6 +56,9 @@ Deno.serve(async (req: Request) => {
           kk_type: kkut.kk_type,
           is_exact_excerpt: kkut.is_exact_excerpt,
           track_id: kkut.track_id,
+          // CRITICAL: excerpt boundaries - frontend MUST enforce these
+          start_ms: kkut.start_ms ?? null,
+          end_ms: kkut.end_ms ?? null,
           source: "k_kuts",
         };
       }
