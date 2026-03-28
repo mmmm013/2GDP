@@ -8,3 +8,11 @@ node_modules
 *.numbers
 *.csv
 ~$*
+
+# Vercel
+.vercel
+
+# Private keys / certificates — NEVER commit these
+*.p8
+*.pem
+*.key

@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Pause, Play, AlertCircle, Radio, Volume2, VolumeX } from 'lucide-react';
 import { gpmET } from '@/lib/gpm-et';
+import { resolveAudioUrl } from '@/lib/audio/resolveAudioUrl';
 
 /**
  * GLOBAL PLAYER - BIC MC BOT Streaming Player
@@ -12,27 +13,6 @@ import { gpmET } from '@/lib/gpm-et';
  * SINGLE-SONG: Dispatches 'stop-all-audio' so only ONE player plays at a time
  * GPM ET: Tracks play, pause, duration, and error events
  */
-
-// GPM Master Vault - Standardized bucket URL for all audio
-const SITE_CATALOG_BASE = 'https://lbzpfqarraegkghxwbah.supabase.co/storage/v1/object/public/tracks/';
-
-// Resolve any audio URL to the standardized tracks bucket
-const resolveAudioUrl = (url: string): string => {
-  if (!url) return '';
-  if (url.includes('tracks')) return url;
-  let filename = url;
-  if (url.includes('supabase.co/storage')) {
-    const parts = url.split('/public/');
-    if (parts.length > 1) {
-      const pathParts = parts[1].split('/');
-      filename = pathParts[pathParts.length - 1];
-    }
-  } else if (url.includes('/')) {
-    filename = url.split('/').pop() || url;
-  }
-  filename = filename.split('?')[0];
-  return SITE_CATALOG_BASE + filename;
-};
 
 export default function GlobalPlayer() {
   const [isPlaying, setIsPlaying] = useState(false);

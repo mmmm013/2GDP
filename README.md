@@ -1,63 +1,72 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# G Putnam Music (GPMC)
 
-## Getting Started
+Public-facing Next.js application for [G Putnam Music](https://gputnammusic.com).
 
-First, run the development server:
+## Homepage & Source of Truth
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+| Item | Value |
+|---|---|
+| **Homepage route** | `app/page.tsx` |
+| **Vercel Root Directory** | `./` (repo root) |
+| **Framework** | Next.js App Router |
+
+> Do **not** deploy any `staging/` sub-application from this repo as the Vercel root.
+> All production traffic must come from the repo-root `app/` directory.
+
+## Required Environment Variables
+
+| Variable | Required | Description |
+|---|---|---|
+| `NEXT_PUBLIC_SUPABASE_URL` | ✅ | Supabase project URL |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | ✅ | Supabase anon key |
+| `NEXT_PUBLIC_SUPABASE_TRACKS_BASE_URL` | ✅ | Canonical audio bucket base URL (see below) |
+| `SUPABASE_SERVICE_ROLE_KEY` | server | Service role key (never expose client-side) |
+| `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | optional | Stripe publishable key |
+| `STRIPE_SECRET_KEY` | optional | Stripe secret key (server only) |
+
+See `.env.example` for the full template and `DEPLOYMENT.md` for detailed setup instructions.
+
+## Audio Architecture
+
+All audio is served from one canonical source: the **Supabase `tracks` public bucket**.
+
+### Resolver: `lib/audio/resolveAudioUrl.ts`
+
+Single source of truth for converting any track reference into a playable URL:
+
+- Absolute `http(s)` URL → pass through unchanged.
+- Supabase storage path → pass through unchanged.
+- Bare filename / track key → resolved via `NEXT_PUBLIC_SUPABASE_TRACKS_BASE_URL`.
+
+Both `FeaturedPlaylists` and `GlobalPlayer` use this resolver. **Never hardcode Supabase
+project refs or `/pix/...` paths in component files.**
+
+### Canonical base URL
+
+```
+NEXT_PUBLIC_SUPABASE_TRACKS_BASE_URL=https://<project-ref>.supabase.co/storage/v1/object/public/tracks/
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-
-## Deployment (Best Practices)
-
-1. Copy environment template and fill secrets locally:
+## Local Development
 
 ```bash
 cp .env.example .env.local
-# edit .env.local and add keys (Supabase, Stripe, etc.)
+# Fill in real values in .env.local
+npm install
+npm run dev
 ```
 
-2. Run a local production build to verify:
+## Security
+
+- **Never commit** private keys (`*.p8`, `*.pem`, `*.key`) or `.env` files.
+  These patterns are enforced in `.gitignore`.
+- If a secret is ever committed: remove it, **revoke/rotate it immediately** at the provider,
+  and update Vercel environment variables with the new credentials.
+- Store all secrets as Vercel environment variables, never in source code.
+
+## Build
 
 ```bash
-npm ci
-npm run build
+npm run build   # must pass with zero TypeScript or Next.js errors
 ```
 
-3. CI: this repo includes a GitHub Actions workflow at `.github/workflows/ci.yml` that runs lint and build on push/PR. To enable automatic Vercel deploys from CI, add the following repository secrets in GitHub: `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`.
-
-4. Manual deploy (CLI):
-
-```bash
-npx vercel login
-npx vercel --prod
-```
-
-If you want, I can initialize a Git repo in this folder (so CI and standard Vercel flows work) and commit these changes — say the word and I'll do it.
