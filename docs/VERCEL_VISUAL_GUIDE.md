@@ -25,7 +25,7 @@ URL: https://vercel.com/dashboard
 │                                                     │
 │  Your Projects:                                     │
 │                                                     │
-│  📁 2GDP  <--- CLICK THIS      │
+│  📁 gputnam-music-final-site  <--- CLICK THIS      │
 │  📁 other-project                                   │
 │  📁 another-project                                 │
 │                                                     │
@@ -36,7 +36,7 @@ URL: https://vercel.com/dashboard
 
 ```
 ┌─────────────────────────────────────────────────────┐
-│  2GDP                          │
+│  gputnam-music-final-site                          │
 ├─────────────────────────────────────────────────────┤
 │  [Overview] [Deployments] [Analytics] [Settings]   │
 │                                          ↑          │
@@ -197,7 +197,7 @@ Use this to track your progress:
 
 ```
 □ Opened Vercel dashboard
-□ Selected 2GDP project
+□ Selected gputnam-music-final-site project
 □ Clicked Settings → Environment Variables
 □ Added NEXT_PUBLIC_SUPABASE_URL
    Value: https://lbzpfqarraegkghxwbah.supabase.co

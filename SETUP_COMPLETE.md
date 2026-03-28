@@ -48,7 +48,7 @@ This will guide you step-by-step and show you exactly what to copy/paste.
 #### Option B: Manual Setup
 
 1. Go to: https://vercel.com/dashboard
-2. Select your project: **2GDP**
+2. Select your project: **gputnam-music-final-site**
 3. Click **Settings** → **Environment Variables**
 4. Add these two variables:
 

@@ -29,7 +29,7 @@
 
 #### Option A: Use Vercel Dashboard (Recommended)
 1. Go to: https://vercel.com/dashboard
-2. Select project: **2GDP**
+2. Select project: **gputnam-music-final-site**
 3. Click: **Settings** → **Environment Variables**
 4. Add Variable 1:
    ```
@@ -227,7 +227,7 @@ vercel --prod
    - ✅ Verify `tracks` bucket exists and is public
 
 4. **Test Audio Playback:**
-   - Visit: https://2gdp.vercel.app/mip
+   - Visit: https://gputnam-music-final-site.vercel.app/mip
    - Enter password: `gpmpro26`
    - Click on a vault (RCKLS or VoiceClover)
    - ✅ Tracks should load and play
@@ -299,11 +299,11 @@ You'll know everything is PERMANENT when:
 
 ### Key URLs:
 - **Vercel Dashboard:** https://vercel.com/dashboard
-- **Vercel Env Vars:** https://vercel.com/dashboard → 2GDP → Settings → Environment Variables
+- **Vercel Env Vars:** https://vercel.com/dashboard → gputnam-music-final-site → Settings → Environment Variables
 - **Supabase Dashboard:** https://supabase.com/dashboard/project/lbzpfqarraegkghxwbah
 - **Supabase API Settings:** https://supabase.com/dashboard/project/lbzpfqarraegkghxwbah/settings/api
 - **Supabase Storage:** https://supabase.com/dashboard/project/lbzpfqarraegkghxwbah/storage/buckets
-- **Live Site:** https://2gdp.vercel.app
+- **Live Site:** https://gputnam-music-final-site.vercel.app
 
 ### Key Files:
 - Track Catalog: `public/assets/stl.csv` (20,674 tracks)

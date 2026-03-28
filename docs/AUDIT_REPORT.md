@@ -1,4 +1,4 @@
-# 2GDP Application Audit Report
+# G Putnam Music Application Audit Report
 **Date:** 2026-03-28  
 **Auditor:** @copilot  
 **Request:** Inspect all KKs & mKs for availability, silos, paths, functionality, and audio
