@@ -56,7 +56,7 @@ Deno.serve(async (req: Request) => {
         // Fallback: check sb.k_kuts table
         const { data: skk, error: skkErr } = await supabaseAdmin
           .from('sb.k_kuts')
-          .select('id, org_id, title, artist, kk_type, file_path, status')
+          .select('id, org_id, title, artist, kk_type, file_path, status, start_ms, end_ms')
           .eq('kk_type', 'K-kut')
           .eq('status', 'active')
           .limit(1)
