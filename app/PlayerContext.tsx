@@ -59,7 +59,6 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
         console.error('PlayerContext: Supabase init failed silently', err);
       }
     };
-
     fetchMusic();
   }, []);
 

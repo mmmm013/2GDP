@@ -1,0 +1,89 @@
+#!/bin/bash
+
+# Demo of the quick-setup script
+# This shows what the user will see
+
+cat << 'EOF'
+╔════════════════════════════════════════════════════════════╗
+║   🎵 G Putnam Music - Quick Environment Setup            ║
+╚════════════════════════════════════════════════════════════╝
+
+✨ Good news! I already know your Supabase project details:
+
+  Project ID: lbzpfqarraegkghxwbah
+  Project URL: https://lbzpfqarraegkghxwbah.supabase.co
+
+I just need ONE more thing from you: your Supabase anon key
+
+═══════════════════════════════════════════════════════════
+   How to Get Your Supabase Anon Key (30 seconds)         
+═══════════════════════════════════════════════════════════
+
+Step 1: Open this link in your browser:
+  https://supabase.com/dashboard/project/lbzpfqarraegkghxwbah/settings/api
+
+Step 2: Look for the section titled "Project API keys"
+
+Step 3: Find the key labeled "anon" or "anon public"
+
+Step 4: Click the [Copy] button next to it
+
+Step 5: Paste it below
+
+═══════════════════════════════════════════════════════════
+
+Paste your Supabase anon key here:
+(It starts with 'eyJ' and is quite long)
+> [YOU PASTE YOUR KEY HERE]
+
+✓ Anon key received!
+
+═══════════════════════════════════════════════════════════
+   Optional: Stripe Payment Configuration                 
+═══════════════════════════════════════════════════════════
+
+Do you want to configure Stripe for payment features?
+(You can skip this and add it later if needed)
+
+Configure Stripe now? (y/N): [PRESS N OR ENTER TO SKIP]
+
+╔════════════════════════════════════════════════════════════╗
+  🎉 SUCCESS! Your environment is configured!               
+╚════════════════════════════════════════════════════════════╝
+
+✓ Created: /path/to/.env.local
+
+What's been configured:
+  ✓ Supabase URL: https://lbzpfqarraegkghxwbah.supabase.co
+  ✓ Supabase Anon Key: eyJhbGciOiJIUzI1NiIs...
+
+═══════════════════════════════════════════════════════════
+   NEXT STEPS:
+═══════════════════════════════════════════════════════════
+
+1. Test locally:
+   npm install
+   npm run dev
+
+2. For Vercel deployment:
+   I've created a helper script for you!
+   ./scripts/setup-vercel.sh
+
+   Or manually add these in Vercel Dashboard:
+   → Go to: https://vercel.com/dashboard
+   → Select your project → Settings → Environment Variables
+   → Add:
+      NEXT_PUBLIC_SUPABASE_URL = https://lbzpfqarraegkghxwbah.supabase.co
+      NEXT_PUBLIC_SUPABASE_ANON_KEY = (your anon key)
+
+3. Verify everything works:
+   ./scripts/verify-env.sh
+
+═══════════════════════════════════════════════════════════
+
+🔒 Security Note:
+  • .env.local is already in .gitignore (safe from git)
+  • Never share your keys publicly
+  • Use test keys for development, live keys only in production
+
+EOF
