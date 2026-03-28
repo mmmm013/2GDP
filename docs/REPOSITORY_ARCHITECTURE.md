@@ -11,7 +11,7 @@
 **VIOLATION:**
 - Repository named "2GDP" contains 20,674 music tracks
 - Repository named "2GDP" contains music player infrastructure
-- Repository named "2GDP" deploys to `gputnam-music-final-site.vercel.app`
+- Repository named "2GDP" deploys to `gpmc.vercel.app` (should be GPMC project)
 
 **REQUIRED CORRECTION:**
 - Move ALL music code OUT of `mmmm013/2GDP`
@@ -118,14 +118,14 @@ This document describes the G Putnam Music platform architecture and repository 
 - ❌ Stripe payment integration for music - SHOULD NOT BE IN 2GDP REPO
 
 **Deployment:**
-- **Vercel Project:** gputnam-music-final-site (CORRECT)
-- **Live URL:** https://gputnam-music-final-site.vercel.app (CORRECT)
+- **Vercel Project:** GPMC (G Putnam Music Catalog) - UPDATE IN PROGRESS
+- **Live URL:** https://gpmc.vercel.app (TARGET URL)
 
 **🚨 CRITICAL BRANDING RULES:**
 - ❌ **2GDP HAS ZERO INVOLVEMENT WITH ANYTHING MUSIC**
 - ❌ **2GDP IS ONLY FOR KONSULTING**
 - ❌ **NEVER use "2GDP" or "2gdp" or "2gdp.com" for ANY music content**
-- ✅ "gputnam-music-final-site" is correct for music
+- ✅ "GPMC" (G Putnam Music Catalog) is the correct project name for music
 - ✅ "2GDP/2gdp.com" is exclusively for The Vektor [Konsulting]
 
 **Root Cause:**
@@ -404,6 +404,6 @@ Per user guidance, these terms/tools adapt to ANY business environment:
 ## References
 
 - **Branding Guidelines:** See stored memory - "2GDP is ONLY for Konsulting"
-- **Current Deployment:** https://gputnam-music-final-site.vercel.app
+- **Current Deployment:** https://gpmc.vercel.app (G Putnam Music Catalog)
 - **Track Inventory:** `docs/KK_MK_VERIFICATION.md`
 - **Setup Guide:** `FINALIZATION_GUIDE.md`

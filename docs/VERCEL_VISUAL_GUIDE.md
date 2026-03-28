@@ -25,7 +25,7 @@ URL: https://vercel.com/dashboard
 │                                                     │
 │  Your Projects:                                     │
 │                                                     │
-│  📁 gputnam-music-final-site  <--- CLICK THIS      │
+│  📁 GPMC (G Putnam Music Catalog)  <--- CLICK THIS      │
 │  📁 other-project                                   │
 │  📁 another-project                                 │
 │                                                     │
@@ -36,7 +36,7 @@ URL: https://vercel.com/dashboard
 
 ```
 ┌─────────────────────────────────────────────────────┐
-│  gputnam-music-final-site                          │
+│  GPMC (G Putnam Music Catalog)                          │
 ├─────────────────────────────────────────────────────┤
 │  [Overview] [Deployments] [Analytics] [Settings]   │
 │                                          ↑          │
@@ -197,7 +197,7 @@ Use this to track your progress:
 
 ```
 □ Opened Vercel dashboard
-□ Selected gputnam-music-final-site project
+□ Selected GPMC project
 □ Clicked Settings → Environment Variables
 □ Added NEXT_PUBLIC_SUPABASE_URL
    Value: https://lbzpfqarraegkghxwbah.supabase.co

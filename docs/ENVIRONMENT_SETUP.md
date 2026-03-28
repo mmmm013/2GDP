@@ -132,7 +132,7 @@ After setting up locally, you need to set the same environment variables in Verc
 
 1. **Go to Vercel Dashboard:**
    - Navigate to [https://vercel.com/dashboard](https://vercel.com/dashboard)
-   - Select your project (gputnam-music-final-site)
+   - Select your project (GPMC - G Putnam Music Catalog)
 
 2. **Open Environment Variables Settings:**
    - Click **Settings** tab

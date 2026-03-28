@@ -10,7 +10,7 @@ This guide shows you **exactly** how to configure environment variables in Verce
 
 1. Go to [https://vercel.com/dashboard](https://vercel.com/dashboard)
 2. Log in to your account
-3. Find and click on your project: **gputnam-music-final-site**
+3. Find and click on your project: **GPMC** (G Putnam Music Catalog)
 
 ### Step 2: Navigate to Environment Variables
 
