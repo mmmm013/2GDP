@@ -8,3 +8,4 @@ node_modules
 *.numbers
 *.csv
 ~$*
+tsconfig.tsbuildinfo
