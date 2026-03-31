@@ -51,11 +51,20 @@ const BLOCKED_COUNTRIES = [
 export function middleware(req: NextRequest) {
   // Get hostname for subdomain detection
   const hostname = req.headers.get('host') || '';
+  const isKleighDomain = hostname.includes('2kleigh.com');
   
   // Check for social subdomain redirects
   const subdomain = hostname.split('.')[0];
   if (SOCIAL_REDIRECTS[subdomain]) {
     return NextResponse.redirect(SOCIAL_REDIRECTS[subdomain], 308);
+  }
+
+  // Domain branding guardrail:
+  // 2kleigh.com should land on the KLEIGH product experience.
+  if (isKleighDomain && req.nextUrl.pathname === '/') {
+    const url = req.nextUrl.clone();
+    url.pathname = '/kleigh';
+    return NextResponse.rewrite(url);
   }
   
   // Extract country from Vercel's geo headers

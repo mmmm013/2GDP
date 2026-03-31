@@ -6,6 +6,11 @@ import stiLogo from '@/images/gpm_logo copy 2.png';
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [isKleighDomain, setIsKleighDomain] = useState(false);
+
+  useEffect(() => {
+    setIsKleighDomain(window.location.hostname.includes('2kleigh.com'));
+  }, []);
 
   // MOBILE FIX: Lock body scroll when mobile menu is open
   useEffect(() => {
@@ -36,9 +41,17 @@ export default function Header() {
           </div>
           <div className="flex flex-col">
             <span className="text-lg font-bold text-[#C8A882] tracking-wide leading-tight group-hover:text-[#D07CC8] transition-colors">G Putnam Music</span>
-            <span className="text-[10px] text-[#C8A882]/70 uppercase tracking-widest leading-tight">The One Stop Song Shop</span>
+            <span className="text-[10px] text-[#C8A882]/70 uppercase tracking-widest leading-tight">
+              {isKleighDomain ? 'KLEIGH Project - Tier 2 Brand' : 'The One Stop Song Shop'}
+            </span>
           </div>
         </Link>
+
+        {isKleighDomain && (
+          <span className="hidden sm:inline-flex text-[10px] uppercase tracking-[0.18em] text-[#F5e6c8]/70 border border-[#C8A882]/30 rounded-full px-3 py-1">
+            KLEIGH
+          </span>
+        )}
 
         {/* CENTER: Spacer */}
         <div className="flex-1" />
