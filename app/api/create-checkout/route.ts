@@ -1,38 +1,69 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from '@/lib/supabaseClient';
+
+export const runtime = 'nodejs';
+
+const REQUIRED_ENVS = [
+  'STRIPE_SECRET_KEY',
+] as const;
+
+for (const key of REQUIRED_ENVS) {
+  if (!process.env[key]) {
+    throw new Error(`Missing required env var: ${key}`);
+  }
+}
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2024-04-10',
 });
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+const TIERS = ['tap', 'double_tap', 'long_press', 'hold_heart'] as const;
+type Tier = (typeof TIERS)[number];
 
-// Tier price mapping (cents)
-const TIER_AMOUNTS: Record<string, number> = {
+const TIER_AMOUNTS: Record<Tier, number> = {
   tap: 199,
   double_tap: 499,
   long_press: 999,
   hold_heart: 2499,
 };
 
-const TIER_LABELS: Record<string, string> = {
+const TIER_LABELS: Record<Tier, string> = {
   tap: 'Quick Tap',
   double_tap: 'Double Tap',
   long_press: 'Long Press',
   hold_heart: 'Hold My Heart',
 };
 
+type CheckoutBody = {
+  tier?: string;
+  donorName?: string;
+  donorEmail?: string;
+  donorPhone?: string;
+  message?: string;
+  isAnonymous?: boolean;
+};
+
+const isTier = (value: string): value is Tier => (TIERS as readonly string[]).includes(value);
+const clean = (v: unknown, max = 500) => (typeof v === 'string' ? v.trim().slice(0, max) : '');
+
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json();
-    const { tier, donorName, donorEmail, donorPhone, message, isAnonymous } = body;
+    let body: CheckoutBody;
+    try {
+      body = await req.json();
+    } catch {
+      return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
+    }
 
-    // Validate tier
-    if (!tier || !TIER_AMOUNTS[tier]) {
+    const tier = clean(body.tier, 50);
+    const donorName = clean(body.donorName, 120);
+    const donorEmail = clean(body.donorEmail, 254);
+    const donorPhone = clean(body.donorPhone, 40);
+    const message = clean(body.message, 500);
+    const isAnonymous = Boolean(body.isAnonymous);
+
+    if (!isTier(tier)) {
       return NextResponse.json(
         { error: 'Invalid tier. Must be: tap, double_tap, long_press, or hold_heart' },
         { status: 400 }
@@ -41,8 +72,8 @@ export async function POST(req: NextRequest) {
 
     const amount = TIER_AMOUNTS[tier];
     const label = TIER_LABELS[tier];
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || req.nextUrl.origin;
 
-    // Create Stripe Checkout Session
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: [
@@ -60,8 +91,8 @@ export async function POST(req: NextRequest) {
         },
       ],
       mode: 'payment',
-      success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/gift/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/gift?cancelled=true`,
+      success_url: `${baseUrl}/gift/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${baseUrl}/gift?cancelled=true`,
       metadata: {
         tier,
         donorName: donorName || '',
@@ -72,23 +103,25 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // Create pending donation record in Supabase
     const { error: dbError } = await supabase.from('gpm_donations').insert({
       stripe_session_id: session.id,
-      donor_name: isAnonymous ? 'Anonymous' : (donorName || null),
+      donor_name: isAnonymous ? 'Anonymous' : donorName || null,
       donor_email: donorEmail || null,
       donor_phone: donorPhone || null,
       amount_cents: amount,
       tier,
       message: message || null,
-      is_anonymous: isAnonymous || false,
+      is_anonymous: isAnonymous,
       grand_prize_eligible: tier !== 'tap',
       status: 'pending',
     });
 
     if (dbError) {
       console.error('Supabase insert error:', dbError);
-      // Don't block checkout - log and continue
+    }
+
+    if (!session.url) {
+      return NextResponse.json({ error: 'Failed to create checkout URL' }, { status: 500 });
     }
 
     return NextResponse.json({ sessionId: session.id, url: session.url });
