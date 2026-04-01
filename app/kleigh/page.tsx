@@ -4,6 +4,11 @@ import MusicSystem from '@/components/MusicSystem';
 import { Mic2, BookOpen } from 'lucide-react';
 import { createClient } from '@supabase/supabase-js';
 
+export const metadata = {
+  title: 'KLEIGH | G Putnam Music',
+  description: 'KLEIGH is a G Putnam Music product brand featuring the legacy collection and Sponsor CUBs support.',
+};
+
 // BEHIND THE MUSIC: Vocalist stories from his own words
 const TRACK_STORIES = [
   {
@@ -55,30 +60,67 @@ export default async function KleighPage() {
     <main className="min-h-screen bg-[#FFFDF5] text-[#2C241B]">
       <Header />
 
-      {/* HEADER HERO - Now strictly utilizing the Tan palette */}
       <section className="relative pt-20 pb-20 bg-gradient-to-br from-[#D2B48C] to-[#C8A882] text-[#FFFDF5]">
         <div className="max-w-4xl mx-auto px-6 text-center">
+          <p className="text-xs font-semibold uppercase tracking-[0.45em] text-[#2C241B]/75 mb-4">
+            G Putnam Music, LLC Presents
+          </p>
           <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-[#FFFDF5]/10 backdrop-blur-md mb-6 border border-[#FFFDF5]/20">
             <Mic2 size={40} />
           </div>
           <h1 className="text-5xl md:text-7xl font-black uppercase tracking-tighter mb-4">Kleigh</h1>
           <p className="text-xl font-serif italic opacity-80">The Legacy Collection</p>
+          <p className="max-w-2xl mx-auto mt-6 text-sm md:text-base leading-relaxed text-[#FFFDF5]/88">
+            KLEIGH is the Tier 2 product brand. G Putnam Music remains the parent label, and this collection exists to preserve the voice,
+            catalog, and story while inviting supporters to Sponsor CUBs.
+          </p>
+          <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
+            <a
+              href="/gift"
+              className="inline-flex items-center justify-center rounded-full bg-[#2C241B] px-6 py-3 text-sm font-bold uppercase tracking-[0.25em] text-[#FFFDF5] transition hover:bg-[#1E1812]"
+            >
+              Sponsor CUBs
+            </a>
+            <a
+              href="#audio-vault"
+              className="inline-flex items-center justify-center rounded-full border border-[#FFFDF5]/40 px-6 py-3 text-sm font-bold uppercase tracking-[0.25em] text-[#FFFDF5] transition hover:bg-[#FFFDF5]/10"
+            >
+              Enter The Vault
+            </a>
+          </div>
         </div>
       </section>
 
-      {/* TRACK LISTING - Injected Live Engine */}
-      <section className="py-16 max-w-4xl mx-auto px-6">
+      <section className="py-10 bg-[#F4E6CF] border-y border-[#C8A882]/25">
+        <div className="max-w-4xl mx-auto px-6 grid gap-4 md:grid-cols-3">
+          <div className="rounded-2xl border border-[#C8A882]/25 bg-[#FFF9EE] p-5">
+            <p className="text-xs font-bold uppercase tracking-[0.3em] text-[#8F714F] mb-2">Tier 1</p>
+            <p className="text-lg font-bold uppercase">G Putnam Music, LLC</p>
+            <p className="mt-2 text-sm leading-relaxed text-[#5C4A37]">Corporate identity, catalog stewardship, and platform governance remain visible here.</p>
+          </div>
+          <div className="rounded-2xl border border-[#C8A882]/25 bg-[#FFF9EE] p-5">
+            <p className="text-xs font-bold uppercase tracking-[0.3em] text-[#8F714F] mb-2">Tier 2</p>
+            <p className="text-lg font-bold uppercase">KLEIGH</p>
+            <p className="mt-2 text-sm leading-relaxed text-[#5C4A37]">The public-facing product brand for legacy vocal storytelling and curated listening.</p>
+          </div>
+          <div className="rounded-2xl border border-[#C8A882]/25 bg-[#FFF9EE] p-5">
+            <p className="text-xs font-bold uppercase tracking-[0.3em] text-[#8F714F] mb-2">Support Action</p>
+            <p className="text-lg font-bold uppercase">Sponsor CUBs</p>
+            <p className="mt-2 text-sm leading-relaxed text-[#5C4A37]">This domain should convert support into sponsorship, not generic donations or vague fan messaging.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="audio-vault" className="py-16 max-w-4xl mx-auto px-6">
         <h2 className="text-2xl font-bold uppercase tracking-widest text-[#C8A882] mb-8 border-b border-[#C8A882]/20 pb-4">
           Live Audio Vault
         </h2>
-        
-        {/* The Live MusicSystem Component */}
+
         <div className="bg-black p-2 rounded-xl border border-[#C8A882]/30 shadow-lg">
            <MusicSystem tracks={safeTracks} />
         </div>
       </section>
 
-      {/* BEHIND THE MUSIC */}
       <section className="py-16 bg-[#2C241B] text-[#FFFDF5]">
         <div className="max-w-4xl mx-auto px-6">
           <div className="flex items-center gap-3 mb-10">
