@@ -4,6 +4,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const base = 'https://www.gputnammusic.com';
   const routes = [
     '',
+    '/about',
     '/who',
     '/heroes',
     '/gift',
