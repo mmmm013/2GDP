@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabaseAdmin'
+import { upsertFallbackKut } from '@/lib/kkutFallbackStore'
 
 // POST /api/k/create
 // Body: { code: string, destination: string, item_type: 'STI'|'BTI'|'FP', item_id: string }
@@ -18,6 +19,10 @@ export async function POST(req: NextRequest) {
 
   if (!code || !destination || !item_type || !item_id) {
     return NextResponse.json({ error: 'Missing required fields: code, destination, item_type, item_id' }, { status: 400 })
+  }
+
+  if (!/^[a-z0-9]{4,10}$/i.test(code)) {
+    return NextResponse.json({ error: 'code must be 4-10 alphanumeric characters' }, { status: 400 })
   }
 
   const validTypes = ['STI', 'BTI', 'FP']
@@ -46,6 +51,18 @@ export async function POST(req: NextRequest) {
         .single()
       return NextResponse.json(existing ?? { code, destination }, { status: 200 })
     }
+
+    // Dev-only escape hatch: allow local testing if Supabase is unreachable.
+    if (process.env.NODE_ENV !== 'production') {
+      const fallback = upsertFallbackKut({
+        code,
+        destination,
+        item_type: item_type as 'STI' | 'BTI' | 'FP',
+        item_id,
+      })
+      return NextResponse.json({ code: fallback.code, destination: fallback.destination, source: 'fallback-store' }, { status: 201 })
+    }
+
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 

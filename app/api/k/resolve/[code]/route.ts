@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabaseAdmin'
+import { getFallbackKut } from '@/lib/kkutFallbackStore'
 
 // GET /api/k/resolve/[code]
 // Returns the destination path for a K-KUT short code.
@@ -7,9 +8,9 @@ import { supabaseAdmin } from '@/lib/supabaseAdmin'
 
 export async function GET(
   _req: NextRequest,
-  { params }: { params: { code: string } }
+  { params }: { params: Promise<{ code: string }> }
 ) {
-  const { code } = params
+  const { code } = await params
 
   if (!code || !/^[a-z0-9]{4,10}$/i.test(code)) {
     return NextResponse.json({ error: 'Invalid code format' }, { status: 400 })
@@ -22,6 +23,17 @@ export async function GET(
     .single()
 
   if (error || !data) {
+    if (process.env.NODE_ENV !== 'production') {
+      const fallback = getFallbackKut(code)
+      if (fallback) {
+        return NextResponse.json({
+          destination: fallback.destination,
+          item_type: fallback.item_type,
+          item_id: fallback.item_id,
+          source: 'fallback-store',
+        })
+      }
+    }
     return NextResponse.json({ error: 'Code not found' }, { status: 404 })
   }
 

@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import { useParams } from 'next/navigation'
 
 // mKUT prefab container — receives a canonical mKUT ID in the form:
 //   mkut-{type}-{itemId}-{timestamp}  (e.g. mkut-sti-abc123-1712000000)
@@ -61,7 +62,9 @@ function parseMkutId(id: string): ParsedMkutId {
 // Resolve edge base URL — NEXT_PUBLIC_ env vars are safe in the browser
 const EDGE_BASE = process.env.NEXT_PUBLIC_SUPABASE_URL ?? ''
 
-export default function MKutPlayer({ params }: { params: { id: string } }) {
+export default function MKutPlayer() {
+  const routeParams = useParams<{ id: string }>()
+  const id = routeParams?.id ?? ''
   const [mkut, setMkut]           = useState<MKutRecord | null>(null)
   const [loading, setLoading]     = useState(true)
   const [error, setError]         = useState<string | null>(null)
@@ -72,6 +75,12 @@ export default function MKutPlayer({ params }: { params: { id: string } }) {
   const audioRef = useRef<HTMLAudioElement | null>(null)
 
   useEffect(() => {
+    if (!id) {
+      setError('Invalid mKUT id.')
+      setLoading(false)
+      return
+    }
+
     if (!EDGE_BASE) {
       setError('Player configuration missing.')
       setLoading(false)
@@ -79,7 +88,7 @@ export default function MKutPlayer({ params }: { params: { id: string } }) {
     }
 
     const controller = new AbortController()
-    const parsed = parseMkutId(params.id)
+    const parsed = parseMkutId(id)
     const edgeBody = parsed.mode === 'pix'
       ? { pix_pck_id: parsed.pix_pck_id, tag: parsed.tag }
       : { k_kut_id: parsed.k_kut_id }
@@ -102,7 +111,7 @@ export default function MKutPlayer({ params }: { params: { id: string } }) {
         const meta = data.meta ?? {}
         setStreamUrl(data.signed_url ?? null)
         setMkut({
-          id:            params.id,
+          id,
           title:         data.title         ?? meta.title        ?? 'Untitled',
           artist:        data.artist        ?? meta.artist       ?? 'G Putnam Music',
           structure_tag: data.structure_tag ?? meta.structure_tag ?? 'Verse',
@@ -120,7 +129,7 @@ export default function MKutPlayer({ params }: { params: { id: string } }) {
       .finally(() => setLoading(false))
 
     return () => controller.abort()
-  }, [params.id])
+  }, [id])
 
   useEffect(() => {
     const audio = audioRef.current
@@ -177,7 +186,7 @@ export default function MKutPlayer({ params }: { params: { id: string } }) {
   }
 
   const share = async () => {
-    const url = `${window.location.origin}/mkut/${params.id}`
+    const url = `${window.location.origin}/mkut/${id}`
     if (navigator.share) {
       await navigator.share({ title: mkut?.title ?? 'mKUT', url }).catch(() => {})
     } else {

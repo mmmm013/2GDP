@@ -260,6 +260,7 @@ export default function KKKCreatorPage() {
               </button>
             ))}
           </div>
+        </div>
 
         {/* Generated KUT - Clean Display */}
         {generatedKUT && (

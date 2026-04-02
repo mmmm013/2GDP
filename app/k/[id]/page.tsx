@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useParams, useRouter, useSearchParams } from 'next/navigation'
 
 type RouteTarget = {
   href: string
@@ -78,22 +78,27 @@ const resolveRoute = (kutId: string): RouteTarget => {
   }
 }
 
-export default function KUTRedirect({ params }: { params: { id: string } }) {
+export default function KUTRedirect() {
+  const routeParams = useParams<{ id: string }>()
+  const id = routeParams?.id ?? ''
   const router = useRouter()
   const searchParams = useSearchParams()
   const [isNavigating, setIsNavigating] = useState(false)
   const [resolvedTarget, setResolvedTarget] = useState<RouteTarget | null>(null)
 
   const mode = useMemo<OpenMode>(() => {
-    if (isJewelrySignal(params.id, searchParams.get('mode'))) return 'jewelry'
-    if (isRomanceSkin(params.id, searchParams.get('skin'))) return 'romance'
-    if (isMiniKutSignal(params.id, searchParams.get('mk'))) return 'mkut'
+    if (isJewelrySignal(id, searchParams.get('mode'))) return 'jewelry'
+    if (isRomanceSkin(id, searchParams.get('skin'))) return 'romance'
+    if (isMiniKutSignal(id, searchParams.get('mk'))) return 'mkut'
     return 'kkut'
-  }, [params.id, searchParams])
+  }, [id, searchParams])
 
   // --- Resolve destination (async for K-KUT short codes) ---
   useEffect(() => {
-    const id = params.id
+    if (!id) {
+      setResolvedTarget({ href: '/kupid', label: 'KUPID' })
+      return
+    }
 
     // 1. Canonical mKUT ID → mKUT player
     if (id.toLowerCase().startsWith('mkut-')) {
@@ -120,7 +125,7 @@ export default function KUTRedirect({ params }: { params: { id: string } }) {
 
     // 3. Semantic IDs (sti-…, bti-…, fp-…) — synchronous resolve
     setResolvedTarget(resolveRoute(id))
-  }, [params.id])
+  }, [id])
 
   // --- Navigate once target is resolved + delay expires ---
   useEffect(() => {
