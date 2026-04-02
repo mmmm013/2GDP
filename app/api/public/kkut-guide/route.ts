@@ -4,6 +4,56 @@ const KNOWN_BOTS = ['MC-BOT', 'LF-BOT', 'GD-BOT', 'PIXIE-BOT'] as const;
 
 type KnownBot = (typeof KNOWN_BOTS)[number];
 
+const BOT_PROFILES: Record<KnownBot, {
+  voice: string;
+  specialty: string;
+  arrival_greeting: string;
+}> = {
+  'MC-BOT': {
+    voice: 'Commanding, premium concierge',
+    specialty: 'Master control, routing, and orchestration',
+    arrival_greeting: 'Welcome to G Putnam Music. I am MC-BOT. I will guide your full journey step by step.',
+  },
+  'LF-BOT': {
+    voice: 'Warm lifestyle curator',
+    specialty: 'Gift flow and user journey guidance',
+    arrival_greeting: 'Welcome. I am LF-BOT. Tell me your goal and I will map each next step clearly.',
+  },
+  'GD-BOT': {
+    voice: 'Precise operations analyst',
+    specialty: 'Data-driven guidance and system status',
+    arrival_greeting: 'Welcome. GD-BOT online. I will provide exact, actionable steps and checkpoints.',
+  },
+  'PIXIE-BOT': {
+    voice: 'Creative micro-moment stylist',
+    specialty: 'K-KUT and mKUT moment design',
+    arrival_greeting: 'Hi, I am PIXIE-BOT. I can shape your perfect music moment and guide every click.',
+  },
+};
+
+const PROPRIETARY_GUARDRAILS = {
+  preserve_proprietary_info: true,
+  never_expose: [
+    'service_role keys',
+    'private tokens',
+    'internal-only architecture notes',
+    'customer private records',
+  ],
+  disclosure_policy: 'Only public, user-authorized, or explicitly permitted information may be returned.',
+};
+
+const JOURNEY_PROTOCOL = {
+  mode: 'step-by-step',
+  behavior: 'Bot follows user-declared journey intent and confirms progress at each step.',
+  default_steps: [
+    'Discover user intent',
+    'Recommend K-KUT or mKUT path',
+    'Generate or resolve link',
+    'Confirm open/play experience',
+    'Offer next best action',
+  ],
+};
+
 const GUIDE = {
   version: '2026-04-02',
   title: 'K-KUT, mini-KUT, and K-kUpId Explainer',
@@ -63,6 +113,7 @@ export async function GET(req: Request) {
   const url = new URL(req.url);
   const bot = (url.searchParams.get('bot') ?? '').toUpperCase();
   const isKnownBot = (KNOWN_BOTS as readonly string[]).includes(bot);
+  const profile = isKnownBot ? BOT_PROFILES[bot as KnownBot] : null;
 
   const payload = {
     ...GUIDE,
@@ -71,9 +122,14 @@ export async function GET(req: Request) {
     bot_profile: bot
       ? {
           name: bot,
-          capabilities: ['read_guide', 'read_script', 'read_concepts'],
+          capabilities: ['read_guide', 'read_script', 'read_concepts', 'journey_guidance'],
+          voice: profile?.voice ?? 'General assistant',
+          specialty: profile?.specialty ?? 'General guidance',
+          arrival_greeting: profile?.arrival_greeting ?? 'Welcome to G Putnam Music. How can I guide your journey?',
         }
       : null,
+    proprietary_guardrails: PROPRIETARY_GUARDRAILS,
+    journey_protocol: JOURNEY_PROTOCOL,
   };
 
   return NextResponse.json(payload, {
