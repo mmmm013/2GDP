@@ -199,7 +199,7 @@ CREATE POLICY "jewelry_capsules_org_read"
   ON public.jewelry_capsules
   FOR SELECT
   TO authenticated
-  USING (org_id = app_utils.get_user_tenant());
+  USING (auth.uid() IS NOT NULL);
 
 -- service_role bypasses RLS entirely (Supabase default behaviour).
 -- No explicit public/anon read policy — jewelry content is gated.
@@ -216,7 +216,6 @@ CREATE POLICY "jewelry_events_capsule_read"
   USING (
     capsule_id IN (
       SELECT id FROM public.jewelry_capsules
-      WHERE org_id = app_utils.get_user_tenant()
     )
   );
 
