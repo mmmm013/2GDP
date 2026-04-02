@@ -1,16 +1,36 @@
 'use client'
 
 import { useSearchParams } from 'next/navigation'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
+import { supabase } from '@/lib/supabaseClient'
 
-// /gift/playlists?playlist={playlistId}
-// Destination after a K-KUT or mKUT FP (Featured Playlist) open.
+interface Playlist {
+  id: string
+  name: string
+  description?: string
+}
 
 export default function GiftPlaylistsPage() {
   const searchParams = useSearchParams()
   const playlistId = searchParams.get('playlist') ?? ''
+  const [playlist, setPlaylist] = useState<Playlist | null>(null)
+  const [loading, setLoading] = useState(!!playlistId)
+
+  useEffect(() => {
+    if (!playlistId) return
+    supabase
+      .from('playlists')
+      .select('id, name, description')
+      .eq('id', playlistId)
+      .single()
+      .then(({ data }) => {
+        setPlaylist(data ?? null)
+        setLoading(false)
+      })
+  }, [playlistId])
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-black via-gray-950 to-black text-white">
@@ -25,21 +45,35 @@ export default function GiftPlaylistsPage() {
           <p className="mt-3 text-white/50 max-w-sm mx-auto text-sm">
             Someone shared a curated GPM playlist K-KUT with you.
           </p>
-          {playlistId && (
-            <p className="mt-2 text-[10px] font-mono text-white/25 tracking-widest uppercase">
-              Playlist ID: {playlistId}
-            </p>
-          )}
         </div>
 
-        {/* Playlist card placeholder */}
+        {/* Playlist card */}
         <div className="bg-white/5 border border-white/10 rounded-2xl p-8 text-center">
-          <div className="w-16 h-16 mx-auto rounded-full bg-gradient-to-br from-teal-400 to-cyan-500 flex items-center justify-center text-3xl mb-5 shadow-lg shadow-teal-500/25">
-            ▤
-          </div>
-          <p className="text-white/60 text-sm">
-            This featured playlist K-KUT is loading. Once activated, the full curated tracklist from G Putnam Music will be available here.
-          </p>
+          {loading ? (
+            <p className="text-white/40 text-sm py-8 animate-pulse">Loading playlist…</p>
+          ) : playlist ? (
+            <>
+              <div className="w-16 h-16 mx-auto rounded-full bg-gradient-to-br from-teal-400 to-cyan-500 flex items-center justify-center text-3xl mb-5 shadow-lg shadow-teal-500/25">
+                ▤
+              </div>
+              <h2 className="text-2xl font-bold text-white mb-2">{playlist.name}</h2>
+              {playlist.description && (
+                <p className="text-white/50 text-sm mb-4">{playlist.description}</p>
+              )}
+              <p className="text-white/40 text-sm">
+                The full curated tracklist from G Putnam Music will be available here once activated.
+              </p>
+            </>
+          ) : (
+            <>
+              <div className="w-16 h-16 mx-auto rounded-full bg-gradient-to-br from-teal-400 to-cyan-500 flex items-center justify-center text-3xl mb-5 shadow-lg shadow-teal-500/25">
+                ▤
+              </div>
+              <p className="text-white/60 text-sm">
+                This featured playlist K-KUT is loading. Once activated, the full curated tracklist from G Putnam Music will be available here.
+              </p>
+            </>
+          )}
         </div>
 
         <div className="mt-10 flex flex-wrap justify-center gap-4">

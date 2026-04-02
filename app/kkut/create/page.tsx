@@ -1,30 +1,17 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Share2, Copy, Check, Music, Radio, Heart, Sparkles, Zap } from 'lucide-react';
 import Header from '@/components/Header';
+import { supabase } from '@/lib/supabaseClient';
 
-// Sample data - Replace with actual Supabase queries
-const TRACKS = [
-  { id: '1', title: 'Reflections', artist: 'Kleigh', type: 'STI' },
-  { id: '2', title: 'Best Nights of Our Lives', artist: 'Kleigh', type: 'STI' },
-  { id: '3', title: 'I Need an Angel', artist: 'G Putnam Music', type: 'STI' },
-  { id: '4', title: 'Can You See It', artist: 'KLEIGH', type: 'STI' },
-];
-
-const BTI_STORIES = [
-  { id: 'bti1', title: 'Can You See It - Behind The Music', artist: 'KLEIGH', type: 'BTI' },
-  { id: 'bti2', title: 'Best Nights - Creation Story', artist: 'KLEIGH', type: 'BTI' },
-  { id: 'bti3', title: 'Reflections - Studio Session', artist: 'KLEIGH', type: 'BTI' },
-];
-
-const FEATURED_PLAYLISTS = [
-  { id: 'fp1', title: "A Love Like This - Valentine's", type: 'FP', trackCount: 7 },
-  { id: 'fp2', title: 'DISCO - Core Collection', type: 'FP', trackCount: 120 },
-  { id: 'fp3', title: 'Melancholy Moods', type: 'FP', trackCount: 15 },
-  { id: 'fp4', title: 'High Energy Beats', type: 'FP', trackCount: 22 },
-];
+interface CatalogItem {
+  id: string;
+  title: string;
+  type: 'STI' | 'BTI' | 'FP';
+  artist?: string;
+}
 
 // Generate short 6-character K-KUT share code
 const generateShortCode = (): string => {
@@ -53,6 +40,20 @@ export default function KKKCreatorPage() {
   const [kutMode, setKutMode] = useState<'kkut' | 'mkut'>('kkut');
   const [mkutId, setMkutId] = useState<string>('');
   const [structTag, setStructTag] = useState<'Verse' | 'BR' | 'Ch'>('Verse');
+  const [tracks, setTracks] = useState<CatalogItem[]>([]);
+  const [playlists, setPlaylists] = useState<CatalogItem[]>([]);
+  const [itemsLoading, setItemsLoading] = useState(true);
+
+  useEffect(() => {
+    Promise.all([
+      supabase.from('gpm_tracks').select('id, title, artist').order('title'),
+      supabase.from('playlists').select('id, name').eq('is_featured', true).order('name'),
+    ]).then(([{ data: tData }, { data: pData }]) => {
+      setTracks((tData ?? []).map((t: any) => ({ id: t.id, title: t.title, type: 'STI' as const, artist: t.artist })));
+      setPlaylists((pData ?? []).map((p: any) => ({ id: p.id, title: p.name, type: 'FP' as const })));
+      setItemsLoading(false);
+    });
+  }, []);
 
   // Build the relative destination path for a given type + itemId.
   const buildDestination = (type: string, itemId: string): string => {
@@ -95,16 +96,12 @@ export default function KKKCreatorPage() {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const getCurrentItems = () => {
+  const getCurrentItems = (): CatalogItem[] => {
     switch (selectedType) {
-      case 'STI':
-        return TRACKS;
-      case 'BTI':
-        return BTI_STORIES;
-      case 'FP':
-        return FEATURED_PLAYLISTS;
-      default:
-        return [];
+      case 'STI': return tracks;
+      case 'BTI': return tracks.map(t => ({ ...t, type: 'BTI' as const }));
+      case 'FP':  return playlists;
+      default:    return [];
     }
   };
 
@@ -230,7 +227,12 @@ export default function KKKCreatorPage() {
           </h2>
           
           <div className="grid gap-2">
-            {getCurrentItems().map((item) => (
+            {itemsLoading ? (
+              <p className="text-center text-[#F5E6D3]/40 py-6 text-sm">Loading…</p>
+            ) : getCurrentItems().length === 0 ? (
+              <p className="text-center text-[#F5E6D3]/40 py-6 text-sm">No items found.</p>
+            ) : null}
+            {!itemsLoading && getCurrentItems().map((item) => (
               <button
                 key={item.id}
                 onClick={() => generateKUT(item.id, item.type)}
@@ -258,7 +260,6 @@ export default function KKKCreatorPage() {
               </button>
             ))}
           </div>
-        </div>
 
         {/* Generated KUT - Clean Display */}
         {generatedKUT && (

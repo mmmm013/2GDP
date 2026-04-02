@@ -11,8 +11,18 @@ type RouteTarget = {
 // A K-KUT short code is 4-10 alphanumeric chars with no hyphens.
 const isShortCode = (id: string): boolean => /^[a-z0-9]{4,10}$/i.test(id)
 
-type OpenMode = 'kkut' | 'mkut' | 'jewelry'
+type OpenMode = 'kkut' | 'mkut' | 'jewelry' | 'romance'
 
+const isRomanceSkin = (id: string, querySkin: string | null): boolean => {
+  if (querySkin === 'romance' || querySkin === 'love' || querySkin === 'rom') return true
+  const normalized = id.toLowerCase()
+  return (
+    normalized.startsWith('love-') ||
+    normalized.startsWith('rom-') ||
+    normalized.startsWith('vday-') ||
+    normalized.startsWith('heart-')
+  )
+}
 const isJewelrySignal = (id: string, queryMode: string | null): boolean => {
   if (queryMode === 'jewelry' || queryMode === 'jlr') return true
   const normalized = id.toLowerCase()
@@ -46,7 +56,7 @@ const resolveRoute = (kutId: string): RouteTarget => {
   // Support mKUT wrappers while preserving existing type routing.
   if (parts[0] === 'mk' || parts[0] === 'mkut' || (parts[0] === 'm' && parts[1] === 'kut')) {
     parts.shift()
-    if (parts[0] === 'kut') parts.shift()
+    if ((parts[0] as string) === 'kut') parts.shift()
   }
 
   if (parts.length < 2) {
@@ -76,6 +86,7 @@ export default function KUTRedirect({ params }: { params: { id: string } }) {
 
   const mode = useMemo<OpenMode>(() => {
     if (isJewelrySignal(params.id, searchParams.get('mode'))) return 'jewelry'
+    if (isRomanceSkin(params.id, searchParams.get('skin'))) return 'romance'
     if (isMiniKutSignal(params.id, searchParams.get('mk'))) return 'mkut'
     return 'kkut'
   }, [params.id, searchParams])
@@ -114,7 +125,7 @@ export default function KUTRedirect({ params }: { params: { id: string } }) {
   // --- Navigate once target is resolved + delay expires ---
   useEffect(() => {
     if (!resolvedTarget) return
-    const delayMs = mode === 'mkut' ? 1100 : mode === 'jewelry' ? 2000 : 1650
+    const delayMs = mode === 'mkut' ? 1100 : mode === 'jewelry' ? 2000 : mode === 'romance' ? 1900 : 1650
     const timer = window.setTimeout(() => {
       setIsNavigating(true)
       router.push(resolvedTarget.href)
@@ -233,6 +244,81 @@ export default function KUTRedirect({ params }: { params: { id: string } }) {
           @keyframes note-rise {
             0%   { opacity: 0; transform: translateY(6px); }
             100% { opacity: 1; transform: translateY(0px); }
+          }
+        `}</style>
+      </div>
+    )
+  }
+
+  if (mode === 'romance') {
+    return (
+      <div className="rom-shell min-h-screen flex items-center justify-center px-6">
+        <div className="rom-card max-w-sm w-full rounded-3xl p-8 text-center">
+          <div className="hearts-wrap" aria-hidden="true">
+            <span className="heart heart-a">♥</span>
+            <span className="heart heart-b">♥</span>
+            <span className="heart heart-c">♥</span>
+          </div>
+
+          <p className="mt-4 text-[10px] tracking-[0.45em] font-semibold text-[#e8a0b0] uppercase">G Putnam Music</p>
+          <h1 className="mt-2 text-2xl font-black text-[#fff0f3] tracking-tight">
+            {isNavigating ? 'Delivering your gift…' : 'Made with Love'}
+          </h1>
+          <p className="mt-3 text-sm text-[#f5c6d0] italic">A song that says what words cannot.</p>
+          <p className="mt-5 text-[10px] uppercase tracking-[0.3em] text-[#f0a0b5]">
+            {isNavigating ? `Entering ${resolvedTarget?.label ?? '…'}` : 'Opening your moment'}
+          </p>
+        </div>
+
+        <style jsx>{`
+          .rom-shell {
+            background:
+              radial-gradient(800px 400px at 50% -10%, rgba(220, 80, 110, 0.28), transparent 60%),
+              linear-gradient(155deg, #1a0810 0%, #2d0a18 50%, #1a0508 100%);
+          }
+          .rom-card {
+            background: rgba(22, 6, 12, 0.82);
+            border: 1px solid rgba(230, 120, 150, 0.3);
+            box-shadow: 0 24px 64px rgba(180, 20, 60, 0.35), inset 0 1px 0 rgba(255, 180, 200, 0.1);
+          }
+          .hearts-wrap {
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            gap: 14px;
+            height: 64px;
+          }
+          .heart {
+            font-size: 2rem;
+            color: #e8607a;
+            text-shadow: 0 0 12px rgba(232, 96, 122, 0.7);
+            animation: heart-float 2s ease-in-out infinite;
+          }
+          .heart-a {
+            font-size: 1.5rem;
+            animation-delay: 0s;
+            color: #d64060;
+          }
+          .heart-b {
+            font-size: 2.4rem;
+            animation-delay: 0.25s;
+            color: #f07090;
+          }
+          .heart-c {
+            font-size: 1.7rem;
+            animation-delay: 0.5s;
+            color: #e04868;
+          }
+          @keyframes heart-float {
+            0%,
+            100% {
+              transform: translateY(0px) scale(1);
+              opacity: 0.85;
+            }
+            50% {
+              transform: translateY(-10px) scale(1.08);
+              opacity: 1;
+            }
           }
         `}</style>
       </div>

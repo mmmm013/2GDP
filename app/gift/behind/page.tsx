@@ -1,16 +1,37 @@
 'use client'
 
 import { useSearchParams } from 'next/navigation'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
+import { supabase } from '@/lib/supabaseClient'
 
-// /gift/behind?track={itemId}
-// Destination after a K-KUT or mKUT BTI (Behind The Music / Story) open.
+interface Track {
+  id: string
+  title: string
+  artist: string
+  image?: string
+}
 
 export default function GiftBehindPage() {
   const searchParams = useSearchParams()
   const trackId = searchParams.get('track') ?? ''
+  const [track, setTrack] = useState<Track | null>(null)
+  const [loading, setLoading] = useState(!!trackId)
+
+  useEffect(() => {
+    if (!trackId) return
+    supabase
+      .from('gpm_tracks')
+      .select('id, title, artist, image')
+      .eq('id', trackId)
+      .single()
+      .then(({ data }) => {
+        setTrack(data ?? null)
+        setLoading(false)
+      })
+  }, [trackId])
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-black via-gray-950 to-black text-white">
@@ -25,21 +46,41 @@ export default function GiftBehindPage() {
           <p className="mt-3 text-white/50 max-w-sm mx-auto text-sm">
             Someone shared a K-KUT story with you — an intimate look behind the music.
           </p>
-          {trackId && (
-            <p className="mt-2 text-[10px] font-mono text-white/25 tracking-widest uppercase">
-              Story ID: {trackId}
-            </p>
-          )}
         </div>
 
-        {/* Story card placeholder */}
+        {/* Story card */}
         <div className="bg-white/5 border border-white/10 rounded-2xl p-8 text-center">
-          <div className="w-16 h-16 mx-auto rounded-full bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center text-3xl mb-5 shadow-lg shadow-purple-500/25">
-            ◎
-          </div>
-          <p className="text-white/60 text-sm">
-            The behind-the-music story for this K-KUT is loading. Once activated, this space reveals the creative context, studio notes, and personal reflections from the artist.
-          </p>
+          {loading ? (
+            <p className="text-white/40 text-sm py-8 animate-pulse">Loading story…</p>
+          ) : track ? (
+            <>
+              {track.image ? (
+                <img
+                  src={track.image}
+                  alt={track.title}
+                  className="w-20 h-20 mx-auto rounded-full object-cover mb-5 shadow-lg shadow-purple-500/20"
+                />
+              ) : (
+                <div className="w-16 h-16 mx-auto rounded-full bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center text-3xl mb-5 shadow-lg shadow-purple-500/25">
+                  ◎
+                </div>
+              )}
+              <h2 className="text-2xl font-bold text-white mb-1">{track.title}</h2>
+              <p className="text-purple-400 font-medium mb-4">{track.artist}</p>
+              <p className="text-white/50 text-sm">
+                The behind-the-music story for this K-KUT is loading. Once activated, this space reveals the creative context, studio notes, and personal reflections from the artist.
+              </p>
+            </>
+          ) : (
+            <>
+              <div className="w-16 h-16 mx-auto rounded-full bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center text-3xl mb-5 shadow-lg shadow-purple-500/25">
+                ◎
+              </div>
+              <p className="text-white/60 text-sm">
+                The behind-the-music story for this K-KUT is loading. Once activated, this space reveals the creative context, studio notes, and personal reflections from the artist.
+              </p>
+            </>
+          )}
         </div>
 
         <div className="mt-10 flex flex-wrap justify-center gap-4">
