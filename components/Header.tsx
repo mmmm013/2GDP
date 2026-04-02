@@ -4,12 +4,44 @@ import Image from 'next/image';
 import { useState, useEffect } from 'react';
 import stiLogo from '@/images/gpm_logo copy 2.png';
 
+type StiTemplateResponse = {
+  slots?: Record<string, unknown>;
+};
+
+const asText = (value: unknown, fallback: string): string => {
+  if (typeof value === 'string' && value.trim()) return value;
+  if (value && typeof value === 'object' && 'value' in value) {
+    const candidate = (value as { value?: unknown }).value;
+    if (typeof candidate === 'string' && candidate.trim()) return candidate;
+  }
+  return fallback;
+};
+
+const asMenuLabel = (slot: unknown, key: string, fallback: string): string => {
+  if (!slot || typeof slot !== 'object') return fallback;
+  const value = (slot as Record<string, unknown>)[key];
+  return asText(value, fallback);
+};
+
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [isKleighDomain, setIsKleighDomain] = useState(false);
+  const [templateSlots, setTemplateSlots] = useState<Record<string, unknown>>({});
 
   useEffect(() => {
     setIsKleighDomain(window.location.hostname.includes('2kleigh.com'));
+  }, []);
+
+  useEffect(() => {
+    const host = window.location.hostname;
+    fetch(`/api/sti-template?host=${encodeURIComponent(host)}`)
+      .then((r) => r.json())
+      .then((data: StiTemplateResponse) => {
+        setTemplateSlots(data.slots ?? {});
+      })
+      .catch(() => {
+        setTemplateSlots({});
+      });
   }, []);
 
   // MOBILE FIX: Lock body scroll when mobile menu is open
@@ -23,6 +55,11 @@ export default function Header() {
       document.body.style.overflow = '';
     };
   }, [menuOpen]);
+
+  const companyName = asText(templateSlots.ui_company_name, 'G Putnam Music');
+  const menuHeroes = asMenuLabel(templateSlots.menu_item_heroes, 'heroes', 'Heroes');
+  const menuUru = asMenuLabel(templateSlots.menu_item_uru, 'uru', 'URU');
+  const menuGift = asText(templateSlots.menu_item_sponsorships, 'Gift');
 
   return (
     <nav className="w-full bg-[#2A1506] shadow-lg border-b border-[#5C3A1E]/40 relative z-50">
@@ -40,7 +77,7 @@ export default function Header() {
             />
           </div>
           <div className="flex flex-col">
-            <span className="text-lg font-bold text-[#C8A882] tracking-wide leading-tight group-hover:text-[#D07CC8] transition-colors">G Putnam Music</span>
+            <span className="text-lg font-bold text-[#C8A882] tracking-wide leading-tight group-hover:text-[#D07CC8] transition-colors">{companyName}</span>
             <span className="text-[10px] text-[#C8A882]/70 uppercase tracking-widest leading-tight">
               {isKleighDomain ? 'KLEIGH Project - Tier 2 Brand' : 'The One Stop Song Shop'}
             </span>
@@ -58,9 +95,9 @@ export default function Header() {
 
         {/* RIGHT: Desktop Menu */}
         <div className="hidden md:flex items-center gap-6">
-          <Link href="/heroes" className="text-sm text-[#C4A882] hover:text-[#C8A882] font-medium tracking-wide transition-colors">Heroes</Link>
-          <Link href="/uru" className="text-sm text-[#C4A882] hover:text-[#C8A882] font-medium tracking-wide transition-colors">URU</Link>
-          <Link href="/gift" className="text-sm text-[#C4A882] hover:text-[#C8A882] font-medium tracking-wide transition-colors">Gift</Link>
+          <Link href="/heroes" className="text-sm text-[#C4A882] hover:text-[#C8A882] font-medium tracking-wide transition-colors">{menuHeroes}</Link>
+          <Link href="/uru" className="text-sm text-[#C4A882] hover:text-[#C8A882] font-medium tracking-wide transition-colors">{menuUru}</Link>
+          <Link href="/gift" className="text-sm text-[#C4A882] hover:text-[#C8A882] font-medium tracking-wide transition-colors">{menuGift}</Link>
           <Link href="/kupid" className="text-sm text-[#C4A882] hover:text-[#C8A882] font-medium tracking-wide transition-colors">kUpId</Link>
           <Link href="/join" className="text-sm bg-[#C8A882] text-[#2A1506] px-4 py-1.5 rounded-full font-bold text-center hover:bg-[#D07CC8] transition-colors tracking-wide">Join</Link>
         </div>
@@ -80,9 +117,9 @@ export default function Header() {
       {/* Mobile Menu Dropdown - MOBILE FIX: 44px+ touch targets, body scroll lock */}
       {menuOpen && (
         <div className="md:hidden bg-[#2A1506] border-t border-[#5C3A1E]/40 px-4 py-4 flex flex-col gap-1">
-          <Link href="/heroes" onClick={() => setMenuOpen(false)} className="text-sm text-[#C4A882] hover:text-[#C8A882] font-medium tracking-wide min-h-[44px] flex items-center">Heroes</Link>
-          <Link href="/uru" onClick={() => setMenuOpen(false)} className="text-sm text-[#C4A882] hover:text-[#C8A882] font-medium tracking-wide min-h-[44px] flex items-center">URU</Link>
-          <Link href="/gift" onClick={() => setMenuOpen(false)} className="text-sm text-[#C4A882] hover:text-[#C8A882] font-medium tracking-wide min-h-[44px] flex items-center">Gift</Link>
+          <Link href="/heroes" onClick={() => setMenuOpen(false)} className="text-sm text-[#C4A882] hover:text-[#C8A882] font-medium tracking-wide min-h-[44px] flex items-center">{menuHeroes}</Link>
+          <Link href="/uru" onClick={() => setMenuOpen(false)} className="text-sm text-[#C4A882] hover:text-[#C8A882] font-medium tracking-wide min-h-[44px] flex items-center">{menuUru}</Link>
+          <Link href="/gift" onClick={() => setMenuOpen(false)} className="text-sm text-[#C4A882] hover:text-[#C8A882] font-medium tracking-wide min-h-[44px] flex items-center">{menuGift}</Link>
           <Link href="/kupid" onClick={() => setMenuOpen(false)} className="text-sm text-[#C4A882] hover:text-[#C8A882] font-medium tracking-wide min-h-[44px] flex items-center">kUpId</Link>
           <Link href="/join" onClick={() => setMenuOpen(false)} className="text-sm bg-[#C8A882] text-[#2A1506] px-4 py-3 rounded-full font-bold text-center hover:bg-[#D07CC8] transition-colors tracking-wide mt-2">Join</Link>
         </div>
