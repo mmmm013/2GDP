@@ -6,11 +6,6 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2024-04-10',
 });
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
-
 // Tier price mapping (cents)
 const TIER_AMOUNTS: Record<string, number> = {
   tap: 199,
@@ -27,6 +22,22 @@ const TIER_LABELS: Record<string, string> = {
 };
 
 export async function POST(req: NextRequest) {
+  // Initialise Supabase inside the handler so env vars are never
+  // evaluated at build time (fixes "supabaseUrl is required" build error)
+  const supabaseUrl =
+    process.env.SUPABASE_URL ?? process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseKey =
+    process.env.SUPABASE_SERVICE_ROLE_KEY ?? process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  if (!supabaseUrl || !supabaseKey) {
+    return NextResponse.json(
+      { error: 'Server configuration error: Supabase env vars missing' },
+      { status: 500 }
+    );
+  }
+
+  const supabase = createClient(supabaseUrl, supabaseKey);
+
   try {
     const body = await req.json();
     const { tier, donorName, donorEmail, donorPhone, message, isAnonymous } = body;
@@ -70,31 +81,15 @@ export async function POST(req: NextRequest) {
         message: message || '',
         isAnonymous: isAnonymous ? 'true' : 'false',
       },
+      customer_email: donorEmail || undefined,
     });
-
-    // Create pending donation record in Supabase
-    const { error: dbError } = await supabase.from('gpm_donations').insert({
-      stripe_session_id: session.id,
-      donor_name: isAnonymous ? 'Anonymous' : (donorName || null),
-      donor_email: donorEmail || null,
-      donor_phone: donorPhone || null,
-      amount_cents: amount,
-      tier,
-      message: message || null,
-      is_anonymous: isAnonymous || false,
-      grand_prize_eligible: tier !== 'tap',
-      status: 'pending',
-    });
-
-    if (dbError) {
-      console.error('Supabase insert error:', dbError);
-      // Don't block checkout - log and continue
-    }
 
     return NextResponse.json({ sessionId: session.id, url: session.url });
-  } catch (err: unknown) {
-    console.error('Checkout error:', err);
-    const message = err instanceof Error ? err.message : 'Internal server error';
-    return NextResponse.json({ error: message }, { status: 500 });
+  } catch (error: any) {
+    console.error('Checkout error:', error);
+    return NextResponse.json(
+      { error: error.message || 'Internal server error' },
+      { status: 500 }
+    );
   }
 }
