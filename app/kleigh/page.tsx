@@ -2,11 +2,10 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import MusicSystem from '@/components/MusicSystem';
 import { Mic2, BookOpen } from 'lucide-react';
-import { createClient } from '@supabase/supabase-js';
 
 export const metadata = {
   title: 'KLEIGH | G Putnam Music',
-  description: 'KLEIGH is a G Putnam Music product brand featuring the legacy collection and Sponsor CUBs support.',
+  description: 'KLEIGH is a G Putnam Music product brand featuring the legacy collection and KUBs support.',
 };
 
 // BEHIND THE MUSIC: Vocalist stories from his own words
@@ -44,10 +43,7 @@ const TRACK_STORIES = [
 ];
 
 export default async function KleighPage() {
-  // Connect directly to the SB Vault to pull live audio
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://lbzpfqarraegkghxwbah.supabase.co';
-  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
-  const supabase = createClient(supabaseUrl, supabaseKey);
+  const { supabaseAdmin: supabase } = await import('@/lib/supabaseAdmin');
 
   const { data: tracks } = await supabase
     .from('gpm_tracks')
@@ -72,14 +68,14 @@ export default async function KleighPage() {
           <p className="text-xl font-serif italic opacity-80">The Legacy Collection</p>
           <p className="max-w-2xl mx-auto mt-6 text-sm md:text-base leading-relaxed text-[#FFFDF5]/88">
             KLEIGH is the Tier 2 product brand. G Putnam Music remains the parent label, and this collection exists to preserve the voice,
-            catalog, and story while inviting supporters to Sponsor CUBs.
+            catalog, and story while inviting supporters to become KUBs.
           </p>
           <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
             <a
               href="/gift"
               className="inline-flex items-center justify-center rounded-full bg-[#2C241B] px-6 py-3 text-sm font-bold uppercase tracking-[0.25em] text-[#FFFDF5] transition hover:bg-[#1E1812]"
             >
-              Sponsor CUBs
+              KUBs
             </a>
             <a
               href="#audio-vault"
@@ -105,7 +101,7 @@ export default async function KleighPage() {
           </div>
           <div className="rounded-2xl border border-[#C8A882]/25 bg-[#FFF9EE] p-5">
             <p className="text-xs font-bold uppercase tracking-[0.3em] text-[#8F714F] mb-2">Support Action</p>
-            <p className="text-lg font-bold uppercase">Sponsor CUBs</p>
+            <p className="text-lg font-bold uppercase">KUBs</p>
             <p className="mt-2 text-sm leading-relaxed text-[#5C4A37]">This domain should convert support into sponsorship, not generic donations or vague fan messaging.</p>
           </div>
         </div>

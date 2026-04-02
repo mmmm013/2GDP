@@ -2,14 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import { Fingerprint, Lock, Music, ArrowRight, ShieldCheck, DollarSign, Play } from 'lucide-react';
-import { createClient } from '@supabase/supabase-js';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-
-// GPM CONFIG
-const SUPABASE_URL = 'https://eajxgrbxvkhfmmfiotpm.supabase.co';
-const SUPABASE_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
-const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+import { supabase } from '@/lib/supabaseClient';
 
 export default function UruPage() {
   const [snippets, setSnippets] = useState<any[]>([]);

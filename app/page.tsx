@@ -1,6 +1,5 @@
 'use client';
 
-import { createClient } from '@supabase/supabase-js';
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -10,11 +9,7 @@ import GlobalPlayer from '@/components/GlobalPlayer';
 // import WeeklyRace from '@/components/WeeklyRace';
 import FeaturedPlaylists from '@/components/FeaturedPlaylists';
 // import EmailCapture from '@/components/EmailCapture';
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL as string,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY as string
-);
+import { supabase } from '@/lib/supabaseClient';
 
 // Brand hero images for rotation
 // MOBILE FIX: Only render the ACTIVE image, not all 6 stacked
