@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
-import { supabase } from '@/lib/supabaseClient';
+import { supabaseAdmin } from '@/lib/supabaseAdmin';
 
 export const runtime = 'nodejs';
 
@@ -103,7 +103,7 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    const { error: dbError } = await supabase.from('gpm_donations').insert({
+    const { error: dbError } = await supabaseAdmin.from('gpm_donations').insert({
       stripe_session_id: session.id,
       donor_name: isAnonymous ? 'Anonymous' : donorName || null,
       donor_email: donorEmail || null,

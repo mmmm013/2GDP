@@ -26,7 +26,7 @@ const FEATURED_PLAYLISTS = [
   { id: 'fp4', title: 'High Energy Beats', type: 'FP', trackCount: 22 },
 ];
 
-// Generate short 6-character KUT code
+// Generate short 6-character K-KUT share code
 const generateShortCode = (): string => {
   const chars = 'abcdefghjkmnpqrstuvwxyz23456789';
   let code = '';
@@ -36,24 +36,61 @@ const generateShortCode = (): string => {
   return code;
 };
 
+// Generate canonical mKUT ID: mkut-{type}-{pixPckId}-{structTag}-{base36ts}
+// Embeds pix_pck_id + structure_tag so the player can call the edge function
+// without a secondary lookup.
+const generateMkutId = (type: string, pixPckId: string, structTag: string): string => {
+  const ts = Date.now().toString(36);
+  return `mkut-${type.toLowerCase()}-${pixPckId}-${structTag.toLowerCase()}-${ts}`;
+};
+
 export default function KKKCreatorPage() {
   const [selectedType, setSelectedType] = useState<'STI' | 'BTI' | 'FP'>('STI');
   const [selectedItem, setSelectedItem] = useState<string | null>(null);
   const [generatedKUT, setGeneratedKUT] = useState<string>('');
   const [shortCode, setShortCode] = useState<string>('');
   const [copied, setCopied] = useState(false);
+  const [kutMode, setKutMode] = useState<'kkut' | 'mkut'>('kkut');
+  const [mkutId, setMkutId] = useState<string>('');
+  const [structTag, setStructTag] = useState<'Verse' | 'BR' | 'Ch'>('Verse');
 
-  const generateKUT = (id: string, type: string) => {
+  // Build the relative destination path for a given type + itemId.
+  const buildDestination = (type: string, itemId: string): string => {
+    switch (type) {
+      case 'STI': return `/gift/songs?track=${encodeURIComponent(itemId)}`;
+      case 'BTI': return `/gift/behind?track=${encodeURIComponent(itemId)}`;
+      case 'FP':  return `/gift/playlists?playlist=${encodeURIComponent(itemId)}`;
+      default:    return '/kupid';
+    }
+  };
+
+  const generateKUT = async (id: string, type: string) => {
     setSelectedItem(id);
-    // Generate SHORT 6-char KUT code for easy sharing
-    const code = generateShortCode();
-    setShortCode(code);
-    const kutUrl = `kkupid.com/k/${code}`;
-    setGeneratedKUT(kutUrl);
+    if (kutMode === 'mkut') {
+      // Canonical mKUT format: mkut-{type}-{pixPckId}-{structTag}-{base36ts}
+      const mId = generateMkutId(type, id, structTag);
+      setMkutId(mId);
+      setGeneratedKUT(`${window.location.origin}/mkut/${mId}`);
+      setShortCode('');
+    } else {
+      // K-KUT: short 6-char code stored in Supabase for gateway resolution
+      const code = generateShortCode();
+      const destination = buildDestination(type, id);
+      setShortCode(code);
+      setMkutId('');
+      setGeneratedKUT(`kkupid.com/k/${code}`);
+      // Fire-and-forget: persist code → destination mapping
+      fetch('/api/k/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code, destination, item_type: type, item_id: id }),
+      }).catch(() => { /* creator still works if offline */ });
+    }
   };
 
   const copyToClipboard = async () => {
-    await navigator.clipboard.writeText(`https://${generatedKUT}`);
+    const toCopy = kutMode === 'mkut' ? generatedKUT : `https://${generatedKUT}`;
+    await navigator.clipboard.writeText(toCopy);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
@@ -94,6 +131,58 @@ export default function KKKCreatorPage() {
             Short links. Big impact. Easy to share.
           </p>
         </div>
+
+        {/* Mode Toggle — K-KUT vs mKUT */}
+        <div className="flex justify-center mb-8">
+          <div className="flex bg-[#2a1f0f] border border-[#C8A882]/20 rounded-full p-1 gap-1">
+            <button
+              onClick={() => { setKutMode('kkut'); setGeneratedKUT(''); setSelectedItem(null); }}
+              className={`px-5 py-2 rounded-full text-sm font-bold transition-all duration-200 ${
+                kutMode === 'kkut'
+                  ? 'bg-gradient-to-r from-[#8B4513] to-[#CD853F] text-[#3E2723] shadow-md'
+                  : 'text-[#F5E6D3]/50 hover:text-[#F5E6D3]'
+              }`}
+            >
+              K-KUT
+            </button>
+            <button
+              onClick={() => { setKutMode('mkut'); setGeneratedKUT(''); setSelectedItem(null); }}
+              className={`px-5 py-2 rounded-full text-sm font-bold transition-all duration-200 ${
+                kutMode === 'mkut'
+                  ? 'bg-gradient-to-r from-[#2a6e48] to-[#3a9e65] text-white shadow-md'
+                  : 'text-[#F5E6D3]/50 hover:text-[#F5E6D3]'
+              }`}
+            >
+              mKUT
+            </button>
+          </div>
+        </div>
+
+        {/* Structure tag selector — mKUT mode only */}
+        {kutMode === 'mkut' && (
+          <div className="flex justify-center mb-6">
+            <div className="bg-[#2a1f0f] border border-[#4a8060]/30 rounded-xl p-4 text-center">
+              <p className="text-[10px] font-bold tracking-[0.25em] uppercase text-[#4a8060] mb-3">
+                Structure Tag — which excerpt?
+              </p>
+              <div className="flex gap-2 justify-center">
+                {(['Verse', 'BR', 'Ch'] as const).map(tag => (
+                  <button
+                    key={tag}
+                    onClick={() => setStructTag(tag)}
+                    className={`px-4 py-2 rounded-lg text-sm font-bold transition-all duration-200 ${
+                      structTag === tag
+                        ? 'bg-gradient-to-r from-[#2a6e48] to-[#3a9e65] text-white shadow-md'
+                        : 'bg-[#3E2723] border border-[#4a8060]/30 text-[#F5E6D3]/60 hover:text-[#F5E6D3]'
+                    }`}
+                  >
+                    {tag === 'Verse' ? 'Verse' : tag === 'BR' ? 'Bridge' : 'Chorus'}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Type Selector - Sleek Pills */}
         <div className="flex justify-center gap-3 mb-10">
@@ -179,19 +268,30 @@ export default function KKKCreatorPage() {
                 <Share2 className="text-[#3E2723]" size={24} />
               </div>
               <div>
-                <h2 className="text-2xl font-black text-[#8B4513]">Your K-KUT is Ready!</h2>
-                <p className="text-sm text-[#F5E6D3]/60">6-character code for easy sharing</p>
+                <h2 className="text-2xl font-black text-[#8B4513]">
+                  {kutMode === 'mkut' ? 'Your mKUT is Ready!' : 'Your K-KUT is Ready!'}
+                </h2>
+                <p className="text-sm text-[#F5E6D3]/60">
+                  {kutMode === 'mkut'
+                    ? 'Canonical mKUT prefab container link'
+                    : '6-character code for easy sharing'}
+                </p>
               </div>
             </div>
-            
-            {/* Short Code Display */}
+
+            {/* Link Display */}
             <div className="bg-[#3E2723] rounded-xl p-6 mb-4">
               <div className="flex items-center justify-between">
-                <div className="flex-1">
-                  <p className="text-xs text-[#F5E6D3]/40 uppercase tracking-wider mb-2">Your K-KUT Link</p>
-                  <code className="text-2xl font-mono font-bold text-[#A0522D] tracking-wider">
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs text-[#F5E6D3]/40 uppercase tracking-wider mb-2">
+                    {kutMode === 'mkut' ? 'mKUT Prefab Link' : 'K-KUT Share Link'}
+                  </p>
+                  <code className="text-sm font-mono font-bold text-[#A0522D] tracking-wider break-all">
                     {generatedKUT}
                   </code>
+                  {kutMode === 'mkut' && mkutId && (
+                    <p className="mt-1 text-[10px] text-[#F5E6D3]/30 font-mono break-all">ID: {mkutId}</p>
+                  )}
                 </div>
                 <button
                   onClick={copyToClipboard}
@@ -211,7 +311,9 @@ export default function KKKCreatorPage() {
             </div>
             
             <p className="text-sm text-[#F5E6D3]/60 text-center">
-              Share this short link anywhere. Recipients will be directed to your selected content on kkupid.com.
+              {kutMode === 'mkut'
+                ? 'Share this mKUT link. Recipients open a prefab mini-player pre-loaded with your content.'
+                : 'Share this short link anywhere. Recipients will be directed to your selected content on kkupid.com.'}
             </p>
           </div>
         )}
@@ -219,7 +321,7 @@ export default function KKKCreatorPage() {
         {/* Info Footer */}
         <div className="mt-12 text-center">
           <p className="text-sm text-[#F5E6D3]/40 mb-4">
-            K-KUTs are permanent 6-character links. Each connects to one item on the G Putnam Music platform.
+            K-KUTs are permanent 6-character links. mKUTs use canonical IDs for prefab container routing.
           </p>
           <Link href="/kupid" className="inline-flex items-center gap-2 text-[#8B4513] hover:text-[#8B4513]/80 font-bold transition-colors">
             <span>←</span> Back to K-KUTs Lockets
