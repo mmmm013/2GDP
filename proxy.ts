@@ -48,7 +48,7 @@ const BLOCKED_COUNTRIES = [
   'SY', // Syria
 ];
 
-export function middleware(req: NextRequest) {
+export function proxy(req: NextRequest) {
   // Get hostname for subdomain detection
   const hostname = req.headers.get('host') || '';
   const isKleighDomain = hostname.includes('2kleigh.com');
