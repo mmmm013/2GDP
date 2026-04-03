@@ -34,6 +34,8 @@ const BOT_CONFIG: Record<BotName, {
   ringColor: string;
   emoji: string;
   greeting: string;
+  /** Single bold line shown on first-ever visit — the invention unveiling itself */
+  firstVisitCue: string;
 }> = {
   'MC-BOT': {
     label: 'MC-BOT',
@@ -41,6 +43,7 @@ const BOT_CONFIG: Record<BotName, {
     ringColor: 'ring-amber-500/60',
     emoji: '🎛️',
     greeting: 'Welcome to G Putnam Music. I am MC-BOT. I will guide your full journey step by step.',
+    firstVisitCue: "I'm MC-BOT. Say \"NEXT\" or tap → to discover your sound.",
   },
   'LF-BOT': {
     label: 'LF-BOT',
@@ -48,6 +51,7 @@ const BOT_CONFIG: Record<BotName, {
     ringColor: 'ring-pink-400/60',
     emoji: '💌',
     greeting: 'Welcome. I am LF-BOT. Tell me your goal and I will map each next step clearly.',
+    firstVisitCue: "I'm LF-BOT. Say \"NEXT\" or tap → and I'll guide you to the perfect gift moment.",
   },
   'GD-BOT': {
     label: 'GD-BOT',
@@ -55,6 +59,7 @@ const BOT_CONFIG: Record<BotName, {
     ringColor: 'ring-emerald-400/60',
     emoji: '📊',
     greeting: 'Welcome. GD-BOT online. I will provide exact, actionable steps and checkpoints.',
+    firstVisitCue: "GD-BOT online. Say \"NEXT\" or tap → to begin your guided sequence.",
   },
   'PIXIE-BOT': {
     label: 'PIXIE-BOT',
@@ -62,6 +67,7 @@ const BOT_CONFIG: Record<BotName, {
     ringColor: 'ring-violet-400/60',
     emoji: '✨',
     greeting: 'Hi, I am PIXIE-BOT. I can shape your perfect music moment and guide every click.',
+    firstVisitCue: "I'm PIXIE-BOT ✨ Say \"NEXT\" or tap → and I'll shape your perfect music moment.",
   },
 };
 
@@ -82,31 +88,31 @@ export interface JourneyStep {
 export const DEFAULT_STEPS: JourneyStep[] = [
   {
     title: 'Discover your music moment',
-    hint: 'Browse the catalog or tell the BOT what mood, occasion, or artist you have in mind.',
+    hint: 'You know that one moment in a song — the hook that wrecks you? We call that the Sweet Spot. Browse the catalog or tell me your mood, occasion, or artist.',
     action: 'Browse Catalog',
     href: '/#t20',
   },
   {
     title: 'Choose a K-KUT or mini-KUT path',
-    hint: 'K-KUT = full sweet-spot link. mini-KUT = short verse/chorus clip. Both shareable in one tap.',
+    hint: 'A K-KUT is a 6-character link — short enough to text — that opens a curated Sweet Spot. A mini-KUT streams a specific verse, bridge, or chorus. Both shareable in one tap.',
     action: 'Explore K-KUTs',
     href: '/kupid',
   },
   {
     title: 'Generate or resolve your link',
-    hint: 'Create your 6-character K-KUT code at kkupid.com/kkut/create or let the BOT resolve one for you.',
+    hint: 'K-kUpId is the gifting layer. Pick your track. Choose your moment. Generate a link — or dress it up with a romance skin, a jewelry capsule, a whole experience.',
     action: 'Create K-KUT',
     href: '/kkut/create',
   },
   {
     title: 'Open & play your experience',
-    hint: 'Tap the link to open the track at its exact sweet spot. No app needed — just tap and hear it.',
+    hint: 'Tap the link. No app. No account. Just tap and hear the exact Sweet Spot. That\'s the whole move.',
     action: 'Play a Track',
     href: '/k',
   },
   {
     title: 'Share or gift your K-kUpId',
-    hint: 'Send to a friend, pair with a K-kUpId jewelry capsule, or add to a Heart-Tap gift.',
+    hint: 'Music has always been the best gift. Now you can send exactly the right note — paired with a K-kUpId jewelry capsule, a Heart-Tap gift box, or just a text.',
     action: 'Gift It',
     href: '/gift',
   },
@@ -141,6 +147,7 @@ export default function GpmBot({
   const [isListening, setIsListening] = useState(false);
   const [voiceStatus, setVoiceStatus] = useState('');
   const [isFirstVisit, setIsFirstVisit] = useState(false);
+  const [moodAck, setMoodAck] = useState('');
   const recognitionRef = useRef<any>(null);
   const stepRefs = useRef<(HTMLDivElement | null)[]>([]);
 
@@ -162,6 +169,19 @@ export default function GpmBot({
     const t = setTimeout(() => setIsFirstVisit(false), 3000);
     return () => clearTimeout(t);
   }, [isFirstVisit]);
+
+  // Listen for T20 mood changes and acknowledge them
+  useEffect(() => {
+    const handler = (e: CustomEvent<{ mood: string; emoji: string }>) => {
+      const { mood, emoji } = e.detail ?? {};
+      if (!mood) return;
+      setMoodAck(`${emoji ?? '🎵'} ${mood} vibes — switching now`);
+      setIsCollapsed(false);
+      setTimeout(() => setMoodAck(''), 3500);
+    };
+    window.addEventListener('t20-mood-change', handler as EventListener);
+    return () => window.removeEventListener('t20-mood-change', handler as EventListener);
+  }, []);
 
   // Show greeting bubble once on mount
   useEffect(() => {
@@ -347,16 +367,32 @@ export default function GpmBot({
         </div>
       </div>
 
-      {/* Greeting Bubble */}
-      {showGreeting && (
+      {/* Mood acknowledgment flash */}
+      {moodAck && (
         <div
-          className="mx-4 mt-3 px-3 py-2.5 rounded-xl text-xs text-white/80 leading-relaxed"
+          className="mx-4 mt-3 px-3 py-2 rounded-xl text-xs font-bold text-white leading-snug animate-pulse"
+          style={{ background: `${profile.color}20`, border: `1px solid ${profile.color}40` }}
+        >
+          <span style={{ color: profile.color }}>{moodAck}</span>
+        </div>
+      )}
+
+      {/* Greeting Bubble */}
+      {showGreeting && !moodAck && (
+        <div
+          className="mx-4 mt-3 px-3 py-2.5 rounded-xl leading-relaxed"
           style={{ background: `${profile.color}15`, border: `1px solid ${profile.color}25` }}
         >
-          <Zap className="inline w-3 h-3 mr-1 mb-0.5" style={{ color: profile.color }} />
-          {isFirstVisit
-            ? `I'm ${profile.label}. Say "NEXT" or tap → to discover your sound.`
-            : profile.greeting}
+          {isFirstVisit ? (
+            <p className="text-sm font-black text-white leading-snug">
+              {profile.firstVisitCue}
+            </p>
+          ) : (
+            <p className="text-xs text-white/80">
+              <Zap className="inline w-3 h-3 mr-1 mb-0.5" style={{ color: profile.color }} />
+              {profile.greeting}
+            </p>
+          )}
         </div>
       )}
 
@@ -365,7 +401,6 @@ export default function GpmBot({
         {steps.map((step, i) => {
           const isPast = i < activeStep;
           const isCurrent = i === activeStep;
-          const isFuture = i > activeStep;
 
           return (
             <div
