@@ -1,19 +1,26 @@
 import { NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
 import { randomUUID } from 'crypto'
+import { createClient } from '@/lib/supabase/server'
 
 // ---------------------------------------------------------------------------
 // POST /api/log-stream-time
 //
+// Requires: authenticated Supabase user session (cookie-based).
+// Unauthenticated requests receive HTTP 401.
+//
 // Body (JSON):
-//   seconds      number   required  >0, integer
-//   pixPckId     string   optional  k_kuts_master.id  (PIX-PCK path)
-//   parentVtId   string   optional  k_kuts_master.id  (legacy fallback)
-//   productId    string   optional  product identifier for audit
-//   ascapWorkId  string   optional  ASCAP work ID
-//   source       string   optional  e.g. 'kleigh-player'
-//   idempotencyKey string optional  caller-supplied UUID; prevents double-counting
+//   seconds        number   required  >0, integer
+//   pixPckId       string   optional  k_kuts_master.id  (PIX-PCK path)
+//   parentVtId     string   optional  k_kuts_master.id  (legacy fallback)
+//   productId      string   optional  product identifier for audit
+//   ascapWorkId    string   optional  ASCAP work ID
+//   source         string   optional  e.g. 'kleigh-player'
+//   idempotencyKey string   optional  caller-supplied UUID v4; auto-generated if omitted
 // ---------------------------------------------------------------------------
+
+// UUID v4 pattern used for idempotency key validation
+const UUID_V4_PATTERN =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
 
 export async function POST(request: Request) {
   // ── 1. Parse & validate payload ──────────────────────────────────────────
@@ -34,9 +41,16 @@ export async function POST(request: Request) {
   const productId = typeof body.productId === 'string' ? body.productId.trim() : null
   const ascapWorkId = typeof body.ascapWorkId === 'string' ? body.ascapWorkId.trim() : null
   const source = typeof body.source === 'string' ? body.source.trim() : 'unknown'
-  const idempotencyKey = typeof body.idempotencyKey === 'string'
-    ? body.idempotencyKey.trim()
-    : randomUUID()
+
+  // Validate caller-supplied idempotency key; fall back to a fresh UUID.
+  // TODO: consider scoping idempotency to (user_id, idempotency_key) once
+  //       a unique constraint on that pair is added to ascap_events.
+  const rawKey = typeof body.idempotencyKey === 'string' ? body.idempotencyKey.trim() : ''
+  const isValidKey = rawKey !== '' && UUID_V4_PATTERN.test(rawKey)
+  if (rawKey !== '' && !isValidKey) {
+    console.warn('[log-stream-time] Invalid idempotency key provided, generating new UUID')
+  }
+  const idempotencyKey = isValidKey ? rawKey : randomUUID()
 
   if (typeof seconds !== 'number' || !Number.isInteger(seconds) || seconds <= 0) {
     return NextResponse.json(
@@ -52,22 +66,26 @@ export async function POST(request: Request) {
     )
   }
 
-  // ── 2. Supabase client (service role) ────────────────────────────────────
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  )
+  // ── 2. Supabase SSR client — reads auth session from request cookies ──────
+  const supabase = await createClient()
 
-  // ── 3. Idempotency guard ─────────────────────────────────────────────────
+  // ── 3. Enforce authentication ─────────────────────────────────────────────
+  const { data: { user }, error: authError } = await supabase.auth.getUser()
+  if (authError || !user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  // ── 4. Idempotency guard ─────────────────────────────────────────────────
   // ascap_events.id is UUID; we insert with a deterministic id derived from
   // the idempotency key so a duplicate POST is silently ignored.
   const eventId = idempotencyKey
 
-  // ── 4. Audit insert into ascap_events ────────────────────────────────────
+  // ── 5. Audit insert into ascap_events ────────────────────────────────────
   const { error: eventError } = await supabase
     .from('ascap_events')
     .insert({
       id: eventId,
+      user_id: user.id,
       product_id: productId,
       parent_vt_id: parentVtId ?? pixPckId,
       ascap_work_id: ascapWorkId,
@@ -88,11 +106,11 @@ export async function POST(request: Request) {
         { status: 200 }
       )
     }
-    console.error('[log-stream-time] ascap_events insert error', eventError)
+    console.error('[log-stream-time] ascap_events insert error', eventError.message)
     return NextResponse.json({ error: 'Audit log failed' }, { status: 500 })
   }
 
-  // ── 5. PIX-PCK accumulation path (primary) ───────────────────────────────
+  // ── 6. PIX-PCK accumulation path (primary) ───────────────────────────────
   if (pixPckId) {
     const { data: rpcData, error: rpcError } = await supabase.rpc(
       'accumulate_play_seconds_pix',
@@ -104,7 +122,7 @@ export async function POST(request: Request) {
     )
 
     if (rpcError) {
-      console.error('[log-stream-time] accumulate_play_seconds_pix error', rpcError)
+      console.error('[log-stream-time] accumulate_play_seconds_pix error', rpcError.message)
       return NextResponse.json(
         { error: 'Accumulation failed (PIX-PCK path)' },
         { status: 500 }
@@ -121,7 +139,7 @@ export async function POST(request: Request) {
     })
   }
 
-  // ── 6. Legacy fallback: ascap_accumulator_ledger by parent_vt_id ─────────
+  // ── 7. Legacy fallback: ascap_accumulator_ledger by parent_vt_id ─────────
   const { data: ledger, error: ledgerError } = await supabase
     .from('ascap_accumulator_ledger')
     .upsert(
@@ -140,7 +158,7 @@ export async function POST(request: Request) {
     .single()
 
   if (ledgerError) {
-    console.error('[log-stream-time] ascap_accumulator_ledger upsert error', ledgerError)
+    console.error('[log-stream-time] ascap_accumulator_ledger upsert error', ledgerError.message)
     return NextResponse.json(
       { error: 'Accumulation failed (legacy ledger path)' },
       { status: 500 }
