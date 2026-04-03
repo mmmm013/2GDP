@@ -20,6 +20,8 @@ const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL ?? 'https://lbzpfqarra
 function EnrollForm() {
   const searchParams = useSearchParams();
   const brandParam = (searchParams.get('brand') ?? '').toLowerCase();
+  // selfService = link was sent directly to the creator (brand pre-set in URL)
+  const selfService = brandParam !== '';
   const [selectedBrand, setSelectedBrand] = useState(brandParam);
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [message, setMessage] = useState('');
@@ -29,7 +31,7 @@ function EnrollForm() {
   async function handleEnroll() {
     if (!creator) { setMessage('Select a valid creator brand first.'); setStatus('error'); return; }
     setStatus('loading');
-    setMessage('Requesting enrollment options…');
+    setMessage('Starting biometric enrollment…');
     try {
       const { startRegistration } = await import('@simplewebauthn/browser');
       const optRes = await fetch('/api/creator/webauthn/register', {
@@ -38,7 +40,7 @@ function EnrollForm() {
       });
       if (!optRes.ok) { const e = await optRes.json(); throw new Error(e.error ?? 'Failed to get options'); }
       const options = await optRes.json();
-      setMessage('Please complete biometric verification…');
+      setMessage('👆 Follow the Face ID / Touch ID prompt…');
       const credential = await startRegistration({ optionsJSON: options });
       setMessage('Verifying with server…');
       const verRes = await fetch('/api/creator/webauthn/register', {
@@ -47,46 +49,106 @@ function EnrollForm() {
       });
       if (!verRes.ok) { const e = await verRes.json(); throw new Error(e.error ?? 'Verification failed'); }
       setStatus('success');
-      setMessage(`✅ ${creator.displayName} enrolled! They can now log in at /creator/${creator.portalSlug}`);
+      setMessage(`✅ You're enrolled, ${creator.displayName}! Tap below to open your portal.`);
     } catch (err: unknown) {
       setStatus('error');
       setMessage(`❌ Enrollment failed: ${err instanceof Error ? err.message : String(err)}`);
     }
   }
 
+  // ── Self-service mode (brand pre-set in URL — link was sent to PIXIE)
+  if (selfService && creator) {
+    return (
+      <div className="w-full max-w-md text-center">
+        <p className="text-xs uppercase tracking-widest mb-2" style={{color:'#a8cc7f'}}>GPM Creator Portal</p>
+        <h1 className="text-3xl font-bold mb-1" style={{color:'#FFD54F'}}>{creator.displayName}</h1>
+        <p className="text-xs mb-6" style={{color:'rgba(255,255,255,0.35)'}}>{creator.legalName} · {creator.role}</p>
+
+        {/* PIXIE-BOT self-enrollment guide */}
+        <div className="mb-6 rounded-2xl p-4 text-left" style={{background:'rgba(168,204,127,0.07)',border:'1px solid rgba(168,204,127,0.2)'}}>
+          <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{color:'#a8cc7f'}}>
+            🤖 PIXIE-BOT · Set Up Your Access
+          </p>
+          <ol className="space-y-3 text-xs" style={{color:'rgba(255,255,255,0.65)'}}>
+            <li className="flex gap-2">
+              <span style={{color:'#FFD54F'}} className="font-bold shrink-0">①</span>
+              <span>You received this link — <strong style={{color:'rgba(255,255,255,0.9)'}}>you&apos;re already in the right place!</strong> This device will be your key.</span>
+            </li>
+            <li className="flex gap-2">
+              <span style={{color:'#FFD54F'}} className="font-bold shrink-0">②</span>
+              <span>Tap <strong style={{color:'rgba(255,255,255,0.9)'}}>Set Up My Access</strong> below.</span>
+            </li>
+            <li className="flex gap-2">
+              <span style={{color:'#FFD54F'}} className="font-bold shrink-0">③</span>
+              <span>Your phone will ask for <strong style={{color:'rgba(255,255,255,0.9)'}}>Face ID or Touch ID</strong> — approve it.</span>
+            </li>
+            <li className="flex gap-2">
+              <span style={{color:'#FFD54F'}} className="font-bold shrink-0">④</span>
+              <span>Done! Your portal opens automatically. Next time just visit{' '}
+                <code style={{color:'#FFD54F',fontSize:'0.7rem'}}>gputnammusic.com/creator/{creator.portalSlug}</code>
+                {' '}and tap the button.
+              </span>
+            </li>
+          </ol>
+          <p className="mt-3 text-xs" style={{color:'rgba(255,255,255,0.3)'}}>
+            No password. No app to install. Just your face or fingerprint. 🌿
+          </p>
+        </div>
+
+        {status !== 'success' && (
+          <button onClick={handleEnroll} disabled={status === 'loading'}
+            className="w-full py-4 rounded-2xl font-bold tracking-widest text-base transition-all mb-4"
+            style={{
+              background: status === 'loading' ? 'rgba(255,213,79,0.5)' : '#FFD54F',
+              color: '#000',
+              cursor: status === 'loading' ? 'not-allowed' : 'pointer',
+              fontSize: '1rem',
+            }}>
+            {status === 'loading' ? '⏳ Setting up…' : `🌿 Set Up My Access`}
+          </button>
+        )}
+
+        {message && (
+          <div className="mb-4 rounded-xl p-4 text-sm" style={{
+            background: status==='success' ? 'rgba(34,197,94,0.1)' : status==='error' ? 'rgba(239,68,68,0.1)' : 'rgba(255,255,255,0.05)',
+            border: status==='success' ? '1px solid rgba(34,197,94,0.3)' : status==='error' ? '1px solid rgba(239,68,68,0.3)' : '1px solid rgba(255,255,255,0.1)',
+            color: status==='success' ? '#86efac' : status==='error' ? '#fca5a5' : 'rgba(255,255,255,0.6)',
+          }}>{message}</div>
+        )}
+
+        {status === 'success' && (
+          <Link href={`/creator/${creator.portalSlug}`}
+            className="block w-full py-4 rounded-2xl font-bold tracking-widest text-base text-center"
+            style={{background:'#a8cc7f',color:'#000'}}>
+            🌿 Open {creator.displayName}&apos;s Portal →
+          </Link>
+        )}
+
+        {status === 'error' && (
+          <p className="mt-2 text-xs" style={{color:'rgba(255,255,255,0.3)'}}>
+            Having trouble? Make sure you&apos;re using Safari (iOS) or Chrome (Android) and try again.
+          </p>
+        )}
+
+        <div className="mt-8">
+          <Link href="/" className="text-xs hover:underline" style={{color:'rgba(255,255,255,0.2)'}}>← Back to Home</Link>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Admin mode (no brand in URL — admin selecting creator to enroll)
   return (
     <div className="w-full max-w-md">
       <div className="mb-8 text-center">
         <h1 className="text-2xl font-bold tracking-widest mb-1">GPM <span style={{color:'#FFD54F'}}>4PE-MSC</span></h1>
-        <p style={{color:'rgba(255,255,255,0.5)'}} className="text-sm">Creator Portal — Biometric Enrollment</p>
+        <p style={{color:'rgba(255,255,255,0.5)'}} className="text-sm">Creator Portal — Admin Enrollment</p>
       </div>
 
-      {/* PIXIE-BOT enrollment guide */}
-      {(selectedBrand === 'pixie' || selectedBrand === '') && (
-        <div className="mb-6 rounded-2xl p-4" style={{background:'rgba(168,204,127,0.07)',border:'1px solid rgba(168,204,127,0.2)'}}>
-          <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{color:'#a8cc7f'}}>🤖 PIXIE-BOT · Enrollment Steps</p>
-          <ol className="space-y-2 text-xs" style={{color:'rgba(255,255,255,0.6)'}}>
-            <li className="flex gap-2">
-              <span style={{color:'#FFD54F'}} className="font-bold shrink-0">①</span>
-              <span>Select <strong style={{color:'rgba(255,255,255,0.8)'}}>PIXIE</strong> from the dropdown below.</span>
-            </li>
-            <li className="flex gap-2">
-              <span style={{color:'#FFD54F'}} className="font-bold shrink-0">②</span>
-              <span>Make sure <strong style={{color:'rgba(255,255,255,0.8)'}}>Jane (PIXIE)</strong> is holding this device.</span>
-            </li>
-            <li className="flex gap-2">
-              <span style={{color:'#FFD54F'}} className="font-bold shrink-0">③</span>
-              <span>Tap <strong style={{color:'rgba(255,255,255,0.8)'}}>Enroll PIXIE</strong> and follow the Face ID / Touch ID prompt.</span>
-            </li>
-            <li className="flex gap-2">
-              <span style={{color:'#FFD54F'}} className="font-bold shrink-0">④</span>
-              <span>Done! Send PIXIE her portal link:{' '}
-                <code style={{color:'#FFD54F',fontSize:'0.7rem'}}>gputnammusic.com/creator/pixie</code>
-              </span>
-            </li>
-          </ol>
-        </div>
-      )}
+      <div className="mb-4 rounded-xl p-3 text-xs" style={{background:'rgba(255,213,79,0.05)',border:'1px solid rgba(255,213,79,0.15)',color:'rgba(255,255,255,0.5)'}}>
+        💡 <strong style={{color:'rgba(255,255,255,0.7)'}}>Better:</strong> Send the creator their direct enrollment link instead!
+        e.g. <code style={{color:'#FFD54F'}}>gputnammusic.com/creator/enroll?brand=PIXIE</code> — they self-enroll on their own device.
+      </div>
 
       <div className="mb-6">
         <label className="block text-xs uppercase tracking-widest mb-2" style={{color:'rgba(255,255,255,0.5)'}}>Creator Brand</label>
@@ -102,6 +164,12 @@ function EnrollForm() {
           <p style={{color:'#FFD54F'}} className="font-bold text-lg">{creator.displayName}</p>
           <p style={{color:'rgba(255,255,255,0.6)'}} className="text-sm">{creator.legalName}</p>
           <p style={{color:'rgba(255,255,255,0.4)'}} className="text-xs mt-1">{creator.role}</p>
+          <p className="mt-2 text-xs" style={{color:'rgba(168,204,127,0.8)'}}>
+            📋 Send this link to {creator.displayName} →{' '}
+            <code style={{color:'#FFD54F',fontSize:'0.65rem',display:'block',marginTop:'4px',wordBreak:'break-all'}}>
+              gputnammusic.com/creator/enroll?brand={creator.brand}
+            </code>
+          </p>
         </div>
       )}
       <p className="mb-6 text-sm leading-relaxed" style={{color:'rgba(255,255,255,0.4)'}}>
