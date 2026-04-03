@@ -6,6 +6,8 @@ import GiftTierCard from '@/components/GiftTierCard';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import Link from 'next/link';
+import PromoBar from '@/components/PromoBar';
+import GpmBot from '@/components/GpmBot';
 
 export default function GiftPage() {
   const [selectedTier, setSelectedTier] = useState<TierConfig | null>(null);
@@ -49,7 +51,25 @@ export default function GiftPage() {
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-black via-gray-950 to-black text-white">
-          <Header />
+      <PromoBar />
+      <Header />
+
+      {/* PIXIE-BOT: creative gift moment guide */}
+      <div className="flex justify-end px-4 pt-3 pb-1">
+        <GpmBot
+          bot="PIXIE-BOT"
+          steps={[
+            { title: 'Choose your gift moment', hint: 'Think about the person — what song, what feeling, what occasion? That is your starting point.', action: 'Browse Music', href: '/#t20' },
+            { title: 'Pick a Heart-Tap tier', hint: 'Every tier ships a Digital Mixed Bag of exclusive gifts. Scroll down to compare.', action: 'See Tiers', href: '#tiers' },
+            { title: 'Personalize your message', hint: 'Add a name, email, and a heartfelt note. Anonymous option available.', },
+            { title: 'Complete checkout', hint: 'Secure Stripe checkout. Your recipient gets their gift bag delivered digitally.' },
+            { title: 'Share the link or locket', hint: 'Forward the confirmation, or pair it with a K-kUpId locket for the ultimate gift.', action: 'K-kUpId Lockets', href: '/kupid' },
+          ]}
+          startCollapsed={false}
+          className="max-w-xs w-full"
+        />
+      </div>
+
       {/* Hero */}
       <section className="pt-20 pb-6 px-4 text-center">
         <h1 className="text-5xl md:text-6xl font-bold mb-4">

@@ -1,18 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
-import { createClient } from '@supabase/supabase-js';
+import { supabaseAdmin } from '@/lib/supabaseAdmin';
 
 function getStripe() {
   return new Stripe(process.env.STRIPE_SECRET_KEY!, {
-    apiVersion: '2024-04-10',
+    apiVersion: '2025-12-15.clover',
   });
-}
-
-function getSupabase() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  );
 }
 
 export async function POST(req: NextRequest) {
@@ -52,12 +45,11 @@ export async function POST(req: NextRequest) {
 }
 
 async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
-  const supabase = getSupabase();
   const tier = session.metadata?.tier;
   if (!tier) return;
 
   // Update donation status to completed
-  const { error: updateError } = await supabase
+  const { error: updateError } = await supabaseAdmin
     .from('gpm_donations')
     .update({
       status: 'completed',
@@ -72,7 +64,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
   }
 
   // Assign a random gift asset from the tier
-  const { data: assets } = await supabase
+  const { data: assets } = await supabaseAdmin
     .from('gpm_gift_assets')
     .select('id')
     .eq('tier', tier)
@@ -80,7 +72,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
 
   if (assets && assets.length > 0) {
     const randomAsset = assets[Math.floor(Math.random() * assets.length)];
-    await supabase
+    await supabaseAdmin
       .from('gpm_donations')
       .update({ gift_asset_id: randomAsset.id })
       .eq('stripe_session_id', session.id);
@@ -96,9 +88,8 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
 }
 
 async function handlePaymentFailed(intent: Stripe.PaymentIntent) {
-  const supabase = getSupabase();
   // Mark donation as failed
-  const { error } = await supabase
+  const { error } = await supabaseAdmin
     .from('gpm_donations')
     .update({ status: 'failed' })
     .eq('stripe_payment_intent', intent.id);
@@ -109,9 +100,8 @@ async function handlePaymentFailed(intent: Stripe.PaymentIntent) {
 }
 
 async function sendGiftSMS(phone: string, tier: string, sessionId: string) {
-  const supabase = getSupabase();
   // Fetch SMS template from tier config
-  const { data: config } = await supabase
+  const { data: config } = await supabaseAdmin
     .from('gpm_tier_config')
     .select('sms_message_template')
     .eq('tier', tier)

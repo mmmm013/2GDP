@@ -48,7 +48,7 @@ jobs:
       - name: BIC gate - block destructive changes without ALLOW_BIC
         run: |
           set -e
-          if grep -RniE '(^|[^-])\bDROP[[:space:]]+(TABLE|COLUMN)\b' supabase/migrations/ | grep -vi 'ALLOW_BIC'; then
+          if grep -RniE '\bDROP[[:space:]]+(TABLE|COLUMN)\b' supabase/migrations/ | grep -Ev ':[0-9]+:[[:space:]]*--' | grep -vi 'ALLOW_BIC'; then
             echo "ERROR: Detected DROP TABLE/COLUMN without -- ALLOW_BIC approval comment."
             echo "Add '-- ALLOW_BIC' to the migration file to explicitly allow this change."
             exit 1
@@ -71,18 +71,35 @@ jobs:
         with:
           version: latest
 
+      - name: Check required secrets
+        id: secrets-check
+        env:
+          HAS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN != '' && 'true' || 'false' }}
+          HAS_PROJECT: ${{ secrets.SUPABASE_PROJECT_ID != '' && 'true' || 'false' }}
+        run: |
+          if [ "$HAS_TOKEN" != "true" ] || [ "$HAS_PROJECT" != "true" ]; then
+            echo "::warning::SUPABASE_ACCESS_TOKEN or SUPABASE_PROJECT_ID secret is not set — skipping migration."
+            echo "Add these in GitHub → Settings → Secrets and variables → Actions."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Link Supabase project
+        if: steps.secrets-check.outputs.skip != 'true'
         run: |
           supabase link --project-ref "${{ secrets.SUPABASE_PROJECT_ID }}" \
             --password "${{ secrets.SUPABASE_DB_PASSWORD }}"
 
       - name: Apply migrations via Supabase CLI (db push)
+        if: steps.secrets-check.outputs.skip != 'true'
         run: |
           set -e
           supabase db push
           echo "Migrations applied successfully."
 
       - name: Deploy Edge Functions via Supabase CLI
+        if: steps.secrets-check.outputs.skip != 'true'
         run: |
           set -e
           for fn in magic_link tenant_provision notify get-stream-url stream-audio \
@@ -94,6 +111,7 @@ jobs:
           echo "All Edge Functions deployed."
 
       - name: Smoke test - get-stream-url healthcheck
+        if: steps.secrets-check.outputs.skip != 'true'
         env:
           SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
           SUPABASE_FUNCTION_URL: ${{ secrets.SUPABASE_FUNCTION_URL }}
@@ -110,6 +128,7 @@ jobs:
           echo "Smoke test passed (status: $STATUS)"
 
       - name: Smoke test - send-k-kuts healthcheck
+        if: steps.secrets-check.outputs.skip != 'true'
         env:
           SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
           SUPABASE_FUNCTION_URL: ${{ secrets.SUPABASE_FUNCTION_URL }}

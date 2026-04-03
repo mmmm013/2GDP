@@ -5,10 +5,41 @@ import Footer from '@/components/Footer';
 import GlobalPlayer from '@/components/GlobalPlayer';
 import Link from 'next/link';
 import { KUPID_TIERS } from '@/lib/kupid-protocol';
+import GpmBot, { type JourneyStep } from '@/components/GpmBot';
 
 export default function KupidPage() {
   const [isVDay, setIsVDay] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
+
+  // K-KUT purchase journey steps for LF-BOT
+  const kupidSteps: JourneyStep[] = [
+    {
+      title: 'Explore K-KUT & mini-KUT options',
+      hint: 'Scroll down to see all tiers — from $5.99 KidKUTs to the flagship Sovereign Locket.',
+      action: 'See All Tiers',
+      href: '#tiers',
+    },
+    {
+      title: 'Pick your tier',
+      hint: 'KLEAN KUT ($49) = digital link. Mini-KUT ($29) = audio clip. Lockets start at $333.',
+      action: 'View Tiers',
+      href: '#tiers',
+    },
+    {
+      title: 'Tap your chosen tier',
+      hint: 'Each card has a direct Stripe checkout link. Tap the button to purchase securely.',
+    },
+    {
+      title: 'Receive your K-KUT code',
+      hint: 'Your 6-character code is delivered by email. Tap it to open your Sweet Spot experience.',
+    },
+    {
+      title: 'Share or gift your K-kUpId',
+      hint: 'Text it, post it, or pair it with a K-kUpId jewelry capsule for the ultimate gift.',
+      action: 'Gift Options',
+      href: '/gift',
+    },
+  ];
 
   useEffect(() => {
     const now = new Date();
@@ -23,6 +54,11 @@ export default function KupidPage() {
     <main className="min-h-screen bg-gradient-to-b from-black via-gray-950 to-black text-white">
       <Header />
       <GlobalPlayer />
+
+      {/* LF-BOT: guides users through the K-KUT purchase journey */}
+      <div className="flex justify-end px-4 pt-3 pb-1">
+        <GpmBot bot="LF-BOT" steps={kupidSteps} startCollapsed={false} className="max-w-xs w-full" />
+      </div>
 
       {/* Hero Section */}
       <section className="pt-20 pb-6 px-4 text-center">

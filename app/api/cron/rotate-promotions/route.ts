@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 
-export async function POST(request: Request) {
+async function rotatePromotion() {
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!
@@ -25,9 +25,55 @@ export async function POST(request: Request) {
       updated_at: new Date().toISOString()
     })
 
-  return NextResponse.json({
+  return {
     success: true,
     previous_playlist: current?.current_playlist_id,
     new_playlist: nextPlaylistId
-  })
+  }
+}
+
+/**
+ * Shared auth guard for both GET (Vercel cron) and POST (admin trigger).
+ *
+ * Rules:
+ *  - In production, CRON_SECRET MUST be set; requests without the correct
+ *    bearer token are always rejected.
+ *  - In non-production environments (local dev / CI) the check is skipped
+ *    so the endpoint can be tested without secrets configured.
+ */
+function isCronAuthorized(request: Request): boolean {
+  const secret = process.env.CRON_SECRET
+  const isProd = process.env.NODE_ENV === 'production'
+
+  if (isProd && !secret) {
+    // Mis-configured production — deny all rather than expose the endpoint.
+    return false
+  }
+
+  if (!secret) {
+    // Non-production with no secret configured — allow for local dev/CI.
+    return true
+  }
+
+  return request.headers.get('authorization') === `Bearer ${secret}`
+}
+
+// GET is required for Vercel Cron Jobs (vercel.json schedules a GET request)
+export async function GET(request: Request) {
+  if (!isCronAuthorized(request)) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  const result = await rotatePromotion()
+  return NextResponse.json(result)
+}
+
+// Keep POST for manual/admin triggers — uses the same CRON_SECRET guard
+export async function POST(request: Request) {
+  if (!isCronAuthorized(request)) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  const result = await rotatePromotion()
+  return NextResponse.json(result)
 }

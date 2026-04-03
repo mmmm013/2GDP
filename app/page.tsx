@@ -1,61 +1,42 @@
 'use client';
 
-import { createClient } from '@supabase/supabase-js';
-import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+/**
+ * gputnammusic.com — Home Page
+ *
+ * Layout (locked):
+ *   Row 1 — Header: STI top row, BTI-filled slots (Amber / gtmplt)
+ *   Row 2 — Hero image (left) + HomeFP stream player (right) — side-by-side
+ *   Row 3 — T20Grid: Top 20 streaming activities (BTI body row 2)
+ *   Row 4 — STO GPM Footer
+ */
+
+import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
-import Link from 'next/link';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import GlobalPlayer from '@/components/GlobalPlayer';
-// import WeeklyRace from '@/components/WeeklyRace';
-import FeaturedPlaylists from '@/components/FeaturedPlaylists';
-// import EmailCapture from '@/components/EmailCapture';
+import HomeFP from '@/components/HomeFP';
+import T20Grid from '@/components/T20Grid';
+import PromoBar from '@/components/PromoBar';
+import GpmBot from '@/components/GpmBot';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL as string,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY as string
-);
+// ---------------------------------------------------------------------------
+// Hero image rotation — shuffle-based, one image on screen at a time
+// ---------------------------------------------------------------------------
 
-// Brand hero images for rotation
-// MOBILE FIX: Only render the ACTIVE image, not all 6 stacked
-// Each image has its own objectPosition for perfect framing
-const HERO_IMAGES: { src: string; objectPosition: string }[] = [
-  { src: '/assets/hero.jpg', objectPosition: 'center center' },
-  { src: '/k-hero.jpg', objectPosition: 'center center' },
-  { src: '/k-hero-alternate.JPG', objectPosition: 'center center' },
-  { src: '/IMG_7429.JPG', objectPosition: '30% center' },
-  { src: '/assets/MC Agnst Stone Wall Knee Bent.jpg', objectPosition: 'center center' },
-  { src: '/assets/Smoking 1.jpg', objectPosition: 'center center' },
+const HERO_IMAGES: { src: string; objectPosition: string; alt: string }[] = [
+  { src: '/assets/hero.jpg',                           objectPosition: 'center center', alt: 'G Putnam Music' },
+  { src: '/IMG_7429.JPG',                              objectPosition: '30% center',    alt: 'G Putnam Music live' },
+  { src: '/assets/MC Agnst Stone Wall Knee Bent.jpg',  objectPosition: 'center center', alt: 'GPM artist' },
+  { src: '/assets/Smoking 1.jpg',                      objectPosition: 'center center', alt: 'GPM artist' },
 ];
 
-// KLEIGH-BRANDED FP: 3 Congruent PIX — Continuous Loop
-const KLEIGH_FP_PIX = [
-  { src: '/k-hero.jpg', alt: 'KLEIGH — Artist Portrait' },
-  { src: '/k-hero-alternate.JPG', alt: 'KLEIGH — Alternate' },
-  { src: '/assets/Front Pose.jpg', alt: 'KLEIGH — Front Pose' },
-];
-const FP_ROTATION_MS = 4000; // 4s per PIX — sleek cycle
-
-export default function Hero() {
+export default function HomePage() {
   const [heroIndex, setHeroIndex] = useState(0);
-  const [heroFading, setHeroFading] = useState(false);
-  const fadeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [fading, setFading] = useState(false);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // KLEIGH FP PIX state
-  const [fpIndex, setFpIndex] = useState(0);
-  const [fpFading, setFpFading] = useState(false);
-
-  // MOBILE PERF: Detect mobile for lighter rendering
-  const [isMobile, setIsMobile] = useState(false);
   useEffect(() => {
-    const check = () => setIsMobile(window.innerWidth < 768);
-    check();
-    window.addEventListener('resize', check);
-    return () => window.removeEventListener('resize', check);
-  }, []);
-
-  // Shuffle-based hero rotation
-  useEffect(() => {
+    // Fisher-Yates shuffle for non-repeating rotation
     const indices = Array.from({ length: HERO_IMAGES.length }, (_, i) => i);
     for (let i = indices.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
@@ -63,132 +44,81 @@ export default function Hero() {
     }
     let pos = 0;
     setHeroIndex(indices[0]);
+
     const interval = setInterval(() => {
-      setHeroFading(true);
-      fadeTimeoutRef.current = setTimeout(() => {
+      setFading(true);
+      timerRef.current = setTimeout(() => {
         pos = (pos + 1) % indices.length;
         setHeroIndex(indices[pos]);
-        setHeroFading(false);
-      }, 300);
+        setFading(false);
+      }, 400);
     }, 8000);
+
     return () => {
       clearInterval(interval);
-      if (fadeTimeoutRef.current) clearTimeout(fadeTimeoutRef.current);
+      if (timerRef.current) clearTimeout(timerRef.current);
     };
   }, []);
 
-  // KLEIGH FP: Continuous 3-PIX rotation loop — active until inactivated
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setFpFading(true);
-      setTimeout(() => {
-        setFpIndex(prev => (prev + 1) % KLEIGH_FP_PIX.length);
-        setFpFading(false);
-      }, 400);
-    }, FP_ROTATION_MS);
-    return () => clearInterval(interval);
-  }, []);
-
-  const heroImage = HERO_IMAGES[heroIndex];
-  const fpPix = KLEIGH_FP_PIX[fpIndex];
+  const hero = HERO_IMAGES[heroIndex];
 
   return (
     <>
+      {/* PROMO BAR: rotating flash specials above the fold */}
+      <PromoBar />
+
+      {/* ROW 1: STI Header with BTI-filled slots (Amber / gtmplt) */}
       <Header />
-      <GlobalPlayer />
 
-      {/* HERO SECTION */}
-      <section className="relative w-full h-[60vh] md:h-[70vh] overflow-hidden">
-        <Image
-          key={heroImage.src}
-          src={heroImage.src}
-          alt="G Putnam Music"
-          fill
-          priority
-          className={`object-cover transition-opacity duration-300 ${heroFading ? 'opacity-0' : 'opacity-100'}`}
-          style={{ objectPosition: heroImage.objectPosition }}
-          sizes="100vw"
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/70" />
-        <div className="absolute bottom-8 left-8 right-8 text-white">
-          <h1 className="text-4xl md:text-6xl font-bold tracking-tight drop-shadow-lg">G Putnam Music</h1>
-          <p className="mt-2 text-lg md:text-xl text-white/90 drop-shadow">The One Stop Song Shop</p>
-          <p className="mt-1 text-sm md:text-base text-[#C8A882] drop-shadow">Activity-Based, Context-Aware Music Intelligence</p>
-        </div>
-      </section>
+      {/* GPM BOT: Greets users and guides them step-by-step from landing */}
+      <div className="flex justify-end px-4 pt-3 pb-1">
+        <GpmBot bot="MC-BOT" startCollapsed={false} className="max-w-xs w-full" />
+      </div>
 
-      {/* KLEIGH-BRANDED FLOATING PLAYER — 3 Congruent PIX */}
-      <section className="bg-black py-10 px-4">
-        <div className="max-w-4xl mx-auto">
-          {/* FP Visual Core */}
-          <div className="relative w-full aspect-[16/9] md:aspect-[21/9] rounded-2xl overflow-hidden shadow-2xl border border-white/10 bg-neutral-900">
-            <Image
-              key={fpPix.src}
-              src={fpPix.src}
-              alt={fpPix.alt}
-              fill
-              className={`object-cover transition-opacity duration-500 ${fpFading ? 'opacity-0' : 'opacity-100'}`}
-              sizes="(max-width: 768px) 100vw, 896px"
-            />
-            {/* KLEIGH brand overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/30" />
-            <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8">
-              <p className="text-xs md:text-sm tracking-[0.3em] uppercase text-pink-300/80 font-bold mb-1">Now Streaming</p>
-              <h2 className="text-2xl md:text-4xl font-black text-white drop-shadow-lg">KLEIGH</h2>
-              <p className="text-white/60 text-sm mt-1">Songwriter / Singer / Musician</p>
-            </div>
-            {/* PIX indicator dots */}
-            <div className="absolute top-4 right-4 flex gap-1.5">
-              {KLEIGH_FP_PIX.map((_, i) => (
-                <div
-                  key={i}
-                  className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                    i === fpIndex ? 'bg-pink-400 scale-125' : 'bg-white/30'
-                  }`}
-                />
-              ))}
-            </div>
+      {/* ROW 2: Hero Image (left) + Featured Playlist (right) */}
+      <section className="w-full grid grid-cols-1 md:grid-cols-2 min-h-[56vh] md:min-h-[64vh]">
+
+        {/* LEFT: Rotating hero image */}
+        <div className="relative w-full h-[52vw] md:h-auto min-h-[240px] overflow-hidden">
+          <Image
+            key={hero.src}
+            src={hero.src}
+            alt={hero.alt}
+            fill
+            priority
+            className={`object-cover transition-opacity duration-500 ${fading ? 'opacity-0' : 'opacity-100'}`}
+            style={{ objectPosition: hero.objectPosition }}
+            sizes="(max-width: 768px) 100vw, 50vw"
+          />
+          {/* Amber-tinted gradient overlay */}
+          <div className="absolute inset-0 bg-gradient-to-b from-[#2A1506]/40 via-transparent to-[#1a1207]/85" />
+
+          {/* Brand lockup over hero image */}
+          <div className="absolute bottom-6 left-5 right-5 md:bottom-8 md:left-8 md:right-8">
+            <p className="text-[11px] md:text-xs uppercase tracking-[0.35em] text-[#C8A882]/70 mb-1.5 font-bold">
+              G Putnam Music · The One Stop Song Shop
+            </p>
+            <h1 className="text-2xl md:text-4xl font-black text-white leading-none drop-shadow-2xl">
+              All Original.
+              <br />
+              <span className="text-[#D4A017]">Always Streaming.</span>
+            </h1>
+            <p className="mt-2 text-xs md:text-sm text-[#C8A882]/80 max-w-xs drop-shadow">
+              Activity-based, context-aware music intelligence.
+            </p>
           </div>
+        </div>
 
-          {/* Stream CTA */}
-          <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link
-              href="/kleigh"
-              className="px-8 py-3 bg-gradient-to-r from-pink-600 to-purple-600 text-white font-bold text-sm tracking-wider rounded-full hover:brightness-110 transition shadow-lg"
-            >
-              STREAM KLEIGH
-            </Link>
-            <Link
-              href="/kupid"
-              className="px-8 py-3 border border-[#C8A882]/40 text-[#C8A882] font-bold text-sm tracking-wider rounded-full hover:bg-[#C8A882]/10 transition"
-            >
-              KUPID Locket™
-            </Link>
-          </div>
-
-          {/* Platform stats */}
-          <p className="text-center text-white/30 text-xs mt-6 tracking-wide">
-            1,000+ GPMC Catalog Tracks · Continuous FP Streaming · 2+ Hours No Repeats
-          </p>
+        {/* RIGHT: GPM Featured Playlist — non-stop stream */}
+        <div className="flex flex-col justify-center bg-[#110d06] border-l border-[#5C3A1E]/20">
+          <HomeFP />
         </div>
       </section>
 
-      {/* SINGLE FOOTER LINK: All T20 Activities */}
-      <section className="bg-neutral-950 py-6 px-4 border-t border-white/5">
-        <div className="max-w-4xl mx-auto text-center">
-          <Link
-            href="/heroes"
-            className="inline-flex items-center gap-2 text-[#C8A882] hover:text-white text-sm font-medium tracking-wide transition-colors"
-          >
-            <span className="text-lg">🎧</span>
-            Explore All 20 Activity Streams →
-          </Link>
-        </div>
-      </section>
+      {/* ROW 3: TOP 20 Streaming Activities (BTI body row 2) */}
+      <T20Grid />
 
-            <FeaturedPlaylists />
-      {/* <EmailCapture /> */}
-      {/* <WeeklyRace /> */}
+      {/* ROW 4: STO GPM Footer */}
       <Footer />
     </>
   );

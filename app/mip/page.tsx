@@ -2,9 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { Shield, Zap, Mic, Lock, Download, Play, Pause, FileText, ToggleLeft, ToggleRight, CheckCircle, Copy } from 'lucide-react';
-import { createClient } from '@supabase/supabase-js';
-
-const supabase = createClient('https://eajxgrbxvkhfmmfiotpm.supabase.co', process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '');
+import { supabase } from '@/lib/supabaseClient';
 
 export default function MipPage() {
   const [accessGranted, setAccessGranted] = useState(false);

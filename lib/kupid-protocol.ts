@@ -36,6 +36,45 @@ export const KUPID_TIERS: KupidTier[] = [
     badge: 'KLEAN KUT',
     buttonClass: 'bg-gradient-to-r from-violet-500 to-fuchsia-500 text-white hover:opacity-90',
   },
+  // --- Mini-KUT: Standalone Digital Audio Experience ---
+  {
+    id: 'mini-kut',
+    name: 'Mini-KUT Audio Experience',
+    price: '$29',
+    description: 'Canonical mini-KUT digital container – a personalized audio clip (15-45sec) paired to a custom frequency mood. Includes QR code linking to playable experience. Perfect for standalone sharing or embedding in jewelry.',
+    features: [
+      'Custom frequency-matched audio clip',
+      '15-45 second curated excerpt',
+      'Unique mini-KUT ID & QR code',
+      'Shareable across platforms',
+      'Embeddable in digital or physical gifts',
+    ],
+    stripeLink: 'https://buy.stripe.com/dR6aEW8ow00K1Tu9Xs',
+    color: 'from-cyan-500 to-blue-500',
+    borderColor: 'border-cyan-400/40',
+    badge: 'MINI-KUT',
+    buttonClass: 'bg-gradient-to-r from-cyan-500 to-blue-500 text-white hover:opacity-90',
+  },
+  // --- kUpId: Creator's Gifting Platform Subscription ---
+  {
+    id: 'kupid-creator',
+    name: 'kUpId Creator Suite',
+    price: '$99/year',
+    description: 'Annual creator subscription for unlimited K-KUT & mini-KUT generation, custom branding, analytics dashboard, and priority access to new frequency features. Perfect for artists, creators, and gifting brands.',
+    features: [
+      'Unlimited K-KUT code generation',
+      'Unlimited mini-KUT creation',
+      'Creator dashboard & analytics',
+      'Custom branding on links',
+      'API access for integrations',
+      'Priority support & new features',
+    ],
+    stripeLink: 'https://buy.stripe.com/3cs00aBmw00K2Xy8Yb',
+    color: 'from-amber-500 to-yellow-500',
+    borderColor: 'border-amber-400/40',
+    badge: 'KUPID',
+    buttonClass: 'bg-gradient-to-r from-amber-500 to-yellow-500 text-black hover:opacity-90',
+  },
   // --- KidKUTs: Affordable Charm Line (Koala Tier) ---
   {
     id: 'kidkut-frequency',

@@ -2,12 +2,7 @@
 
 import { useState, useRef } from 'react';
 import { Play, Pause, Heart, Star, BookOpen, Sun, Moon, Music } from 'lucide-react';
-import { createClient } from '@supabase/supabase-js';
-
-// --- SHARED AUDIO SOURCE (The "Dependence") ---
-const SUPABASE_URL = 'https://eajxgrbxvkhfmmfiotpm.supabase.co';
-const SUPABASE_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''; 
-const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+import { supabase } from '@/lib/supabaseClient';
 
 export default function Singalongs() {
   const [activeMood, setActiveMood] = useState<string | null>(null);
