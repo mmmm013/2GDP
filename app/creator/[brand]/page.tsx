@@ -600,9 +600,17 @@ function AssetList({
 
 // ----------------------------------------------------------------
 // PIXIE: drag-sort playlist editor (2hr GPM FP curation)
+// Fetches from the GPM tracks table — same source as HomeFP.
+// KLEIGH_LIBRARY / K-KUTs are NOT used here (unrelated to PIXIE).
 // ----------------------------------------------------------------
-import type { Track } from '@/config/kleighLibrary';
-import { KLEIGH_LIBRARY as tracks } from '@/config/kleighLibrary';
+import { createClient } from '@supabase/supabase-js';
+
+interface FPCatalogTrack {
+  id: string | number;
+  title: string;
+  artist?: string;
+  durationSeconds?: number;
+}
 
 function PixiePlaylistEditor({
   assets, onUpload, onDelete, onTogglePublish,
@@ -612,16 +620,53 @@ function PixiePlaylistEditor({
   onDelete: (id: string) => void;
   onTogglePublish: (asset: Asset) => void;
 }) {
-  const [selected, setSelected] = useState<Track[]>([]);
+  const [catalog, setCatalog]   = useState<FPCatalogTrack[]>([]);
+  const [catalogLoading, setCatalogLoading] = useState(true);
+  const [selected, setSelected] = useState<FPCatalogTrack[]>([]);
   const [saving, setSaving] = useState(false);
   const [msg, setMsg]       = useState('');
+  const [search, setSearch] = useState('');
 
-  function addTrack(track: Track) {
+  // Load GPM FP catalog from Supabase on mount
+  useEffect(() => {
+    async function loadCatalog() {
+      const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+      const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+      if (!url || !key) { setCatalogLoading(false); return; }
+      const sb = createClient(url, key);
+      const { data } = await sb
+        .from('tracks')
+        .select('id, title, artist')
+        .not('url', 'is', null)
+        .neq('url', '')
+        .order('title', { ascending: true })
+        .limit(500);
+      if (data && data.length > 0) {
+        setCatalog(data.map((r) => ({ id: String(r.id), title: r.title ?? 'Unknown', artist: r.artist })));
+      } else {
+        // fallback to gpm_tracks table
+        const { data: alt } = await sb
+          .from('gpm_tracks')
+          .select('id, title, artist')
+          .not('audio_url', 'is', null)
+          .neq('audio_url', '')
+          .order('title', { ascending: true })
+          .limit(500);
+        if (alt) {
+          setCatalog(alt.map((r) => ({ id: String(r.id), title: r.title ?? 'Unknown', artist: r.artist })));
+        }
+      }
+      setCatalogLoading(false);
+    }
+    loadCatalog();
+  }, []);
+
+  function addTrack(track: FPCatalogTrack) {
     if (selected.find((t) => t.id === track.id)) return;
     setSelected((prev) => [...prev, track]);
   }
 
-  function removeTrack(id: string) {
+  function removeTrack(id: string | number) {
     setSelected((prev) => prev.filter((t) => t.id !== id));
   }
 
@@ -644,6 +689,10 @@ function PixiePlaylistEditor({
   }
 
   const totalMinutes = selected.reduce((acc, t) => acc + (t.durationSeconds ?? 240) / 60, 0);
+
+  const filteredCatalog = search.trim()
+    ? catalog.filter((t) => t.title.toLowerCase().includes(search.toLowerCase()) || (t.artist ?? '').toLowerCase().includes(search.toLowerCase()))
+    : catalog;
 
   async function savePlaylist() {
     if (selected.length === 0) { setMsg('Add at least one track.'); return; }
@@ -674,22 +723,35 @@ function PixiePlaylistEditor({
           {Math.round(totalMinutes)} / 120 min
         </span>
       </div>
-      <p className="text-white/30 text-xs mb-4">Select tracks from the GPME library. Drag to reorder. Target: 2 hours (120 min).</p>
+      <p className="text-white/30 text-xs mb-4">Select GPM tracks to include. Reorder with ↑↓. Target: 2 hours (120 min).</p>
 
-      {/* Track library */}
-      <div className="mb-4 max-h-48 overflow-y-auto space-y-1 bg-white/3 rounded-xl p-3 border border-white/10">
-        <p className="text-white/30 text-xs uppercase tracking-widest mb-2">Library</p>
-        {(tracks as Track[]).map((t) => (
-          <button
-            key={t.id}
-            onClick={() => addTrack(t)}
-            disabled={!!selected.find((s) => s.id === t.id)}
-            className="w-full text-left px-3 py-1.5 rounded-lg text-sm text-white/70 hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
-          >
-            {t.title}
-            {t.durationSeconds && <span className="text-white/30 ml-2 text-xs">{Math.round(t.durationSeconds / 60)}m</span>}
-          </button>
-        ))}
+      {/* Track catalog search + list */}
+      <div className="mb-4 bg-white/3 rounded-xl p-3 border border-white/10">
+        <p className="text-white/30 text-xs uppercase tracking-widest mb-2">GPM Catalog</p>
+        <input
+          type="text"
+          placeholder="Search tracks…"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-white text-xs mb-2 focus:outline-none focus:border-[#FFD54F]/40"
+        />
+        <div className="max-h-44 overflow-y-auto space-y-1">
+          {catalogLoading ? (
+            <p className="text-white/30 text-xs py-2 animate-pulse">Loading catalog…</p>
+          ) : filteredCatalog.length === 0 ? (
+            <p className="text-white/20 text-xs py-2">No tracks found.</p>
+          ) : filteredCatalog.map((t) => (
+            <button
+              key={t.id}
+              onClick={() => addTrack(t)}
+              disabled={!!selected.find((s) => s.id === t.id)}
+              className="w-full text-left px-3 py-1.5 rounded-lg text-sm text-white/70 hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+            >
+              {t.title}
+              {t.artist && <span className="text-white/30 ml-2 text-xs">{t.artist}</span>}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Selected playlist */}
@@ -701,7 +763,8 @@ function PixiePlaylistEditor({
           <div key={t.id} className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-lg px-3 py-2">
             <span className="text-white/30 text-xs w-5 text-right">{i + 1}</span>
             <span className="flex-1 text-sm text-white truncate">{t.title}</span>
-            {t.durationSeconds && <span className="text-white/30 text-xs">{Math.round(t.durationSeconds / 60)}m</span>}
+            {t.artist && <span className="text-white/30 text-xs shrink-0">{t.artist}</span>}
+            {t.durationSeconds && <span className="text-white/30 text-xs shrink-0">{Math.round(t.durationSeconds / 60)}m</span>}
             <div className="flex gap-1">
               <button onClick={() => moveUp(i)}   className="text-white/30 hover:text-white px-1">↑</button>
               <button onClick={() => moveDown(i)} className="text-white/30 hover:text-white px-1">↓</button>
