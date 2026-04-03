@@ -8,7 +8,7 @@ const PROMOS = [
     id: 'founder',
     bg: 'bg-amber-500',
     text: 'text-black',
-    label: '⚡ FOUNDER SPECIAL — First 50 KUBs get permanent ELDER status for the price of JOEY. Limited.',
+    label: '⚡ FOUNDER SPECIAL — First 50 K-KUTs get permanent ELDER status for the price of JOEY. Limited.',
     cta: 'CLAIM IT →',
     href: '/join',
   },
