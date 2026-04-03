@@ -107,9 +107,24 @@ export default function GlobalPlayer() {
 
     window.addEventListener('play-track', handleTrackSelect as EventListener);
     window.addEventListener('fp-play', handleStopAll);
+
+    // MC-BOT: When FeaturedPlaylists (or any stream) signals ready, update idle label
+    const handleStreamReady = (e: CustomEvent) => {
+      setTrack((prev) => {
+        if (prev.url) return prev; // already playing — don't overwrite
+        return {
+          ...prev,
+          title: 'Stream Ready',
+          vocalist: `${e.detail?.totalTracks ?? ''} tracks loaded · Tap any activity`.trim(),
+        };
+      });
+    };
+    window.addEventListener('fp-stream-ready', handleStreamReady as EventListener);
+
     return () => {
       window.removeEventListener('play-track', handleTrackSelect as EventListener);
       window.removeEventListener('fp-play', handleStopAll);
+      window.removeEventListener('fp-stream-ready', handleStreamReady as EventListener);
       // DEPENDABILITY: Cleanup audio on unmount
       if (audioRef.current) {
         audioRef.current.pause();

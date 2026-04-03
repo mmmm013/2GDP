@@ -184,9 +184,12 @@ export default function KleighT20Grid() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Stop if GlobalPlayer fires
+  // Stop if another player fires — but NEVER stop ourselves
   useEffect(() => {
-    const handleStop = () => {
+    const handleStop = (e: Event) => {
+      const source = (e as CustomEvent).detail?.source;
+      // Ignore our own stop signals — we manage our own audio lifecycle
+      if (source === 'kleigh-t20') return;
       audioRef.current?.pause();
       setNowPlaying(null);
     };
@@ -214,20 +217,14 @@ export default function KleighT20Grid() {
     const audio = audioRef.current;
     if (!audio) return;
     setNowPlaying(track);
+    // Signal all other players to yield BEFORE we start, so our audio is exclusive
+    window.dispatchEvent(new CustomEvent('stop-all-audio', { detail: { source: 'kleigh-t20' } }));
     audio.src = track.src;
     audio.play().catch(() => {/* autoplay blocked — user will need to tap again */});
-
-    // Signal GlobalPlayer to yield
-    window.dispatchEvent(new CustomEvent('stop-all-audio', { detail: { source: 'kleigh-t20' } }));
-    // Re-dispatch play-track so GlobalPlayer UI reflects the track
-    window.dispatchEvent(new CustomEvent('play-track', {
-      detail: {
-        url: track.src,
-        title: track.title,
-        vocalist: track.vocalist,
-        moodTheme: { primary: '#C8A882' },
-      },
-    }));
+    // NOTE: We do NOT dispatch 'play-track' here. KleighT20Grid manages its own
+    // audio lifecycle independently. The Now Playing strip below shows current state.
+    // Dispatching play-track would cause GlobalPlayer to also load + play the same
+    // URL, resulting in double audio.
   }, []);
 
   const advanceQueue = useCallback(() => {
