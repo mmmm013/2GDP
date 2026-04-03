@@ -16,6 +16,13 @@ const nextConfig: NextConfig = {
   },
   turbopack: {
     root: repoRoot,
+    excludes: [
+      '**/gputnam-music-final-site/**',
+      '**/2GDP/**',
+      '**/Global-Warehouse/**',
+      '**/.next/**',
+      '**/node_modules/**',
+    ],
   },
 };
 export default nextConfig;
