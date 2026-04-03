@@ -1,16 +1,30 @@
-# gputnam-music-final-site (staging scaffold)
+# gputnam-music-final-site
 
-This directory is a temporary staging scaffold for the future `gputnam-music-final-site` repository.
+**Production site for gputnammusic.com** — deployed via Vercel from `staging/gputnam-music-final-site/`.
 
-Purpose:
-- hold the public-facing GPMD site code before it is moved into its own repository
-- keep public music UX separate from the 2GDP platform boundary
-- provide a clean handoff target for a future Vercel project connection
+## Template (locked — GTM PLT)
 
-Target responsibilities:
-- landing pages
-- catalog views
-- K-KUT / PIX surfacing
-- contact / commerce hooks
+| Row | Zone | Content |
+|-----|------|---------|
+| 1   | Header (STI top row) | Amber nav — logo · links — BTI-filled slots (gtmplt) |
+| 2   | Hero + Stream | Rotating hero image (left) · GPM Featured Playlist audio player (right) |
+| 3   | T20 Grid | Top 20 streaming activities — live Supabase data |
+| 4   | Footer (STO) | Links · copyright |
 
-Do not place platform kernel naming in public copy.
+**MC-BOT** sits top-right, voice-activated (SpeechRecognition).  
+Voice commands: `next` · `back` · `go` · `done/collapse` · `expand`
+
+## Environment Variables (Vercel)
+
+| Key | Description |
+|-----|-------------|
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anon key for `lbzpfqarraegkghxwbah.supabase.co` |
+
+## Local Dev
+
+```bash
+cd staging/gputnam-music-final-site
+npm install
+npm run dev
+```
+
