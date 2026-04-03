@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@simplewebauthn/browser": "^13.3.0",
     "@supabase/supabase-js": "^2.99.0",
     "@vercel/analytics": "^1.0.0",
     "lucide-react": "^0.300.0",

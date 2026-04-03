@@ -5,7 +5,6 @@ import { createClient } from '@/utils/supabase/client';
 import { Upload, Music, Mic2, Save, Users } from 'lucide-react';
 
 export default function AdminUpload() {
-  const supabase = createClient();
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
 
@@ -23,7 +22,7 @@ export default function AdminUpload() {
     }
     setLoading(true);
     setMessage('Uploading Audio Asset...');
-
+    const supabase = createClient();
     try {
       // 1. Upload File to Storage
       const filename = `${Date.now()}-${file.name.replace(/\s/g, '_').toLowerCase()}`;

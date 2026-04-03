@@ -1,7 +1,7 @@
 'use client'
 
 import { useSearchParams } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { Suspense, useEffect, useState } from 'react'
 import Link from 'next/link'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
@@ -14,7 +14,7 @@ interface Track {
   image?: string
 }
 
-export default function GiftBehindPage() {
+function GiftBehindPageContent() {
   const searchParams = useSearchParams()
   const trackId = searchParams.get('track') ?? ''
   const [track, setTrack] = useState<Track | null>(null)
@@ -101,5 +101,13 @@ export default function GiftBehindPage() {
 
       <Footer />
     </main>
+  )
+}
+
+export default function GiftBehindPage() {
+  return (
+    <Suspense fallback={<div className="pt-24 text-center text-white/40 text-sm">Loading…</div>}>
+      <GiftBehindPageContent />
+    </Suspense>
   )
 }

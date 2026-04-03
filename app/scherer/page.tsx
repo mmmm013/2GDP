@@ -7,10 +7,12 @@ import Footer from '@/components/Footer';
 import GlobalPlayer from '@/components/GlobalPlayer';
 import { Bot, Tv, BadgeCheck, ShoppingCart, Heart, Music2, MapPin } from 'lucide-react';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL as string,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY as string
-);
+function getSupabase() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL as string,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY as string
+  );
+}
 
 interface SchererTrack {
   id: string;
@@ -33,7 +35,7 @@ export default function SchererPage() {
 
   useEffect(() => {
     const loadTracks = async () => {
-      const { data, error } = await supabase
+      const { data, error } = await getSupabase()
         .from('msj_tv_thoroughbreds')
         .select('*')
         .not('audio_url', 'is', null)
