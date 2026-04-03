@@ -67,8 +67,9 @@ export function proxy(req: NextRequest) {
     return NextResponse.rewrite(url);
   }
   
-  // Extract country from Vercel's geo headers
-  const country = req.geo?.country || req.headers.get('x-vercel-ip-country') || 'US';
+  // Extract country from Vercel's geo headers (production) or fallback to headers
+  const geo = (req as any).geo;
+  const country = geo?.country || req.headers.get('x-vercel-ip-country') || 'US';
 
   // Check against sanctions list
   if (BLOCKED_COUNTRIES.includes(country)) {
