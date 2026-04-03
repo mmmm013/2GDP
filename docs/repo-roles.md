@@ -1,6 +1,6 @@
 # Repository Roles
 
-## 2GDP
+## GPMC
 
 This repository is the platform / 4PE-universal codebase.
 

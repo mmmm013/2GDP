@@ -3,6 +3,11 @@
     {
       "path": "/api/cron/rotate-promotions",
       "schedule": "33 */3 * * *"
+    },
+    {
+      "path": "/api/cron/free-gift",
+      "schedule": "0 * * * *"
     }
   ]
 }
+

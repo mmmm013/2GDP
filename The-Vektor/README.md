@@ -1,5 +1,5 @@
 # The Vektor
 
-Internal IP and documentation layer for 2GDP.
+Internal IP and documentation layer for The Vektor [Konsulting].
 
 Not for public exposure.

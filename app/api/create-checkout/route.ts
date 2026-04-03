@@ -1,22 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import Stripe from 'stripe';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
 
 export const runtime = 'nodejs';
-
-const REQUIRED_ENVS = [
-  'STRIPE_SECRET_KEY',
-] as const;
-
-for (const key of REQUIRED_ENVS) {
-  if (!process.env[key]) {
-    throw new Error(`Missing required env var: ${key}`);
-  }
-}
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2024-04-10',
-});
 
 const TIERS = ['tap', 'double_tap', 'long_press', 'hold_heart'] as const;
 type Tier = (typeof TIERS)[number];
@@ -48,6 +33,10 @@ const isTier = (value: string): value is Tier => (TIERS as readonly string[]).in
 const clean = (v: unknown, max = 500) => (typeof v === 'string' ? v.trim().slice(0, max) : '');
 
 export async function POST(req: NextRequest) {
+  const Stripe = (await import('stripe')).default;
+  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+    apiVersion: '2025-12-15.clover',
+  });
   try {
     let body: CheckoutBody;
     try {

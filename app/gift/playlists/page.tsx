@@ -1,7 +1,7 @@
 'use client'
 
 import { useSearchParams } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { Suspense, useEffect, useState } from 'react'
 import Link from 'next/link'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
@@ -13,7 +13,7 @@ interface Playlist {
   description?: string
 }
 
-export default function GiftPlaylistsPage() {
+function GiftPlaylistsPageContent() {
   const searchParams = useSearchParams()
   const playlistId = searchParams.get('playlist') ?? ''
   const [playlist, setPlaylist] = useState<Playlist | null>(null)
@@ -94,5 +94,13 @@ export default function GiftPlaylistsPage() {
 
       <Footer />
     </main>
+  )
+}
+
+export default function GiftPlaylistsPage() {
+  return (
+    <Suspense fallback={<div className="pt-24 text-center text-white/40 text-sm">Loading…</div>}>
+      <GiftPlaylistsPageContent />
+    </Suspense>
   )
 }

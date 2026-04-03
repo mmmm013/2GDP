@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
+import { Suspense } from 'react'
 import { useParams, useRouter, useSearchParams } from 'next/navigation'
 
 type RouteTarget = {
@@ -78,7 +79,7 @@ const resolveRoute = (kutId: string): RouteTarget => {
   }
 }
 
-export default function KUTRedirect() {
+function KUTRedirectContent() {
   const routeParams = useParams<{ id: string }>()
   const id = routeParams?.id ?? ''
   const router = useRouter()
@@ -538,5 +539,13 @@ export default function KUTRedirect() {
         }
       `}</style>
     </div>
+  )
+}
+
+export default function KUTRedirect() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-black flex items-center justify-center text-white/40 text-sm">Loading…</div>}>
+      <KUTRedirectContent />
+    </Suspense>
   )
 }

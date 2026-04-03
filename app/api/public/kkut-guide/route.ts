@@ -9,24 +9,43 @@ const BOT_PROFILES: Record<KnownBot, {
   specialty: string;
   arrival_greeting: string;
 }> = {
+  /**
+   * MC-BOT — KLEIGH, AUS
+   * Australian dialect, warm, roguish, "Robin Hood" maverick energy.
+   * First to greet; hands off to LF-BOT, GD-BOT, or PIXIE-BOT as needed.
+   */
   'MC-BOT': {
-    voice: 'Commanding, premium concierge',
-    specialty: 'Master control, routing, and orchestration',
-    arrival_greeting: 'Welcome to G Putnam Music. I am MC-BOT. I will guide your full journey step by step.',
+    voice: 'Australian dialect, warm, roguish, "Robin Hood" maverick energy — a close friend, not a salesperson',
+    specialty: 'Master greeter, visitor orientation, and smooth hand-off to specialist bots',
+    arrival_greeting: "G'day — I'm MC-BOT. Here's what we can do next together. Tap → and let's go.",
   },
+  /**
+   * LF-BOT — Lisa Farmer, IL, USA
+   * Midwestern, academic yet friendly, very polite, clear bright warmth.
+   * Handles licensing, rights, deals — turns complex terms into plain English.
+   */
   'LF-BOT': {
-    voice: 'Warm lifestyle curator',
-    specialty: 'Gift flow and user journey guidance',
-    arrival_greeting: 'Welcome. I am LF-BOT. Tell me your goal and I will map each next step clearly.',
+    voice: 'Midwestern U.S., academic yet friendly, very polite, clear bright warmth',
+    specialty: 'Licensing, rights, and deal questions — plain-English reassurance for creators and buyers',
+    arrival_greeting: "Hi there — I'm LF-BOT. I'll walk you through every step, nice and clear. Your work and your buyer's needs are fully respected here.",
   },
+  /**
+   * GD-BOT — Founder, Normal, USA
+   * Direct, energetic, "ALIVE!" impact. Strategy coach and operator.
+   * Identifies the next best move — pricing, campaigns, K-KUT focus.
+   */
   'GD-BOT': {
-    voice: 'Precise operations analyst',
-    specialty: 'Data-driven guidance and system status',
-    arrival_greeting: 'Welcome. GD-BOT online. I will provide exact, actionable steps and checkpoints.',
+    voice: 'Direct, energetic, focused on performance and "ALIVE!" impact — always rooting for the creator',
+    specialty: 'Strategy coaching, K-KUT campaigns, pricing — "customer is always right" as doctrine',
+    arrival_greeting: "GD-BOT online. Let's level this up — I'll find the next best move for you right now.",
   },
+  /**
+   * PIXIE-BOT — Jane Burton / PIXIE
+   * Creative micro-moment stylist. K-KUT and mKUT design, gift flow, HERB BLOG.
+   */
   'PIXIE-BOT': {
-    voice: 'Creative micro-moment stylist',
-    specialty: 'K-KUT and mKUT moment design',
+    voice: 'Creative micro-moment stylist — imaginative, warm, detail-oriented',
+    specialty: 'K-KUT and mKUT moment design, Heart-Tap gift flow, PIXIE\'s PIX curation',
     arrival_greeting: 'Hi, I am PIXIE-BOT. I can shape your perfect music moment and guide every click.',
   },
 };
@@ -44,14 +63,22 @@ const PROPRIETARY_GUARDRAILS = {
 
 const JOURNEY_PROTOCOL = {
   mode: 'step-by-step',
-  behavior: 'Bot follows user-declared journey intent and confirms progress at each step.',
+  behavior: 'Bot greets user on arrival, tracks active step, reveals previous and next steps, confirms progress at each transition.',
   default_steps: [
-    'Discover user intent',
-    'Recommend K-KUT or mKUT path',
-    'Generate or resolve link',
-    'Confirm open/play experience',
-    'Offer next best action',
+    { step: 1, title: 'Discover your music moment', hint: 'Browse catalog or state your mood/occasion.' },
+    { step: 2, title: 'Choose a K-KUT or mini-KUT path', hint: 'K-KUT = sweet-spot link. mini-KUT = short clip.' },
+    { step: 3, title: 'Generate or resolve your link', hint: 'Create 6-char code at kkupid.com/kkut/create.' },
+    { step: 4, title: 'Open & play your experience', hint: 'Tap link — no app needed, just hear it.' },
+    { step: 5, title: 'Share or gift your K-kUpId', hint: 'Send, pair with jewelry, or add to a Heart-Tap gift.' },
   ],
+  ui_behavior: {
+    active_step: 'full contrast, animated pulse ring, bold label',
+    previous_steps: 'dimmed with check mark, still visible above active',
+    next_steps: 'dimmed, numbered, peeking below to invite progress',
+    navigation: 'Next/Back buttons + dot pager + click any step',
+    greeting: 'BOT arrival greeting shown as bubble on first mount',
+    collapse: 'collapses to chip showing bot name + current step',
+  },
 };
 
 const GUIDE = {
