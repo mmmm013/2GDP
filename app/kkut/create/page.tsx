@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Share2, Copy, Check, Music, Radio, Heart, Sparkles, Zap } from 'lucide-react';
 import Header from '@/components/Header';
 import { supabase } from '@/lib/supabaseClient';
+import GpmBot from '@/components/GpmBot';
 
 interface CatalogItem {
   id: string;
@@ -108,7 +109,23 @@ export default function KKKCreatorPage() {
   return (
     <main className="min-h-screen bg-gradient-to-b from-[#8B7355] via-[#6B5442] to-[#3E2723] text-[#F5E6D3]">
       <Header />
-      
+
+      {/* GD-BOT: step-by-step K-KUT creation guide */}
+      <div className="flex justify-end px-4 pt-3 pb-1">
+        <GpmBot
+          bot="GD-BOT"
+          steps={[
+            { title: 'Select your track type', hint: 'Choose STI (studio), BTI (behind the scenes), or FP (full playlist).', action: 'Pick Type' },
+            { title: 'Find your track', hint: 'Search or browse the catalog. Select the exact track you want to link.' },
+            { title: 'Set your Sweet Spot', hint: 'Toggle K-KUT (full sweet-spot link) or mini-KUT (short clip). Enter your timestamp.' },
+            { title: 'Generate your code', hint: 'Hit Generate — your 6-character K-KUT code is created instantly.', action: 'Generate' },
+            { title: 'Copy & share', hint: 'Copy the short link and send it anywhere. No app needed — just tap and hear it.', action: 'Copy Link' },
+          ]}
+          startCollapsed={false}
+          className="max-w-xs w-full"
+        />
+      </div>
+
       <div className="container mx-auto px-4 py-20 max-w-5xl">
         {/* KKK Hero Section */}
         <div className="text-center mb-12">
