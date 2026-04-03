@@ -48,7 +48,7 @@ jobs:
       - name: BIC gate - block destructive changes without ALLOW_BIC
         run: |
           set -e
-          if grep -RniE '(^|[^-])\bDROP[[:space:]]+(TABLE|COLUMN)\b' supabase/migrations/ | grep -vi 'ALLOW_BIC'; then
+          if grep -RniE '\bDROP[[:space:]]+(TABLE|COLUMN)\b' supabase/migrations/ | grep -Ev ':[0-9]+:[[:space:]]*--' | grep -vi 'ALLOW_BIC'; then
             echo "ERROR: Detected DROP TABLE/COLUMN without -- ALLOW_BIC approval comment."
             echo "Add '-- ALLOW_BIC' to the migration file to explicitly allow this change."
             exit 1
