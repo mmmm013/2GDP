@@ -44,14 +44,22 @@ const PROPRIETARY_GUARDRAILS = {
 
 const JOURNEY_PROTOCOL = {
   mode: 'step-by-step',
-  behavior: 'Bot follows user-declared journey intent and confirms progress at each step.',
+  behavior: 'Bot greets user on arrival, tracks active step, reveals previous and next steps, confirms progress at each transition.',
   default_steps: [
-    'Discover user intent',
-    'Recommend K-KUT or mKUT path',
-    'Generate or resolve link',
-    'Confirm open/play experience',
-    'Offer next best action',
+    { step: 1, title: 'Discover your music moment', hint: 'Browse catalog or state your mood/occasion.' },
+    { step: 2, title: 'Choose a K-KUT or mini-KUT path', hint: 'K-KUT = sweet-spot link. mini-KUT = short clip.' },
+    { step: 3, title: 'Generate or resolve your link', hint: 'Create 6-char code at kkupid.com/kkut/create.' },
+    { step: 4, title: 'Open & play your experience', hint: 'Tap link — no app needed, just hear it.' },
+    { step: 5, title: 'Share or gift your K-kUpId', hint: 'Send, pair with jewelry, or add to a Heart-Tap gift.' },
   ],
+  ui_behavior: {
+    active_step: 'full contrast, animated pulse ring, bold label',
+    previous_steps: 'dimmed with check mark, still visible above active',
+    next_steps: 'dimmed, numbered, peeking below to invite progress',
+    navigation: 'Next/Back buttons + dot pager + click any step',
+    greeting: 'BOT arrival greeting shown as bubble on first mount',
+    collapse: 'collapses to chip showing bot name + current step',
+  },
 };
 
 const GUIDE = {

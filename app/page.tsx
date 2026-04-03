@@ -17,6 +17,7 @@ import Footer from '@/components/Footer';
 import HomeFP from '@/components/HomeFP';
 import T20Grid from '@/components/T20Grid';
 import PromoBar from '@/components/PromoBar';
+import GpmBot from '@/components/GpmBot';
 
 // ---------------------------------------------------------------------------
 // Hero image rotation — shuffle-based, one image on screen at a time
@@ -68,6 +69,11 @@ export default function HomePage() {
 
       {/* ROW 1: STI Header with BTI-filled slots (Amber / gtmplt) */}
       <Header />
+
+      {/* GPM BOT: Greets users and guides them step-by-step from landing */}
+      <div className="flex justify-end px-4 pt-3 pb-1">
+        <GpmBot bot="MC-BOT" startCollapsed={false} className="max-w-xs w-full" />
+      </div>
 
       {/* ROW 2: Hero Image (left) + Featured Playlist (right) */}
       <section className="w-full grid grid-cols-1 md:grid-cols-2 min-h-[56vh] md:min-h-[64vh]">
