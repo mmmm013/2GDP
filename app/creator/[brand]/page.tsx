@@ -222,6 +222,7 @@ export default function CreatorPortalPage() {
   // Auth gate
   // ----------------------------------------------------------------
   if (!authed) {
+    const isPixie = creator.brand === 'PIXIE';
     return (
       <main className="min-h-screen bg-[#1a1207] text-white flex flex-col items-center justify-center p-6">
         <div className="w-full max-w-sm text-center">
@@ -229,7 +230,31 @@ export default function CreatorPortalPage() {
             <span className="text-[#FFD54F]">{creator.displayName}</span>
           </h1>
           <p className="text-white/40 text-sm mb-2">{creator.role}</p>
-          <p className="text-white/30 text-xs mb-8">{creator.tagline}</p>
+          <p className="text-white/30 text-xs mb-6">{creator.tagline}</p>
+
+          {/* PIXIE-BOT guided walk-through */}
+          {isPixie && (
+            <div className="mb-6 rounded-2xl p-4 text-left bg-[#a8cc7f]/5 border border-[#a8cc7f]/20">
+              <p className="text-xs font-bold uppercase tracking-widest mb-3 text-[#a8cc7f]">🤖 PIXIE-BOT · How to get in</p>
+              <ol className="space-y-2 text-xs text-white/60">
+                <li className="flex gap-2">
+                  <span className="text-[#FFD54F] font-bold shrink-0">①</span>
+                  <span><strong className="text-white/80">First time only:</strong> Ask admin to open{' '}
+                    <code className="text-[#FFD54F] text-[0.7rem]">gputnammusic.com/creator/enroll?brand=PIXIE</code>{' '}
+                    on <em>this device</em>, then tap <strong>Enroll PIXIE</strong>.</span>
+                </li>
+                <li className="flex gap-2">
+                  <span className="text-[#FFD54F] font-bold shrink-0">②</span>
+                  <span>Once enrolled, tap <strong className="text-white/80">Biometric Login</strong> below and use Face ID or Touch ID.</span>
+                </li>
+                <li className="flex gap-2">
+                  <span className="text-[#FFD54F] font-bold shrink-0">③</span>
+                  <span>You&apos;re in! Write posts in <strong className="text-[#a8cc7f]">🌱 Herb Blog</strong> or upload your curated playlist.</span>
+                </li>
+              </ol>
+              <p className="mt-3 text-xs text-white/30">Session stays active 4 hours. No password — ever.</p>
+            </div>
+          )}
 
           <button
             onClick={handleBiometricLogin}

@@ -60,6 +60,33 @@ function CreatorEnrollForm() {
         <p className="text-white/50 text-sm">Creator Portal — Biometric Enrollment</p>
       </div>
 
+      {/* PIXIE-BOT enrollment guide */}
+      {(selectedBrand === 'pixie' || selectedBrand === '') && (
+        <div className="mb-6 rounded-2xl p-4 bg-[#a8cc7f]/5 border border-[#a8cc7f]/20">
+          <p className="text-xs font-bold uppercase tracking-widest mb-3 text-[#a8cc7f]">🤖 PIXIE-BOT · Enrollment Steps</p>
+          <ol className="space-y-2 text-xs text-white/60">
+            <li className="flex gap-2">
+              <span className="text-[#FFD54F] font-bold shrink-0">①</span>
+              <span>Select <strong className="text-white/80">PIXIE</strong> from the dropdown below.</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="text-[#FFD54F] font-bold shrink-0">②</span>
+              <span>Make sure <strong className="text-white/80">Jane (PIXIE)</strong> is holding this device.</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="text-[#FFD54F] font-bold shrink-0">③</span>
+              <span>Tap <strong className="text-white/80">Enroll PIXIE</strong> and follow the Face ID / Touch ID prompt.</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="text-[#FFD54F] font-bold shrink-0">④</span>
+              <span>Done! Send PIXIE her portal link:{' '}
+                <code className="text-[#FFD54F] text-[0.7rem]">gputnammusic.com/creator/pixie</code>
+              </span>
+            </li>
+          </ol>
+        </div>
+      )}
+
       <div className="mb-6">
         <label className="block text-xs text-white/50 uppercase tracking-widest mb-2">Creator Brand</label>
         <select

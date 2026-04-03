@@ -63,7 +63,10 @@ export default function CreatorPortalPage() {
 
   const loadAssets = useCallback(async () => {
     const res = await fetch('/api/creator/assets', { credentials: 'include' });
-    if (res.ok) setAssets(await res.json());
+    if (res.ok) {
+      const data = await res.json();
+      setAssets(Array.isArray(data) ? data : (data.assets ?? []));
+    }
   }, []);
 
   // ── WebAuthn login ────────────────────────────────────────────────
@@ -146,25 +149,58 @@ export default function CreatorPortalPage() {
 
   // ── Auth gate ─────────────────────────────────────────────────────
   if (!authed) {
+    const isPixie = creator.brand === 'PIXIE';
     return (
       <main className="min-h-screen flex flex-col items-center justify-center p-6" style={{background:'#1a1207',color:'white'}}>
         <div className="w-full max-w-sm text-center">
           <p style={{color:'rgba(168,204,127,1)'}} className="text-xs uppercase tracking-widest mb-3">GPM Creator Portal</p>
           <h1 className="text-3xl font-bold mb-1">{creator.displayName}</h1>
-          <p style={{color:'rgba(255,255,255,0.4)'}} className="text-xs mb-8">{creator.legalName} · {creator.role}</p>
+          <p style={{color:'rgba(255,255,255,0.4)'}} className="text-xs mb-6">{creator.legalName} · {creator.role}</p>
+
+          {/* PIXIE-BOT guided walk-through */}
+          {isPixie && (
+            <div className="mb-6 rounded-2xl p-4 text-left" style={{background:'rgba(168,204,127,0.07)',border:'1px solid rgba(168,204,127,0.2)'}}>
+              <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{color:'#a8cc7f'}}>🤖 PIXIE-BOT · How to get in</p>
+              <ol className="space-y-2 text-xs" style={{color:'rgba(255,255,255,0.6)'}}>
+                <li className="flex gap-2">
+                  <span style={{color:'#FFD54F'}} className="font-bold shrink-0">①</span>
+                  <span><strong style={{color:'rgba(255,255,255,0.8)'}}>First time only:</strong> Ask admin to open{' '}
+                    <code style={{color:'#FFD54F',fontSize:'0.7rem'}}>gputnammusic.com/creator/enroll?brand=PIXIE</code>{' '}
+                    on <em>this device</em>, then tap <strong>Enroll PIXIE</strong>.</span>
+                </li>
+                <li className="flex gap-2">
+                  <span style={{color:'#FFD54F'}} className="font-bold shrink-0">②</span>
+                  <span>Once enrolled, tap <strong style={{color:'rgba(255,255,255,0.8)'}}>Verify Identity</strong> below and use Face ID or Touch ID when prompted.</span>
+                </li>
+                <li className="flex gap-2">
+                  <span style={{color:'#FFD54F'}} className="font-bold shrink-0">③</span>
+                  <span>You&apos;re in! Write posts in the <strong style={{color:'#a8cc7f'}}>🌱 Herb Blog</strong> tab or upload your curated playlist.</span>
+                </li>
+              </ol>
+              <p className="mt-3 text-xs" style={{color:'rgba(255,255,255,0.3)'}}>
+                Your session stays active for 4 hours. No password needed — ever.
+              </p>
+            </div>
+          )}
+
           <button onClick={handleAuth}
             className="w-full py-3 rounded-xl font-bold tracking-widest text-sm mb-4"
             style={{background:'#FFD54F',color:'#000'}}>
             🔐 Verify Identity (Face ID / Touch ID)
           </button>
           {authMsg && <p className="text-sm mt-2" style={{color:authMsg.startsWith('❌')?'#fca5a5':'rgba(255,255,255,0.5)'}}>{authMsg}</p>}
+          {authMsg.includes('not yet enrolled') && (
+            <a
+              href={`/creator/enroll?brand=${creator.brand}`}
+              className="mt-3 inline-block px-4 py-2 rounded-lg text-sm font-semibold"
+              style={{background:'rgba(255,213,79,0.15)',border:'1px solid rgba(255,213,79,0.3)',color:'#FFD54F'}}>
+              → Go to Enrollment →
+            </a>
+          )}
           <div className="mt-6 flex flex-col gap-2 text-xs" style={{color:'rgba(255,255,255,0.2)'}}>
             <Link href="/herb-blog" className="hover:underline">→ View PIXIE&apos;s PIX (public)</Link>
             <Link href="/" className="hover:underline">← Back to Home</Link>
           </div>
-          <p className="mt-6 text-xs" style={{color:'rgba(255,255,255,0.2)'}}>
-            First time? Ask admin to visit <code style={{color:'rgba(255,213,79,0.6)'}}>/creator/enroll?brand={creator.brand}</code>
-          </p>
         </div>
       </main>
     );

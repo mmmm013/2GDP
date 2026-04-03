@@ -60,6 +60,34 @@ function EnrollForm() {
         <h1 className="text-2xl font-bold tracking-widest mb-1">GPM <span style={{color:'#FFD54F'}}>4PE-MSC</span></h1>
         <p style={{color:'rgba(255,255,255,0.5)'}} className="text-sm">Creator Portal — Biometric Enrollment</p>
       </div>
+
+      {/* PIXIE-BOT enrollment guide */}
+      {(selectedBrand === 'pixie' || selectedBrand === '') && (
+        <div className="mb-6 rounded-2xl p-4" style={{background:'rgba(168,204,127,0.07)',border:'1px solid rgba(168,204,127,0.2)'}}>
+          <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{color:'#a8cc7f'}}>🤖 PIXIE-BOT · Enrollment Steps</p>
+          <ol className="space-y-2 text-xs" style={{color:'rgba(255,255,255,0.6)'}}>
+            <li className="flex gap-2">
+              <span style={{color:'#FFD54F'}} className="font-bold shrink-0">①</span>
+              <span>Select <strong style={{color:'rgba(255,255,255,0.8)'}}>PIXIE</strong> from the dropdown below.</span>
+            </li>
+            <li className="flex gap-2">
+              <span style={{color:'#FFD54F'}} className="font-bold shrink-0">②</span>
+              <span>Make sure <strong style={{color:'rgba(255,255,255,0.8)'}}>Jane (PIXIE)</strong> is holding this device.</span>
+            </li>
+            <li className="flex gap-2">
+              <span style={{color:'#FFD54F'}} className="font-bold shrink-0">③</span>
+              <span>Tap <strong style={{color:'rgba(255,255,255,0.8)'}}>Enroll PIXIE</strong> and follow the Face ID / Touch ID prompt.</span>
+            </li>
+            <li className="flex gap-2">
+              <span style={{color:'#FFD54F'}} className="font-bold shrink-0">④</span>
+              <span>Done! Send PIXIE her portal link:{' '}
+                <code style={{color:'#FFD54F',fontSize:'0.7rem'}}>gputnammusic.com/creator/pixie</code>
+              </span>
+            </li>
+          </ol>
+        </div>
+      )}
+
       <div className="mb-6">
         <label className="block text-xs uppercase tracking-widest mb-2" style={{color:'rgba(255,255,255,0.5)'}}>Creator Brand</label>
         <select value={selectedBrand} onChange={e => setSelectedBrand(e.target.value)}
