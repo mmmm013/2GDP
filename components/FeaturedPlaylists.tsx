@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { Play, Pause, SkipBack, SkipForward, Volume2, Repeat, Shuffle } from 'lucide-react';
+import { resolveAudioUrl } from '@/lib/audio/resolveAudioUrl';
 
 /**
  * FEATURED PLAYLISTS - BIC Audio Media Players
@@ -25,64 +26,66 @@ interface Playlist {
   tracks: Track[];
 }
 
+// Track `src` values are canonical track keys (filenames).
+// resolveAudioUrl() maps them to the Supabase `tracks` bucket at playback time.
 const PLAYLISTS: Playlist[] = [
   {
     name: "Grandpa's Story",
     tracks: [
-      { title: 'Reflections', vocalist: 'Kleigh', src: '/pix/kleigh--reflections.mp3' },
-      { title: 'I Need an Angel', vocalist: 'G Putnam Music', src: '/pix/i-need-an-angel.mp3' },
-      { title: 'Bought Into Your Game', vocalist: 'Kleigh', src: '/pix/bought-into-your-game.mp3' },
+      { title: 'Reflections', vocalist: 'Kleigh', src: 'kleigh--reflections.mp3' },
+      { title: 'I Need an Angel', vocalist: 'G Putnam Music', src: 'i-need-an-angel.mp3' },
+      { title: 'Bought Into Your Game', vocalist: 'Kleigh', src: 'bought-into-your-game.mp3' },
     ],
   },
   {
     name: 'Kleigh Spotlight',
     tracks: [
-      { title: 'Breathing Serenity', vocalist: 'Kleigh', src: '/pix/kleigh--breathing-serenity.mp3' },
-      { title: 'Nighttime', vocalist: 'G Putnam Music', src: '/pix/nighttime.mp3' },
-      { title: 'Down (Stripped)', vocalist: 'Kleigh', src: '/pix/kleigh--down-(stripped)-with-reverb--69bpm-fmaj.mp3' },
+      { title: 'Breathing Serenity', vocalist: 'Kleigh', src: 'kleigh--breathing-serenity.mp3' },
+      { title: 'Nighttime', vocalist: 'G Putnam Music', src: 'nighttime.mp3' },
+      { title: 'Down (Stripped)', vocalist: 'Kleigh', src: 'kleigh--down-(stripped)-with-reverb--69bpm-fmaj.mp3' },
     ],
   },
   {
     name: 'Who is G Putnam Music',
     tracks: [
-      { title: 'I Was Made to Be Awesome', vocalist: 'G Putnam Music', src: '/pix/i-was-made-to-be-awesome.mp3' },
-      { title: 'Perfect Day', vocalist: 'G Putnam Music', src: '/pix/perfect-day.mp3' },
-      { title: 'Why Does Life Gotta Be This Hard', vocalist: 'G Putnam Music', src: '/pix/why-does-life-gotta-be-this-hard.mp3' },
+      { title: 'I Was Made to Be Awesome', vocalist: 'G Putnam Music', src: 'i-was-made-to-be-awesome.mp3' },
+      { title: 'Perfect Day', vocalist: 'G Putnam Music', src: 'perfect-day.mp3' },
+      { title: 'Why Does Life Gotta Be This Hard', vocalist: 'G Putnam Music', src: 'why-does-life-gotta-be-this-hard.mp3' },
     ],
   },
   {
     name: 'The First Note',
     tracks: [
-      { title: 'Dance Party', vocalist: 'G Putnam Music', src: '/pix/dance-party.mp3' },
-      { title: 'Going Outside', vocalist: 'G Putnam Music', src: '/pix/going-outside.mp3' },
-      { title: 'I Am a Fighter', vocalist: 'G Putnam Music', src: '/pix/i-am-a-fighter--el-mix-instro.mp3' },
+      { title: 'Dance Party', vocalist: 'G Putnam Music', src: 'dance-party.mp3' },
+      { title: 'Going Outside', vocalist: 'G Putnam Music', src: 'going-outside.mp3' },
+      { title: 'I Am a Fighter', vocalist: 'G Putnam Music', src: 'i-am-a-fighter--el-mix-instro.mp3' },
     ],
   },
   {
     name: 'The SHIPS Engine',
     tracks: [
-      { title: 'I Live Free', vocalist: 'G Putnam Music', src: '/pix/i-live-free--instro.mp3' },
-      { title: "We'll Be Free", vocalist: 'G Putnam Music', src: "/pix/we'll-be-free.mp3" },
-      { title: "Fool's Game", vocalist: 'G Putnam Music', src: '/pix/fools-game-(master-2).mp3' },
+      { title: 'I Live Free', vocalist: 'G Putnam Music', src: 'i-live-free--instro.mp3' },
+      { title: "We'll Be Free", vocalist: 'G Putnam Music', src: "we'll-be-free.mp3" },
+      { title: "Fool's Game", vocalist: 'G Putnam Music', src: 'fools-game-(master-2).mp3' },
     ],
   },
   {
     name: 'Scherer Jazz Sessions',
     tracks: [
-      { title: 'Jump', vocalist: 'Michael Scherer', src: '/pix/jump.mp3' },
-      { title: 'New Orleans Piano Trio', vocalist: 'Michael Scherer', src: '/pix/new-orleans-piano-trio-1.mp3' },
-      { title: 'Score 3: The End', vocalist: 'Michael Scherer', src: '/pix/score-3--the-end.mp3' },
+      { title: 'Jump', vocalist: 'Michael Scherer', src: 'jump.mp3' },
+      { title: 'New Orleans Piano Trio', vocalist: 'Michael Scherer', src: 'new-orleans-piano-trio-1.mp3' },
+      { title: 'Score 3: The End', vocalist: 'Michael Scherer', src: 'score-3--the-end.mp3' },
     ],
   },
   {
     name: "Valentine's Day",
     tracks: [
-      { title: 'A Calm Evening', vocalist: 'Kleigh', src: '/pix/kleigh--a-calm-evening.mp3' },
-      { title: 'Wanna Know You', vocalist: 'G Putnam Music', src: '/pix/wanna-know-you.mp3' },
-      { title: 'Waterfall', vocalist: 'Kleigh', src: '/pix/kleigh--waterfall.mp3' },
-      { title: 'A Love Like That', vocalist: 'G Putnam Music', src: '/pix/a-love-like-that.mp3' },
-      { title: 'Forever & A Day', vocalist: 'G Putnam Music', src: '/pix/forever-and-a-day.mp3' },
-      { title: 'Be Mine Tonight', vocalist: 'KLEIGH', src: '/pix/be-mine-tonight.mp3' },
+      { title: 'A Calm Evening', vocalist: 'Kleigh', src: 'kleigh--a-calm-evening.mp3' },
+      { title: 'Wanna Know You', vocalist: 'G Putnam Music', src: 'wanna-know-you.mp3' },
+      { title: 'Waterfall', vocalist: 'Kleigh', src: 'kleigh--waterfall.mp3' },
+      { title: 'A Love Like That', vocalist: 'G Putnam Music', src: 'a-love-like-that.mp3' },
+      { title: 'Forever & A Day', vocalist: 'G Putnam Music', src: 'forever-and-a-day.mp3' },
+      { title: 'Be Mine Tonight', vocalist: 'KLEIGH', src: 'be-mine-tonight.mp3' },
     ],
   },
 ];
@@ -427,7 +430,7 @@ export default function FeaturedPlaylists() {
       {/* Hidden audio - MOBILE: preload none for Safari */}
       <audio
         ref={audioRef}
-        src={currentFlatTrack?.src || ''}
+        src={resolveAudioUrl(currentFlatTrack?.src || '')}
         preload="none"
       />
     </section>
