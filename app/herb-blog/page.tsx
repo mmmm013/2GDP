@@ -15,6 +15,10 @@ export const metadata: Metadata = {
   description: "Herbal gardening, nature writing, and PIXIE's curated GPM FP streaming playlist — by Jane Burton.",
 };
 
+// Category tags for filtering
+const CATEGORIES = ['All', 'Herb Lore', 'Garden Diary', 'Plant Medicine', 'Nature Notes', 'Seasonal'];
+
+
 // Server-side anon read (matches RLS: brand='PIXIE' AND is_published=true)
 function getSupabase() {
   return createClient(
@@ -77,14 +81,34 @@ export default async function HerbBlogPage() {
       <main className="min-h-screen bg-[#1a1207] text-white">
         {/* Hero */}
         <section className="bg-gradient-to-b from-[#2d3a1e] to-[#1a1207] py-16 px-4 text-center border-b border-white/10">
-          <p className="text-[#a8cc7f] text-xs uppercase tracking-[0.3em] mb-3">by Jane Burton</p>
+          <p className="text-[#a8cc7f] text-xs uppercase tracking-[0.3em] mb-3">by Jane Burton · GPM Creator</p>
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-3">
             🌿 PIXIE&apos;s PIX
           </h1>
-          <p className="text-white/50 max-w-xl mx-auto text-sm leading-relaxed">
-            Herbal gardening, nature, and the quiet wisdom of growing things.
+          <p className="text-white/50 max-w-xl mx-auto text-sm leading-relaxed mb-5">
+            Herbal gardening, the quiet wisdom of growing things, and nature in its truest form.
             Plus PIXIE&apos;s personally curated GPM FP streaming playlist — two hours of hand-picked tracks.
           </p>
+          {/* Personal bio */}
+          <div className="inline-block bg-white/5 border border-white/10 rounded-2xl px-6 py-4 max-w-lg text-left">
+            <p className="text-[#a8cc7f] text-xs font-bold uppercase tracking-widest mb-1">About Jane</p>
+            <p className="text-white/60 text-sm leading-relaxed">
+              Jane Burton — known to the GPMC family as PIXIE — tends herbs, follows seasons, and writes about the living world
+              with the same precision she brings to music curation. Every post here is her own hand.
+            </p>
+          </div>
+
+          {/* Category filter chips (client-side interaction handled via URL hash / future filter) */}
+          <div className="flex flex-wrap justify-center gap-2 mt-6">
+            {CATEGORIES.map((cat) => (
+              <span
+                key={cat}
+                className="text-xs bg-white/5 border border-white/10 rounded-full px-3 py-1 text-white/40 hover:text-[#a8cc7f] hover:border-[#a8cc7f]/30 cursor-pointer transition-all"
+              >
+                {cat}
+              </span>
+            ))}
+          </div>
         </section>
 
         <div className="max-w-3xl mx-auto px-4 py-12">
@@ -126,6 +150,22 @@ export default async function HerbBlogPage() {
                 ))}
               </div>
             )}
+          </section>
+
+          {/* ── DMAIC Feedback ── */}
+          <section className="mt-14 mb-4">
+            <div className="bg-white/3 border border-white/8 rounded-2xl p-6 text-center">
+              <p className="text-white/30 text-xs uppercase tracking-widest mb-2">🔄 DMAIC · Continuous Improvement</p>
+              <p className="text-white/50 text-sm mb-4 max-w-md mx-auto">
+                We improve PIXIE&apos;s PIX based on what you find useful. Share what you&apos;d love to see more of.
+              </p>
+              <a
+                href="mailto:feedback@gputnammusic.com?subject=PIXIE%27s%20PIX%20feedback"
+                className="inline-block px-6 py-2 rounded-lg bg-[#a8cc7f]/10 border border-[#a8cc7f]/20 text-[#a8cc7f] text-sm font-semibold hover:bg-[#a8cc7f]/20 transition-all"
+              >
+                📬 Share your thoughts
+              </a>
+            </div>
           </section>
         </div>
       </main>

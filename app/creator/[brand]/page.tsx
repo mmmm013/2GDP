@@ -22,6 +22,17 @@ import {
 import { getCreatorBySlug, CREATORS, type Creator, type CreatorScope } from '@/config/creators';
 import Link from 'next/link';
 import { Upload, Trash2, Eye, EyeOff, Music, Image as Img, FileText, Video } from 'lucide-react';
+import GpmBot from '@/components/GpmBot';
+
+// GD-BOT journey steps for all creators
+// Creators only bio-access + upload — 4PE-MSC handles ingestion automatically.
+const CREATOR_JOURNEY = [
+  { title: 'Identity verified ✓', hint: 'Biometric access confirmed. You are securely inside your brand portal.' },
+  { title: 'Choose your content type', hint: 'Select the scope that matches what you are uploading (Audio, Image, Blog post, etc.).' },
+  { title: 'Upload your file', hint: 'Drag & drop or tap "Upload" to add your media. That\'s all you need to do.' },
+  { title: '4PE-MSC ingests automatically', hint: 'The G Putnam Music Engine processes, tags, and stores your file. No action needed.' },
+  { title: 'Review & publish', hint: 'See your assets below. Toggle the eye icon to publish or unpublish at any time.' },
+];
 
 // ----------------------------------------------------------------
 // Types
@@ -260,8 +271,18 @@ export default function CreatorPortalPage() {
       <main className="min-h-screen bg-[#1a1207] text-white">
         <PortalHeader creator={creator} onLogout={() => { setAuthed(false); router.push('/creator/pixie'); }} />
 
+        {/* GD-BOT: creator journey guide */}
+        <div className="max-w-3xl mx-auto px-4 pt-4 flex justify-end">
+          <GpmBot
+            bot="GD-BOT"
+            steps={CREATOR_JOURNEY}
+            startCollapsed={true}
+            className="max-w-xs w-full"
+          />
+        </div>
+
         {/* Tab switcher */}
-        <div className="max-w-3xl mx-auto px-4 pt-4">
+        <div className="max-w-3xl mx-auto px-4 pt-2">
           <div className="flex gap-2 mb-6">
             {(['HERB_BLOG', 'GPM_FP_PLAYLIST'] as const).map((tab) => (
               <button
@@ -281,7 +302,32 @@ export default function CreatorPortalPage() {
           {/* HERB BLOG tab */}
           {activeTab === 'HERB_BLOG' && (
             <div>
-              <h2 className="text-lg font-bold text-[#FFD54F] mb-4">PIXIE&apos;s PIX — New Post</h2>
+              <h2 className="text-lg font-bold text-[#FFD54F] mb-1">PIXIE&apos;s PIX — New Post</h2>
+              <p className="text-white/30 text-xs mb-4">Write freely, Jane — your voice is the heart of this page. 🌿</p>
+
+              {/* AI writing prompt chips */}
+              <div className="mb-3">
+                <p className="text-white/30 text-xs mb-2 uppercase tracking-widest">Prompt ideas</p>
+                <div className="flex flex-wrap gap-2">
+                  {[
+                    "What I found growing this week…",
+                    "An herb I've been thinking about…",
+                    "A memory tied to a plant…",
+                    "Seasonal foraging notes",
+                    "A remedy I trust",
+                    "The garden right now…",
+                  ].map((prompt) => (
+                    <button
+                      key={prompt}
+                      onClick={() => setBlogContent((c) => c ? c + '\n\n' + prompt : prompt)}
+                      className="text-xs bg-white/5 border border-white/10 rounded-full px-3 py-1 text-white/50 hover:bg-[#a8cc7f]/10 hover:border-[#a8cc7f]/30 hover:text-[#a8cc7f] transition-all"
+                    >
+                      {prompt}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
               <input
                 type="text"
                 placeholder="Post title…"
@@ -333,6 +379,16 @@ export default function CreatorPortalPage() {
       <PortalHeader creator={creator} onLogout={() => { setAuthed(false); }} />
 
       <div className="max-w-3xl mx-auto px-4 pt-4">
+        {/* GD-BOT: creator journey guide — bio-access + upload, that's it */}
+        <div className="flex justify-end mb-4">
+          <GpmBot
+            bot="GD-BOT"
+            steps={CREATOR_JOURNEY}
+            startCollapsed={true}
+            className="max-w-xs w-full"
+          />
+        </div>
+
         {/* Awesome Squad badge for MSJ + ZG */}
         {(creator.brand === 'MSJ' || creator.brand === 'ZG') && (
           <div className="mb-4 bg-white/5 border border-white/10 rounded-xl px-4 py-2 flex items-center gap-2">
