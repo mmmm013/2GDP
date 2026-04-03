@@ -330,12 +330,10 @@ export default function HomeFP() {
 
   if (isLoading) {
     return (
-      <section className="w-full bg-[#110d06] py-10 px-4">
-        <div className="max-w-2xl mx-auto flex items-center justify-center gap-3 text-[#C8A882]/60">
-          <Radio size={18} className="animate-pulse" />
-          <span className="text-sm tracking-widest uppercase">Loading GPM Stream…</span>
-        </div>
-      </section>
+      <div className="w-full py-10 px-4 flex items-center justify-center gap-3 text-[#C8A882]/60">
+        <Radio size={18} className="animate-pulse" />
+        <span className="text-sm tracking-widest uppercase">Loading GPM Stream…</span>
+      </div>
     );
   }
 
@@ -344,8 +342,8 @@ export default function HomeFP() {
   }
 
   return (
-    <section className="w-full bg-[#110d06] py-8 px-4 border-t border-[#5C3A1E]/20">
-      <div className="max-w-2xl mx-auto">
+    <div className="w-full py-6 px-4 md:py-8 md:px-6">
+      <div className="max-w-md mx-auto md:max-w-none">
 
         {/* Stream identity */}
         <div className="flex items-center gap-2 mb-5">
@@ -441,6 +439,6 @@ export default function HomeFP() {
         src={current?.url ?? ''}
         preload="auto"
       />
-    </section>
+    </div>
   );
 }
