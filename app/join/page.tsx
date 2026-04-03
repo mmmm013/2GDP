@@ -220,24 +220,27 @@ export default function JoinPage() {
       {/* MSJ SPOTLIGHT */}
       <div className="w-full bg-[#3E2723] text-white py-10 px-4">
         <div className="max-w-3xl mx-auto text-center">
-          <p className="text-xs font-black uppercase tracking-[0.25em] text-amber-400 mb-2">Artist Spotlight</p>
-          <h2 className="text-3xl font-black mb-2">Michael Scherer Jazz 🎷</h2>
-          <p className="text-base opacity-80 leading-relaxed mb-6 max-w-xl mx-auto">
+          <p className="text-xs font-black uppercase tracking-[0.25em] text-amber-400 mb-2">KEZ — Keys for a Keyboard</p>
+          <h2 className="text-3xl font-black mb-2">Michael Scherer Jazz 🎹</h2>
+          <p className="text-base opacity-80 leading-relaxed mb-2 max-w-xl mx-auto">
             40+ TV placements. A career built on craft and discipline. Michael is fighting through serious
             personal challenges right now. Your support — even $2 — goes directly to keeping his music alive.
           </p>
+          <p className="text-sm text-amber-300/80 font-bold mb-6 max-w-md mx-auto">
+            KEZs are Michael&apos;s keyboard-keys crew. Press a key. Keep him playing.
+          </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
-              href="/scherer"
+              href="/gift"
               className="bg-amber-500 text-black px-8 py-3 rounded-full font-black uppercase tracking-wider hover:bg-amber-400 transition-colors shadow-lg"
             >
-              🎷 Stream MSJ Now
+              🎹 Become a KEZ
             </Link>
             <Link
-              href="/gift"
+              href="/scherer"
               className="bg-white/10 border border-white/30 text-white px-8 py-3 rounded-full font-black uppercase tracking-wider hover:bg-white/20 transition-colors"
             >
-              ❤️ Support Michael
+              Stream MSJ Now →
             </Link>
           </div>
         </div>

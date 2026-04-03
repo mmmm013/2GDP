@@ -16,8 +16,8 @@ const PROMOS = [
     id: 'msj',
     bg: 'bg-red-700',
     text: 'text-white',
-    label: '🎷 MICHAEL SCHERER — Jazz legend, 40+ TV placements. Fighting hard. Support him directly today.',
-    cta: 'SUPPORT MSJ →',
+    label: '🎹 MICHAEL SCHERER — Jazz legend, 40+ TV placements. Fighting hard. Become a KEZ — support him directly today.',
+    cta: 'BECOME A KEZ →',
     href: '/scherer',
   },
   {
@@ -32,8 +32,8 @@ const PROMOS = [
     id: 'kleigh',
     bg: 'bg-purple-900',
     text: 'text-purple-200',
-    label: '🎸 KLEIGH — Alt rock from Down Under. Stream free, share a story, spread the word.',
-    cta: 'LISTEN →',
+    label: '🐨 KLEIGH KUB — Alt rock from Down Under. KUBs are KLEIGH\'s koala crew. Stream free, join the pride.',
+    cta: 'BECOME A KUB →',
     href: 'https://2kleigh.com',
   },
   {
