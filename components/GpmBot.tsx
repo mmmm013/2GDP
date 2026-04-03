@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * GpmBot — Step-by-Step Journey Guide
+ * GpmBot — Step-by-Step Journey Guide (Voice-Activated)
  *
  * Behavior:
  *  - Greets the user on mount with the active bot's arrival greeting
@@ -9,7 +9,8 @@
  *  - Active step: full contrast, animated pulse ring, bold label
  *  - Previous steps (above): dimmed, ✓ check mark, still visible
  *  - Next steps (below): dimmed, numbered, peeking to invite scroll
- *  - User advances via "Next Step" button or keyboard (→)
+ *  - User advances via "Next Step" button, keyboard (→), or VOICE COMMAND
+ *  - Voice commands: "next" / "back" / "go" / "done" / "collapse" / "expand"
  *  - Can collapse to a compact bot-chip to stay non-intrusive
  *
  * Props:
@@ -19,7 +20,7 @@
  */
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { ChevronRight, ChevronDown, CheckCircle, Circle, Zap, X } from 'lucide-react';
+import { ChevronRight, ChevronDown, CheckCircle, Circle, Zap, X, Mic, MicOff } from 'lucide-react';
 
 // ---------------------------------------------------------------------------
 // Bot config — mirrors BOT_PROFILES in /api/public/kkut-guide
@@ -137,6 +138,9 @@ export default function GpmBot({
   const [isCollapsed, setIsCollapsed] = useState(startCollapsed);
   const [greeted, setGreeted] = useState(false);
   const [showGreeting, setShowGreeting] = useState(false);
+  const [isListening, setIsListening] = useState(false);
+  const [voiceStatus, setVoiceStatus] = useState('');
+  const recognitionRef = useRef<any>(null);
   const stepRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   // Show greeting bubble once on mount
@@ -174,6 +178,65 @@ export default function GpmBot({
     }
   }, [steps.length]);
 
+  // Voice command handler
+  const handleVoiceCommand = useCallback((transcript: string) => {
+    const cmd = transcript.toLowerCase().trim();
+    if (cmd.includes('next') || cmd.includes('forward') || cmd.includes('proceed')) {
+      setActiveStep((s) => Math.min(s + 1, steps.length - 1));
+      setVoiceStatus('→ Next');
+    } else if (cmd.includes('back') || cmd.includes('previous') || cmd.includes('prev')) {
+      setActiveStep((s) => Math.max(s - 1, 0));
+      setVoiceStatus('← Back');
+    } else if (cmd.includes('done') || cmd.includes('finish') || cmd.includes('close') || cmd.includes('collapse')) {
+      setIsCollapsed(true);
+      setVoiceStatus('Done ✓');
+    } else if (cmd.includes('expand') || cmd.includes('open') || cmd.includes('show')) {
+      setIsCollapsed(false);
+      setVoiceStatus('Expanded');
+    } else if (cmd.includes('go') || cmd.includes('action') || cmd.includes('click')) {
+      // trigger the current step's href if available
+      const step = steps[activeStep];
+      if (step?.href) window.location.href = step.href;
+      setVoiceStatus('Going →');
+    }
+    setTimeout(() => setVoiceStatus(''), 2000);
+  }, [steps, activeStep]);
+
+  // Set up / tear down SpeechRecognition when isListening changes
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SR) return;
+
+    if (!recognitionRef.current) {
+      const r = new SR();
+      r.continuous = true;
+      r.lang = 'en-US';
+      r.interimResults = false;
+      r.onresult = (event: any) => {
+        const t = event.results[event.results.length - 1][0].transcript;
+        handleVoiceCommand(t);
+      };
+      r.onerror = () => { /* silent */ };
+      r.onend = () => {
+        if (isListening) { try { r.start(); } catch (_) { /* already started */ } }
+      };
+      recognitionRef.current = r;
+    }
+
+    if (isListening) {
+      try { recognitionRef.current.start(); } catch (_) { /* already running */ }
+    } else {
+      try { recognitionRef.current.stop(); } catch (_) { /* not running */ }
+    }
+
+    return () => {
+      if (recognitionRef.current) {
+        try { recognitionRef.current.stop(); } catch (_) { /**/ }
+      }
+    };
+  }, [isListening, handleVoiceCommand]);
+
   const goNext = () => setActiveStep((s) => Math.min(s + 1, steps.length - 1));
   const goPrev = () => setActiveStep((s) => Math.max(s - 1, 0));
 
@@ -197,6 +260,7 @@ export default function GpmBot({
         <span>{profile.emoji}</span>
         <span>{profile.label}</span>
         <span className="text-[9px] text-white/40">STEP {activeStep + 1}/{steps.length}</span>
+        <Mic className="w-2.5 h-2.5 opacity-30" />
         <ChevronDown className="w-3 h-3 opacity-60" />
       </button>
     );
@@ -228,13 +292,39 @@ export default function GpmBot({
             </span>
           </div>
         </div>
-        <button
-          onClick={() => setIsCollapsed(true)}
-          className="p-1 rounded-full hover:bg-white/10 transition-colors"
-          aria-label="Collapse bot"
-        >
-          <X className="w-3.5 h-3.5 text-white/40" />
-        </button>
+        <div className="flex items-center gap-1.5">
+          {/* Voice status flash */}
+          {voiceStatus && (
+            <span className="text-[9px] font-bold tracking-wider" style={{ color: profile.color }}>
+              {voiceStatus}
+            </span>
+          )}
+          {/* Mic toggle button */}
+          <button
+            onClick={() => setIsListening((v) => !v)}
+            className={`p-1.5 rounded-full transition-all ${
+              isListening
+                ? 'animate-pulse'
+                : 'hover:bg-white/10'
+            }`}
+            style={isListening ? { background: `${profile.color}30`, color: profile.color } : {}}
+            aria-label={isListening ? 'Stop voice control' : 'Start voice control'}
+            title={isListening ? 'Voice active — say: next / back / go / done' : 'Enable voice control'}
+          >
+            {isListening ? (
+              <Mic className="w-3.5 h-3.5" style={{ color: profile.color }} />
+            ) : (
+              <MicOff className="w-3.5 h-3.5 text-white/30" />
+            )}
+          </button>
+          <button
+            onClick={() => setIsCollapsed(true)}
+            className="p-1 rounded-full hover:bg-white/10 transition-colors"
+            aria-label="Collapse bot"
+          >
+            <X className="w-3.5 h-3.5 text-white/40" />
+          </button>
+        </div>
       </div>
 
       {/* Greeting Bubble */}
