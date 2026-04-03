@@ -23,6 +23,7 @@ import { getCreatorBySlug, CREATORS, type Creator, type CreatorScope } from '@/c
 import Link from 'next/link';
 import { Upload, Trash2, Eye, EyeOff, Music, Image as Img, FileText, Video } from 'lucide-react';
 import GpmBot from '@/components/GpmBot';
+import { createClient } from '@supabase/supabase-js';
 
 // GD-BOT journey steps for all creators
 // Creators only bio-access + upload — 4PE-MSC handles ingestion automatically.
@@ -603,7 +604,6 @@ function AssetList({
 // Fetches from the GPM tracks table — same source as HomeFP.
 // KLEIGH_LIBRARY / K-KUTs are NOT used here (unrelated to PIXIE).
 // ----------------------------------------------------------------
-import { createClient } from '@supabase/supabase-js';
 
 interface FPCatalogTrack {
   id: string | number;
