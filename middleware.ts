@@ -57,7 +57,7 @@ const BLOCKED_BOT_PATTERNS: RegExp[] = [
   /claudebot/i,               // Anthropic training crawler
   /cohere-training/i,
   /meta-externalagent/i,
-  /facebookexternalhit/i,     // FB link-preview is fine; block only aggressive variants below
+  /facebookexternalhit/i,     // FB link-preview scraper
 ]
 
 /**
@@ -110,7 +110,11 @@ function securityHeaders(): Record<string, string> {
     // Content-Security-Policy — allow media from Supabase storage + Stripe + Twilio
     'Content-Security-Policy': [
       "default-src 'self'",
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://vercel.live",
+      // script-src: 'unsafe-inline' is required by Next.js for its internal
+    // inline bootstrap scripts; 'unsafe-eval' is required by Stripe.js and
+    // Vercel Live feedback widget. A nonce-based approach can replace these
+    // once the Stripe SDK version supports it.
+    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://vercel.live",
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       "font-src 'self' https://fonts.gstatic.com",
       "img-src 'self' data: blob: https://*.supabase.co https://*.supabase.in",

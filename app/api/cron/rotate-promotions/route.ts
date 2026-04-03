@@ -32,13 +32,35 @@ async function rotatePromotion() {
   }
 }
 
+/**
+ * Shared auth guard for both GET (Vercel cron) and POST (admin trigger).
+ *
+ * Rules:
+ *  - In production, CRON_SECRET MUST be set; requests without the correct
+ *    bearer token are always rejected.
+ *  - In non-production environments (local dev / CI) the check is skipped
+ *    so the endpoint can be tested without secrets configured.
+ */
+function isCronAuthorized(request: Request): boolean {
+  const secret = process.env.CRON_SECRET
+  const isProd = process.env.NODE_ENV === 'production'
+
+  if (isProd && !secret) {
+    // Mis-configured production — deny all rather than expose the endpoint.
+    return false
+  }
+
+  if (!secret) {
+    // Non-production with no secret configured — allow for local dev/CI.
+    return true
+  }
+
+  return request.headers.get('authorization') === `Bearer ${secret}`
+}
+
 // GET is required for Vercel Cron Jobs (vercel.json schedules a GET request)
 export async function GET(request: Request) {
-  const authHeader = request.headers.get('authorization')
-  if (
-    process.env.CRON_SECRET &&
-    authHeader !== `Bearer ${process.env.CRON_SECRET}`
-  ) {
+  if (!isCronAuthorized(request)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
@@ -46,13 +68,9 @@ export async function GET(request: Request) {
   return NextResponse.json(result)
 }
 
-// Keep POST for manual/admin triggers — requires same CRON_SECRET
+// Keep POST for manual/admin triggers — uses the same CRON_SECRET guard
 export async function POST(request: Request) {
-  const authHeader = request.headers.get('authorization')
-  if (
-    process.env.CRON_SECRET &&
-    authHeader !== `Bearer ${process.env.CRON_SECRET}`
-  ) {
+  if (!isCronAuthorized(request)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
