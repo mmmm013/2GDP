@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Contact | The Vektor — 2GDP.com</title>
+  <meta name="description" content="Contact The Vektor by 2GDP — engage the 4PE Framework, book a discovery call, or inquire about any KKR-MSC service track." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    .contact-layout {
+      display: grid;
+      grid-template-columns: 1fr 1.4fr;
+      gap: var(--sp-12);
+      align-items: flex-start;
+    }
+    @media (max-width: 800px) { .contact-layout { grid-template-columns: 1fr; } }
+
+    .contact-form-wrap {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      padding: var(--sp-10);
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: var(--sp-2);
+      margin-bottom: var(--sp-5);
+    }
+    .form-group label {
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-secondary);
+    }
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+      background: var(--bg-card-alt);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 0.7rem 1rem;
+      font-size: 0.9rem;
+      color: var(--text-primary);
+      font-family: var(--font-main);
+      transition: border-color var(--t-fast);
+      outline: none;
+      width: 100%;
+      appearance: none;
+    }
+    .form-group input::placeholder,
+    .form-group textarea::placeholder {
+      color: var(--text-muted);
+    }
+    .form-group input:focus,
+    .form-group textarea:focus,
+    .form-group select:focus {
+      border-color: var(--blue-mid);
+    }
+    .form-group textarea { resize: vertical; min-height: 120px; }
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--sp-4);
+    }
+    @media (max-width: 520px) { .form-row { grid-template-columns: 1fr; } }
+
+    .contact-info-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: var(--sp-6);
+      margin-bottom: var(--sp-4);
+    }
+    .contact-info-card h5 { margin-bottom: var(--sp-3); color: var(--text-secondary); }
+    .contact-info-card p { font-size: 0.875rem; }
+    .track-select-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--sp-2);
+      margin-top: var(--sp-2);
+    }
+    @media (max-width: 400px) { .track-select-grid { grid-template-columns: 1fr; } }
+    .track-opt {
+      display: flex;
+      align-items: center;
+      gap: var(--sp-2);
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      background: var(--bg-card-alt);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 0.4rem 0.7rem;
+      cursor: pointer;
+      transition: border-color var(--t-fast), color var(--t-fast);
+      user-select: none;
+    }
+    .track-opt:hover,
+    .track-opt.selected {
+      border-color: rgba(14,165,233,0.4);
+      color: var(--blue-vivid);
+      background: rgba(14,165,233,0.06);
+    }
+    .track-opt input { display: none; }
+  </style>
+</head>
+<body>
+
+  <!-- ══ NAV ══ -->
+  <nav class="nav">
+    <a href="index.html" class="nav__logo">
+      <div class="nav__logo-mark">V</div>
+      The Vektor <span>/ 2GDP</span>
+    </a>
+    <ul class="nav__links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="services.html">Services</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="contact.html" class="active">Contact</a></li>
+    </ul>
+    <a href="contact.html" class="nav__cta">Engage →</a>
+    <button class="nav__hamburger" aria-label="Open menu"><span></span><span></span><span></span></button>
+  </nav>
+  <nav class="nav__mobile">
+    <button class="nav__mobile-close">✕</button>
+    <a href="index.html">Home</a>
+    <a href="services.html">Services</a>
+    <a href="about.html">About</a>
+    <a href="contact.html">Contact</a>
+    <a href="contact.html" class="btn btn--primary mt-4">Engage The Vektor →</a>
+  </nav>
+
+  <!-- ══ PAGE HERO ══ -->
+  <section class="page-hero">
+    <div class="container">
+      <p class="eyebrow">Engage The Vektor</p>
+      <h1>Start the Conversation.</h1>
+      <p>
+        Every engagement begins with a discovery call. Tell us what you're
+        navigating and we'll identify the right service track from our
+        KKR-MSC catalog.
+      </p>
+    </div>
+  </section>
+
+  <!-- ══ CONTACT SECTION ══ -->
+  <section class="section">
+    <div class="container">
+      <div class="contact-layout">
+
+        <!-- LEFT: Info -->
+        <div class="reveal">
+          <div class="contact-info-card">
+            <h5>🧭 Discovery Call</h5>
+            <p>
+              30 minutes. No commitment. We scope your needs and identify the
+              right 4PE engagement track. All discovery calls are free.
+            </p>
+          </div>
+
+          <div class="contact-info-card">
+            <h5>📋 KKR-MSC Tracks</h5>
+            <p style="margin-bottom:var(--sp-3);">Select the service track(s) relevant to your needs:</p>
+            <div class="track-select-grid">
+              <label class="track-opt"><input type="checkbox" /> KKR·01 Process Audit</label>
+              <label class="track-opt"><input type="checkbox" /> KKR·02 Platform Build</label>
+              <label class="track-opt"><input type="checkbox" /> KKR·03 Executive LOI</label>
+              <label class="track-opt"><input type="checkbox" /> KKR·04 Audit Retainer</label>
+              <label class="track-opt"><input type="checkbox" /> KKR·05 Content Architecture</label>
+              <label class="track-opt"><input type="checkbox" /> KKR·06 IP / Invention</label>
+            </div>
+          </div>
+
+          <div class="contact-info-card">
+            <h5>⚡ Response Time</h5>
+            <p>
+              All inquiries receive a response within <strong>1 business day</strong>.
+              Priority engagement requests are flagged within the same business day.
+            </p>
+          </div>
+
+          <div class="contact-info-card">
+            <h5>🌐 2GDP.com</h5>
+            <p>
+              The Vektor operates exclusively at <strong>2gdp.com</strong> within
+              the GPEx ecosystem. This domain is reserved for Konsulting
+              — zero overlap with music or other divisions.
+            </p>
+            <div class="mt-4">
+              <span class="gpmd-badge">✓ GPMD Compliant</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT: Form -->
+        <div class="contact-form-wrap reveal" style="transition-delay:0.15s;">
+          <h3 style="margin-bottom:var(--sp-2);">Send an Inquiry</h3>
+          <p style="margin-bottom:var(--sp-8);font-size:0.9rem;">
+            Fill out the form below. Reference the KKR-MSC slot if you know which
+            service track you need.
+          </p>
+
+          <form id="contact-form" novalidate>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="fname">First Name *</label>
+                <input type="text" id="fname" name="fname" placeholder="First" required />
+              </div>
+              <div class="form-group">
+                <label for="lname">Last Name *</label>
+                <input type="text" id="lname" name="lname" placeholder="Last" required />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="email">Email Address *</label>
+              <input type="email" id="email" name="email" placeholder="you@company.com" required />
+            </div>
+
+            <div class="form-group">
+              <label for="org">Organization / Company</label>
+              <input type="text" id="org" name="org" placeholder="Your organization" />
+            </div>
+
+            <div class="form-group">
+              <label for="track">Service Track (KKR-MSC)</label>
+              <select id="track" name="track">
+                <option value="">— Select a track —</option>
+                <option value="kkr01">KKR·01 — Strategic Process Audit</option>
+                <option value="kkr02">KKR·02 — Platform Build &amp; Integration</option>
+                <option value="kkr03">KKR·03 — Executive LOI &amp; Advisory</option>
+                <option value="kkr04">KKR·04 — 4PE Continuous Audit Retainer</option>
+                <option value="kkr05">KKR·05 — Content &amp; Knowledge Architecture</option>
+                <option value="kkr06">KKR·06 — Invention &amp; IP Commercialization</option>
+                <option value="discovery">Discovery Call (unsure of track)</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="message">Tell us about your challenge *</label>
+              <textarea id="message" name="message" placeholder="Briefly describe what you're navigating and what outcome you're targeting…" required></textarea>
+            </div>
+
+            <div class="form-group">
+              <label for="urgency">Urgency</label>
+              <select id="urgency" name="urgency">
+                <option value="">— Select —</option>
+                <option value="immediate">Immediate (within 2 weeks)</option>
+                <option value="near">Near-term (1–2 months)</option>
+                <option value="planning">Planning phase (3+ months)</option>
+              </select>
+            </div>
+
+            <button type="submit" class="btn btn--primary" style="width:100%;justify-content:center;margin-top:var(--sp-4);">
+              Submit Inquiry →
+            </button>
+
+            <p style="font-size:0.72rem;color:var(--text-muted);text-align:center;margin-top:var(--sp-4);">
+              Submitting this form does not create a binding engagement.
+              A Vektor representative will respond within 1 business day.
+            </p>
+          </form>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ CTA BAR ══ -->
+  <section class="section--sm">
+    <div class="container">
+      <div class="cta-banner reveal">
+        <h2>Not sure where to start?</h2>
+        <p>Start with a discovery call. We'll identify the right service track and scope an engagement that fits.</p>
+        <div class="cta-banner__actions">
+          <a href="services.html" class="btn btn--gold btn--lg">Explore Services →</a>
+          <a href="about.html" class="btn btn--outline btn--lg">About The Vektor</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ FOOTER ══ -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer__grid">
+        <div class="footer__brand">
+          <div class="nav__logo">
+            <div class="nav__logo-mark">V</div>
+            The Vektor <span style="color:var(--gold)">&nbsp;/ 2GDP</span>
+          </div>
+          <p>Process-first strategic Konsulting. 4PE Framework. GPEx ecosystem. BIC standard.</p>
+          <div class="mt-4" style="display:flex;gap:var(--sp-3);flex-wrap:wrap;align-items:center;">
+            <span class="gpmd-badge">✓ GPMD</span>
+            <span class="tag">GPEx Ecosystem</span>
+          </div>
+        </div>
+        <div class="footer__col">
+          <h5>Services</h5>
+          <ul>
+            <li><a href="services.html#phase1">Process Architecture</a></li>
+            <li><a href="services.html#phase2">Platform Engineering</a></li>
+            <li><a href="services.html#phase3">Performance</a></li>
+            <li><a href="services.html#phase4">Perpetual Excellence</a></li>
+          </ul>
+        </div>
+        <div class="footer__col">
+          <h5>Company</h5>
+          <ul>
+            <li><a href="about.html">About</a></li>
+            <li><a href="about.html#approach">Our Approach</a></li>
+            <li><a href="about.html#ecosystem">GPEx Ecosystem</a></li>
+            <li><a href="contact.html">Contact</a></li>
+          </ul>
+        </div>
+        <div class="footer__col">
+          <h5>Framework</h5>
+          <ul>
+            <li><a href="services.html#4pe">4PE Overview</a></li>
+            <li><a href="services.html#kkr">KKR-MSC</a></li>
+            <li><a href="services.html#sti">STI/BTI</a></li>
+            <li><a href="services.html#bic">BIC Standard</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer__bottom">
+        <p>© <span data-year></span> 2GDP · The Vektor · A GPEx Ecosystem Company. All rights reserved.</p>
+        <div class="footer__bottom-links">
+          <a href="#">Privacy</a>
+          <a href="#">Terms</a>
+          <a href="contact.html">Contact</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+  <script>
+    // Track option toggle
+    document.querySelectorAll('.track-opt').forEach(opt => {
+      opt.addEventListener('click', () => opt.classList.toggle('selected'));
+    });
+  </script>
+</body>
+</html>

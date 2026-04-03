@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Services | The Vektor — 2GDP.com</title>
+  <meta name="description" content="The Vektor's full service catalog — 4PE process architecture, platform engineering, strategic advisory, audits, and invention commercialization." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    .service-detail {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      padding: var(--sp-12);
+      margin-bottom: var(--sp-6);
+      display: grid;
+      grid-template-columns: 80px 1fr;
+      gap: var(--sp-8);
+      align-items: flex-start;
+      transition: border-color var(--t-mid);
+    }
+    .service-detail:hover { border-color: var(--border-glow); }
+    .service-detail__num {
+      width: 64px; height: 64px;
+      border-radius: var(--radius-lg);
+      background: linear-gradient(135deg, var(--blue-dim), #0a2a40);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem; font-weight: 900; color: var(--blue-vivid);
+      flex-shrink: 0;
+      border: 1px solid rgba(14,165,233,0.2);
+    }
+    .service-detail__deliverables {
+      margin-top: var(--sp-6);
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--sp-3);
+    }
+    .deliverable {
+      display: flex;
+      align-items: center;
+      gap: var(--sp-2);
+      font-size: 0.82rem;
+      color: var(--text-secondary);
+      background: var(--bg-card-alt);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 0.35rem 0.75rem;
+    }
+    .deliverable::before { content: '✓'; color: var(--green); font-weight: 700; }
+    @media (max-width: 580px) {
+      .service-detail { grid-template-columns: 1fr; }
+      .service-detail__num { width: 48px; height: 48px; font-size: 1rem; }
+    }
+    .framework-block {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: var(--sp-8);
+    }
+    .framework-block h4 { margin-bottom: var(--sp-3); }
+    .framework-block p { font-size: 0.9rem; }
+  </style>
+</head>
+<body>
+
+  <!-- ══ NAV ══ -->
+  <nav class="nav">
+    <a href="index.html" class="nav__logo">
+      <div class="nav__logo-mark">V</div>
+      The Vektor <span>/ 2GDP</span>
+    </a>
+    <ul class="nav__links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="services.html" class="active">Services</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+    <a href="contact.html" class="nav__cta">Engage →</a>
+    <button class="nav__hamburger" aria-label="Open menu"><span></span><span></span><span></span></button>
+  </nav>
+  <nav class="nav__mobile">
+    <button class="nav__mobile-close">✕</button>
+    <a href="index.html">Home</a>
+    <a href="services.html">Services</a>
+    <a href="about.html">About</a>
+    <a href="contact.html">Contact</a>
+    <a href="contact.html" class="btn btn--primary mt-4">Engage The Vektor →</a>
+  </nav>
+
+  <!-- ══ PAGE HERO ══ -->
+  <section class="page-hero">
+    <div class="container">
+      <p class="eyebrow">4PE · KKR-MSC · GPMD Standard</p>
+      <h1>Services &amp; Offerings</h1>
+      <p>
+        Six active service tracks. One methodology. BIC outcomes.
+        Every engagement is structured around the 4PE Framework and
+        delivered through the KKR-MSC content system.
+      </p>
+      <div class="mt-4" style="display:flex;gap:var(--sp-3);flex-wrap:wrap;">
+        <span class="gpmd-badge">✓ GPMD Compliant</span>
+        <span class="tag tag--blue">4PE Framework</span>
+        <span class="tag">KKR-MSC</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ 4PE PHASES ══ -->
+  <section class="section" id="4pe">
+    <div class="container">
+      <div class="section-header reveal">
+        <p class="eyebrow">The 4PE Framework</p>
+        <h2>Four Phases of Excellence</h2>
+        <div class="separator separator--center"></div>
+        <p>
+          The 4PE Framework is a universal process methodology — designed to
+          traverse any business environment without loss of fidelity. It is
+          the architectural spine of every Vektor engagement.
+        </p>
+      </div>
+
+      <!-- Phase 1 -->
+      <div class="service-detail reveal" id="phase1">
+        <div class="service-detail__num">01</div>
+        <div>
+          <p class="eyebrow" style="margin-bottom:var(--sp-2);">Phase 1 · Process Architecture</p>
+          <h3>Strategic Process Architecture</h3>
+          <div class="separator" style="margin-bottom:var(--sp-4);"></div>
+          <p>
+            The first phase is the most critical. Before anything is built or optimized,
+            we must understand exactly how your organization operates — every process,
+            every handoff, every bottleneck. Phase 1 delivers a complete operational
+            blueprint: audited, mapped, and prioritized for transformation.
+          </p>
+          <p class="mt-4">
+            Using the <strong>4PE Audit Protocol</strong>, we assess workflows, decision trees,
+            communication channels, and output quality. The result is a precise
+            transformation roadmap that becomes the backbone of all subsequent phases.
+          </p>
+          <div class="service-detail__deliverables">
+            <span class="deliverable">Process Audit Report</span>
+            <span class="deliverable">Workflow Maps</span>
+            <span class="deliverable">Bottleneck Analysis</span>
+            <span class="deliverable">Transformation Roadmap</span>
+            <span class="deliverable">Priority Matrix</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Phase 2 -->
+      <div class="service-detail reveal" id="phase2">
+        <div class="service-detail__num">02</div>
+        <div>
+          <p class="eyebrow" style="margin-bottom:var(--sp-2);">Phase 2 · Platform Engineering</p>
+          <h3>Platform Build &amp; Integration</h3>
+          <div class="separator" style="margin-bottom:var(--sp-4);"></div>
+          <p>
+            With the blueprint in hand, Phase 2 builds the operational platform.
+            This is the engineering layer — technology stack selection, systems
+            integration, automation architecture, and cross-functional deployment.
+            We build for scale, speed, and longevity.
+          </p>
+          <p class="mt-4">
+            Platform engineering at The Vektor is guided by <strong>STI (Strategic
+            Template Interface)</strong> and <strong>BTI (Business Template Interface)</strong>
+            standards — ensuring every platform component is interoperable,
+            documented, and maintainable.
+          </p>
+          <div class="service-detail__deliverables">
+            <span class="deliverable">Platform Architecture Document</span>
+            <span class="deliverable">Technology Stack Selection</span>
+            <span class="deliverable">Integration Blueprint</span>
+            <span class="deliverable">Automation Design</span>
+            <span class="deliverable">Deployment Plan</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Phase 3 -->
+      <div class="service-detail reveal" id="phase3">
+        <div class="service-detail__num">03</div>
+        <div>
+          <p class="eyebrow" style="margin-bottom:var(--sp-2);">Phase 3 · Performance Optimization</p>
+          <h3>Data-Driven Performance</h3>
+          <div class="separator" style="margin-bottom:var(--sp-4);"></div>
+          <p>
+            Phase 3 is where velocity meets precision. With the platform operational,
+            we instrument, measure, and iterate. Every KPI is tracked. Every process
+            is benchmarked against the BIC (Best-in-Class) standard. Waste is
+            eliminated systematically.
+          </p>
+          <p class="mt-4">
+            This phase employs <strong>VOC (Voice of Customer/Client)</strong> methodology
+            alongside internal performance data to ensure optimization efforts
+            are aligned with real-world outcomes — not internal assumptions.
+          </p>
+          <div class="service-detail__deliverables">
+            <span class="deliverable">KPI Dashboard</span>
+            <span class="deliverable">Performance Baseline</span>
+            <span class="deliverable">Optimization Report</span>
+            <span class="deliverable">Waste Elimination Plan</span>
+            <span class="deliverable">VOC Analysis</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Phase 4 -->
+      <div class="service-detail reveal" id="phase4">
+        <div class="service-detail__num">04</div>
+        <div>
+          <p class="eyebrow" style="margin-bottom:var(--sp-2);">Phase 4 · Perpetual Excellence</p>
+          <h3>BIC Institutionalization</h3>
+          <div class="separator" style="margin-bottom:var(--sp-4);"></div>
+          <p>
+            The final phase ensures gains don't erode. We institutionalize the
+            standards, processes, and behaviors that define Best-in-Class
+            operation — embedding them into the organizational culture and
+            systems so they sustain without constant intervention.
+          </p>
+          <p class="mt-4">
+            Phase 4 may include an optional <strong>Perpetual Excellence Retainer</strong> —
+            ongoing 4PE audit cycles, quarterly performance reviews, and
+            real-time advisory access to The Vektor team.
+          </p>
+          <div class="service-detail__deliverables">
+            <span class="deliverable">BIC Standard Handbook</span>
+            <span class="deliverable">Training Materials</span>
+            <span class="deliverable">Governance Framework</span>
+            <span class="deliverable">Retainer Option</span>
+            <span class="deliverable">Quarterly Review Protocol</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ KKR-MSC CATALOG ══ -->
+  <section class="section" id="catalog" style="background: var(--bg-dark);">
+    <div class="container">
+      <div class="section-header reveal">
+        <p class="eyebrow">KKR-MSC Service Catalog</p>
+        <h2>Six Active Tracks</h2>
+        <div class="separator separator--center"></div>
+        <p>
+          The KKR-MSC system structures our service offerings into discrete,
+          accessible slots — each a deployable engagement track with defined
+          scope, deliverables, and BIC validation.
+        </p>
+      </div>
+      <div class="kkr-grid">
+
+        <div class="kkr-slot">
+          <div class="kkr-slot__header">
+            <span class="kkr-slot__type kkr-slot__type--konsult">Konsulting</span>
+            <span class="kkr-slot__slot-num">KKR·01</span>
+          </div>
+          <div>
+            <h4>Strategic Process Audit</h4>
+            <p>Full 4PE Phase-1 audit with prioritized transformation roadmap. Standalone engagement or Phase-1 entry to a full 4PE program.</p>
+          </div>
+          <div class="kkr-slot__footer">
+            <span class="kkr-slot__meta">4PE · Phase 1 · BIC</span>
+            <button class="kkr-slot__action" onclick="window.location='contact.html'">Inquire <span>→</span></button>
+          </div>
+        </div>
+
+        <div class="kkr-slot">
+          <div class="kkr-slot__header">
+            <span class="kkr-slot__type kkr-slot__type--platform">Platform</span>
+            <span class="kkr-slot__slot-num">KKR·02</span>
+          </div>
+          <div>
+            <h4>Platform Build &amp; Integration</h4>
+            <p>End-to-end platform engineering. Architecture, stack selection, integration, and deployment — STI/BTI standard throughout.</p>
+          </div>
+          <div class="kkr-slot__footer">
+            <span class="kkr-slot__meta">4PE · Phase 2 · STI/BTI</span>
+            <button class="kkr-slot__action" onclick="window.location='contact.html'">Inquire <span>→</span></button>
+          </div>
+        </div>
+
+        <div class="kkr-slot">
+          <div class="kkr-slot__header">
+            <span class="kkr-slot__type kkr-slot__type--strategy">Strategy</span>
+            <span class="kkr-slot__slot-num">KKR·03</span>
+          </div>
+          <div>
+            <h4>Executive LOI &amp; Advisory</h4>
+            <p>C-suite strategic alignment, LOI drafting, and decision-framework design. For executives navigating pivots, partnerships, or expansion.</p>
+          </div>
+          <div class="kkr-slot__footer">
+            <span class="kkr-slot__meta">Executive · LOI · Strategic</span>
+            <button class="kkr-slot__action" onclick="window.location='contact.html'">Inquire <span>→</span></button>
+          </div>
+        </div>
+
+        <div class="kkr-slot">
+          <div class="kkr-slot__header">
+            <span class="kkr-slot__type kkr-slot__type--audit">Audit</span>
+            <span class="kkr-slot__slot-num">KKR·04</span>
+          </div>
+          <div>
+            <h4>4PE Continuous Audit Retainer</h4>
+            <p>Monthly 4PE audit cycles, BIC benchmarking, and performance reporting. Ideal for organizations post-Phase 4 seeking sustained excellence.</p>
+          </div>
+          <div class="kkr-slot__footer">
+            <span class="kkr-slot__meta">Retainer · Monthly · BIC</span>
+            <button class="kkr-slot__action" onclick="window.location='contact.html'">Inquire <span>→</span></button>
+          </div>
+        </div>
+
+        <div class="kkr-slot">
+          <div class="kkr-slot__header">
+            <span class="kkr-slot__type kkr-slot__type--konsult">Konsulting</span>
+            <span class="kkr-slot__slot-num">KKR·05</span>
+          </div>
+          <div>
+            <h4>Content &amp; Knowledge Architecture</h4>
+            <p>Organizational knowledge design using the KKR-MSC system. SOPs, catalogs, playbooks, and institutional memory — structured for retrieval.</p>
+          </div>
+          <div class="kkr-slot__footer">
+            <span class="kkr-slot__meta">KKR-MSC · Content · Systems</span>
+            <button class="kkr-slot__action" onclick="window.location='contact.html'">Inquire <span>→</span></button>
+          </div>
+        </div>
+
+        <div class="kkr-slot">
+          <div class="kkr-slot__header">
+            <span class="kkr-slot__type kkr-slot__type--platform">Platform</span>
+            <span class="kkr-slot__slot-num">KKR·06</span>
+          </div>
+          <div>
+            <h4>Invention &amp; IP Commercialization</h4>
+            <p>From concept to protected, market-ready asset. Invention Vault methodology with 4PE validation, disclosure drafting, and commercialization roadmap.</p>
+          </div>
+          <div class="kkr-slot__footer">
+            <span class="kkr-slot__meta">IP · Invention Vault · 4PE</span>
+            <button class="kkr-slot__action" onclick="window.location='contact.html'">Inquire <span>→</span></button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ FRAMEWORK REFERENCE ══ -->
+  <section class="section" id="sti">
+    <div class="container">
+      <div class="section-header reveal">
+        <p class="eyebrow">Framework Reference</p>
+        <h2>Tools &amp; Templates</h2>
+        <div class="separator separator--center"></div>
+      </div>
+      <div class="method-grid">
+        <div class="framework-block reveal">
+          <h4 class="text-blue">KKR-MSC</h4>
+          <p>Knowledge &amp; Kontact Repository — Method System Catalog. Structures content, services, and deliverables into accessible, deployable slots. Adapted from the GPEx universal catalog architecture.</p>
+        </div>
+        <div class="framework-block reveal">
+          <h4 class="text-gold">STI Templates</h4>
+          <p>Strategic Template Interface. Reusable engagement blueprints for recurring Konsulting scenarios — ensuring consistency and BIC fidelity across all deliverables.</p>
+        </div>
+        <div class="framework-block reveal">
+          <h4 style="color:var(--green)">BTI Interface</h4>
+          <p>Business Template Interface. Cross-functional integration templates that ensure platform components communicate and operate as a unified system.</p>
+        </div>
+        <div class="framework-block reveal" id="bic">
+          <h4 style="color:#a78bfa">BIC Standard</h4>
+          <p>Best-in-Class. The Vektor's zero-defect quality mandate. Every deliverable, platform, and process is benchmarked to BIC before handoff — no exceptions.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ CTA ══ -->
+  <section class="section--sm">
+    <div class="container">
+      <div class="cta-banner reveal">
+        <h2>Find Your Track.</h2>
+        <p>Not sure which service fits? Start with a discovery call and we'll identify the right engagement from our KKR-MSC catalog.</p>
+        <div class="cta-banner__actions">
+          <a href="contact.html" class="btn btn--gold btn--lg">Book Discovery Call →</a>
+          <a href="about.html" class="btn btn--outline btn--lg">About The Vektor</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ FOOTER ══ -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer__grid">
+        <div class="footer__brand">
+          <div class="nav__logo">
+            <div class="nav__logo-mark">V</div>
+            The Vektor <span style="color:var(--gold)">&nbsp;/ 2GDP</span>
+          </div>
+          <p>Process-first strategic Konsulting. 4PE Framework. GPEx ecosystem. BIC standard.</p>
+          <div class="mt-4" style="display:flex;gap:var(--sp-3);flex-wrap:wrap;align-items:center;">
+            <span class="gpmd-badge">✓ GPMD</span>
+            <span class="tag">GPEx Ecosystem</span>
+          </div>
+        </div>
+        <div class="footer__col">
+          <h5>Services</h5>
+          <ul>
+            <li><a href="#phase1">Process Architecture</a></li>
+            <li><a href="#phase2">Platform Engineering</a></li>
+            <li><a href="#phase3">Performance</a></li>
+            <li><a href="#phase4">Perpetual Excellence</a></li>
+          </ul>
+        </div>
+        <div class="footer__col">
+          <h5>Company</h5>
+          <ul>
+            <li><a href="about.html">About</a></li>
+            <li><a href="contact.html">Contact</a></li>
+            <li><a href="index.html">Home</a></li>
+          </ul>
+        </div>
+        <div class="footer__col">
+          <h5>Framework</h5>
+          <ul>
+            <li><a href="#4pe">4PE Overview</a></li>
+            <li><a href="#kkr">KKR-MSC</a></li>
+            <li><a href="#sti">STI/BTI</a></li>
+            <li><a href="#bic">BIC Standard</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer__bottom">
+        <p>© <span data-year></span> 2GDP · The Vektor · A GPEx Ecosystem Company. All rights reserved.</p>
+        <div class="footer__bottom-links">
+          <a href="#">Privacy</a>
+          <a href="#">Terms</a>
+          <a href="contact.html">Contact</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

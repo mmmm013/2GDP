@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>About | The Vektor — 2GDP.com</title>
+  <meta name="description" content="About The Vektor by 2GDP — who we are, the GPEx ecosystem, the 4PE Framework, and our approach to strategic Konsulting." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    .principle-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--sp-6);
+      margin-bottom: var(--sp-6);
+    }
+    @media (max-width: 640px) { .principle-row { grid-template-columns: 1fr; } }
+    .principle-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: var(--sp-8);
+    }
+    .principle-card .icon { font-size: 1.8rem; margin-bottom: var(--sp-4); }
+    .principle-card h4 { margin-bottom: var(--sp-2); }
+    .eco-diagram {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      padding: var(--sp-12);
+    }
+    .eco-node {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--sp-2);
+      background: var(--bg-card-alt);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 0.45rem 0.9rem;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin: var(--sp-2);
+    }
+    .eco-node--active {
+      border-color: rgba(14,165,233,0.4);
+      background: rgba(14,165,233,0.08);
+      color: var(--blue-vivid);
+    }
+    .eco-node--parent {
+      border-color: rgba(212,168,83,0.4);
+      background: rgba(212,168,83,0.08);
+      color: var(--gold);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ══ NAV ══ -->
+  <nav class="nav">
+    <a href="index.html" class="nav__logo">
+      <div class="nav__logo-mark">V</div>
+      The Vektor <span>/ 2GDP</span>
+    </a>
+    <ul class="nav__links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="services.html">Services</a></li>
+      <li><a href="about.html" class="active">About</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+    <a href="contact.html" class="nav__cta">Engage →</a>
+    <button class="nav__hamburger" aria-label="Open menu"><span></span><span></span><span></span></button>
+  </nav>
+  <nav class="nav__mobile">
+    <button class="nav__mobile-close">✕</button>
+    <a href="index.html">Home</a>
+    <a href="services.html">Services</a>
+    <a href="about.html">About</a>
+    <a href="contact.html">Contact</a>
+    <a href="contact.html" class="btn btn--primary mt-4">Engage The Vektor →</a>
+  </nav>
+
+  <!-- ══ PAGE HERO ══ -->
+  <section class="page-hero">
+    <div class="container">
+      <p class="eyebrow">About The Vektor</p>
+      <h1>Direction. Magnitude.<br>Precision.</h1>
+      <p>
+        The Vektor is the Konsulting division of 2GDP.com — a GPEx ecosystem
+        company. We exist to give organizations a clear vector: a defined
+        direction with sufficient force to get there.
+      </p>
+    </div>
+  </section>
+
+  <!-- ══ BRAND STORY ══ -->
+  <section class="section">
+    <div class="container">
+      <div class="grid-2 reveal" style="align-items:center;gap:var(--sp-12);">
+        <div>
+          <p class="eyebrow">The Name</p>
+          <h2>Why "The Vektor"?</h2>
+          <div class="separator"></div>
+          <p>
+            In mathematics and physics, a vector has two essential properties:
+            <strong>magnitude</strong> and <strong>direction</strong>.
+            Most organizations have energy — they lack direction.
+            Most strategies have direction — they lack force.
+          </p>
+          <p class="mt-4">
+            The Vektor provides both. Every engagement is engineered to deliver
+            measurable force in a clearly defined direction — producing outcomes
+            that compound over time rather than dissipate.
+          </p>
+          <p class="mt-4">
+            The "K" in Vektor is intentional. It reflects the precise,
+            process-driven Konsulting methodology at our core — aligned
+            with the broader GPEx naming convention.
+          </p>
+        </div>
+        <div>
+          <div class="quote-block" style="border-color: var(--gold);">
+            <p>"A vector has magnitude and direction. We provide both — to every client, on every engagement."</p>
+            <cite>— The Vektor / 2GDP Founding Principle</cite>
+          </div>
+          <div class="mt-8" style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:var(--sp-6);">
+            <div style="font-family:var(--font-mono);font-size:0.9rem;color:var(--text-secondary);">
+              <div style="color:var(--text-muted);font-size:0.72rem;margin-bottom:var(--sp-3);">// VEKTOR IDENTITY</div>
+              <div><span class="text-blue">brand</span>    : <span style="color:var(--gold)">The Vektor</span></div>
+              <div><span class="text-blue">domain</span>   : <span style="color:var(--gold)">2gdp.com</span></div>
+              <div><span class="text-blue">parent</span>   : <span style="color:var(--text-secondary)">GPEx</span></div>
+              <div><span class="text-blue">type</span>     : <span style="color:var(--text-secondary)">Konsulting ONLY</span></div>
+              <div><span class="text-blue">method</span>   : <span style="color:var(--text-secondary)">4PE Framework</span></div>
+              <div><span class="text-blue">catalog</span>  : <span style="color:var(--text-secondary)">KKR-MSC</span></div>
+              <div><span class="text-blue">standard</span> : <span style="color:var(--green)">BIC</span></div>
+              <div><span class="text-blue">status</span>   : <span style="color:var(--green)">✓ GPMD Compliant</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ PRINCIPLES ══ -->
+  <section class="section" style="background:var(--bg-dark);" id="approach">
+    <div class="container">
+      <div class="section-header reveal">
+        <p class="eyebrow">Our Approach</p>
+        <h2>Foundational Principles</h2>
+        <div class="separator separator--center"></div>
+        <p>Four principles that govern every engagement, every deliverable, every interaction.</p>
+      </div>
+
+      <div class="principle-row">
+        <div class="principle-card reveal">
+          <div class="icon">🔬</div>
+          <h4>Process First</h4>
+          <p>
+            We never jump to solutions. Every engagement begins with rigorous
+            process analysis. The 4PE Phase-1 audit is non-negotiable —
+            it is the foundation everything else is built on.
+          </p>
+        </div>
+        <div class="principle-card reveal">
+          <div class="icon">⚡</div>
+          <h4>Zero Defect</h4>
+          <p>
+            BIC (Best-in-Class) is our operating standard, not an aspiration.
+            Every deliverable is reviewed against BIC criteria before handoff.
+            We do not ship defects.
+          </p>
+        </div>
+      </div>
+      <div class="principle-row">
+        <div class="principle-card reveal">
+          <div class="icon">📐</div>
+          <h4>Structured Everything</h4>
+          <p>
+            From the first discovery call to the final handoff, every step
+            has a structure. The KKR-MSC system, STI templates, and 4PE
+            phases ensure consistency regardless of engagement complexity.
+          </p>
+        </div>
+        <div class="principle-card reveal">
+          <div class="icon">♾️</div>
+          <h4>Perpetual Orientation</h4>
+          <p>
+            We build for permanence, not projects. Every engagement is
+            designed to outlast our involvement — institutionalizing the
+            standards that drive Perpetual Excellence (Phase 4).
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ GPEX ECOSYSTEM ══ -->
+  <section class="section" id="ecosystem">
+    <div class="container">
+      <div class="section-header reveal">
+        <p class="eyebrow">The GPEx Ecosystem</p>
+        <h2>Where The Vektor Lives</h2>
+        <div class="separator separator--center"></div>
+        <p>
+          The Vektor is a dedicated unit within the GPEx (Groom Process
+          Excellarators) ecosystem. GPEx operates multiple divisions —
+          each with strict separation of identity and purpose.
+        </p>
+      </div>
+
+      <div class="eco-diagram reveal">
+        <div style="text-align:center;margin-bottom:var(--sp-8);">
+          <div style="display:inline-block;">
+            <span class="eco-node eco-node--parent">🏛 GPEx — Parent Company (Groom Process Excellarators)</span>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-8);">
+          <div>
+            <p class="eyebrow" style="margin-bottom:var(--sp-4);">Konsulting Division</p>
+            <div>
+              <span class="eco-node eco-node--active">▶ The Vektor (Active)</span>
+              <span class="eco-node eco-node--active">▶ 2GDP.com</span>
+              <span class="eco-node">4PE Framework</span>
+              <span class="eco-node">KKR-MSC Catalog</span>
+              <span class="eco-node">STI / BTI</span>
+              <span class="eco-node">Invention Vault</span>
+            </div>
+          </div>
+          <div>
+            <p class="eyebrow" style="margin-bottom:var(--sp-4);">Music Division (Separate)</p>
+            <div>
+              <span class="eco-node">GPMC — Music Catalog</span>
+              <span class="eco-node">GPMCC — Commercial</span>
+              <span class="eco-node">GPME — Music Engine</span>
+              <span class="eco-node" style="font-size:0.7rem;color:var(--text-muted);">✗ No overlap with 2GDP</span>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top:var(--sp-8);padding-top:var(--sp-6);border-top:1px solid var(--border);">
+          <p style="font-size:0.82rem;color:var(--text-muted);text-align:center;">
+            ⚠️ Critical Separation: 2GDP / The Vektor is <strong style="color:var(--text-secondary);">exclusively Konsulting</strong>.
+            Music operations are entirely separate. Zero overlap.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ CTA ══ -->
+  <section class="section--sm">
+    <div class="container">
+      <div class="cta-banner reveal">
+        <h2>Align with The Vektor.</h2>
+        <p>Ready to bring process, platform, and perpetual excellence to your organization? Let's start with a conversation.</p>
+        <div class="cta-banner__actions">
+          <a href="contact.html" class="btn btn--gold btn--lg">Start a Conversation →</a>
+          <a href="services.html" class="btn btn--outline btn--lg">View Services</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ FOOTER ══ -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer__grid">
+        <div class="footer__brand">
+          <div class="nav__logo">
+            <div class="nav__logo-mark">V</div>
+            The Vektor <span style="color:var(--gold)">&nbsp;/ 2GDP</span>
+          </div>
+          <p>Process-first strategic Konsulting. 4PE Framework. GPEx ecosystem. BIC standard.</p>
+          <div class="mt-4" style="display:flex;gap:var(--sp-3);flex-wrap:wrap;align-items:center;">
+            <span class="gpmd-badge">✓ GPMD</span>
+            <span class="tag">GPEx Ecosystem</span>
+          </div>
+        </div>
+        <div class="footer__col">
+          <h5>Services</h5>
+          <ul>
+            <li><a href="services.html#phase1">Process Architecture</a></li>
+            <li><a href="services.html#phase2">Platform Engineering</a></li>
+            <li><a href="services.html#phase3">Performance</a></li>
+            <li><a href="services.html#phase4">Perpetual Excellence</a></li>
+          </ul>
+        </div>
+        <div class="footer__col">
+          <h5>Company</h5>
+          <ul>
+            <li><a href="about.html">About</a></li>
+            <li><a href="#approach">Our Approach</a></li>
+            <li><a href="#ecosystem">GPEx Ecosystem</a></li>
+            <li><a href="contact.html">Contact</a></li>
+          </ul>
+        </div>
+        <div class="footer__col">
+          <h5>Framework</h5>
+          <ul>
+            <li><a href="services.html#4pe">4PE Overview</a></li>
+            <li><a href="services.html#kkr">KKR-MSC</a></li>
+            <li><a href="services.html#sti">STI/BTI</a></li>
+            <li><a href="services.html#bic">BIC Standard</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer__bottom">
+        <p>© <span data-year></span> 2GDP · The Vektor · A GPEx Ecosystem Company. All rights reserved.</p>
+        <div class="footer__bottom-links">
+          <a href="#">Privacy</a>
+          <a href="#">Terms</a>
+          <a href="contact.html">Contact</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>
