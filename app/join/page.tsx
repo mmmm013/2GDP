@@ -65,7 +65,7 @@ export default function JoinPage() {
         <div className="max-w-3xl mx-auto text-center">
           <p className="text-xs font-black uppercase tracking-[0.2em] mb-1 opacity-70">⚡ Limited Time — Founder Special</p>
           <p className="text-lg font-black leading-tight">
-            First {FOUNDER_TOTAL} KUBs get <span className="text-white">ELDER status at the JOEY price</span> — forever.
+            First {FOUNDER_TOTAL} K-KUTs get <span className="text-white">ELDER status at the JOEY price</span> — forever.
           </p>
           <div className="mt-2 flex items-center justify-center gap-3">
             <div className="h-2 bg-[#FFD54F]/20 rounded-full flex-1 max-w-xs overflow-hidden">
@@ -108,7 +108,7 @@ export default function JoinPage() {
           Partner with us to keep the music flowing.
         </p>
         <p className="text-sm font-semibold text-[#3E2723]/60 mb-8 max-w-md mx-auto">
-          We want volume. We value every single KUB. Pick your level — all tiers get real access, real benefits.
+          We want volume. We value every single K-KUT. Pick your level — all tiers get real access, real benefits.
         </p>
       </div>
 
@@ -123,14 +123,14 @@ export default function JoinPage() {
           <div className="bg-[#FFF8E1] border-2 border-[#3E2723] rounded-3xl p-8 shadow-[8px_8px_0px_0px_rgba(62,39,35,1)]">
             <h2 className="text-2xl font-black uppercase tracking-tight mb-6 flex items-center gap-2"><Compass size={24} /> The Course</h2>
             <div className="space-y-4 text-base font-bold text-[#3E2723]/80 leading-relaxed">
-              <p>K-KUBs are the engine of G Putnam Music. You aren&apos;t just a fan — you are a partner.</p>
+              <p>K-KUTs are the engine of G Putnam Music. You aren&apos;t just a fan — you are a partner.</p>
               <p>Your contribution keeps the <strong>Singalongs</strong> free for pediatric wards and the <strong>Kleigh</strong> stream running for fans worldwide.</p>
               <p><span className="text-[#E65100]">100% of proceeds</span> fuel artist support &amp; platform development.</p>
               <p className="text-xs opacity-50 italic">We watch process. Money cares for itself when the process is right.</p>
             </div>
 
             <div className="mt-6 pt-6 border-t-2 border-[#3E2723]/10 space-y-3">
-              <h3 className="font-black text-sm uppercase">Every KUB Gets:</h3>
+              <h3 className="font-black text-sm uppercase">Every K-KUT Gets:</h3>
               <div className="flex items-center gap-3 font-bold text-sm"><Check size={18} className="text-[#E65100]" /> Access to URU Story Engine</div>
               <div className="flex items-center gap-3 font-bold text-sm"><Check size={18} className="text-[#E65100]" /> Unlimited Plays (No Limits)</div>
               <div className="flex items-center gap-3 font-bold text-sm"><Check size={18} className="text-[#E65100]" /> Verified &quot;Sponsor&quot; Rank</div>
