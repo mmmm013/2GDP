@@ -431,7 +431,7 @@ export default function HomeFP() {
 
         {/* Footer meta */}
         <p className="text-center text-[10px] text-[#C8A882]/30 mt-4 tracking-wide">
-          {tracks.length} tracks · 2-hr no-repeat · Completely independent from SYBC Band, Wounded &amp; Willing
+          {tracks.length} tracks · 2-hr no-repeat · Completely independent from SYBC Band, Wounded & Willing
         </p>
       </div>
 
