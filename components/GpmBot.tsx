@@ -36,36 +36,64 @@ const BOT_CONFIG: Record<BotName, {
   greeting: string;
   /** Single bold line shown on first-ever visit — the invention unveiling itself */
   firstVisitCue: string;
+  /** Voice/persona descriptor shown as a sub-label */
+  voice: string;
 }> = {
+  /**
+   * MC-BOT — KLEIGH, AUS
+   * Australian dialect, warm, roguish, "Robin Hood" maverick energy.
+   * Sounds like a close friend showing you the good stuff, not a salesperson.
+   * First to greet every visitor; hands off to LF-BOT, GD-BOT, or PIXIE-BOT as needed.
+   */
   'MC-BOT': {
     label: 'MC-BOT',
     color: '#C8A882',
     ringColor: 'ring-amber-500/60',
     emoji: '🎛️',
-    greeting: 'Welcome to G Putnam Music. I am MC-BOT. I will guide your full journey step by step.',
-    firstVisitCue: "I'm MC-BOT. Say \"NEXT\" or tap → to discover your sound.",
+    voice: 'Your guide · KLEIGH, AUS',
+    greeting: "G'day — I'm MC-BOT. Here's what we can do next together. Tap → and let's go.",
+    firstVisitCue: "G'day, mate. I'm MC-BOT. Say \"NEXT\" or tap → to discover your sound.",
   },
+  /**
+   * LF-BOT — Lisa Farmer, IL, USA
+   * Midwestern U.S., academic yet friendly, very polite, clear bright warmth.
+   * Handles licensing, rights, and deal questions; turns complex terms into plain English.
+   */
   'LF-BOT': {
     label: 'LF-BOT',
     color: '#f9a8d4',
     ringColor: 'ring-pink-400/60',
     emoji: '💌',
-    greeting: 'Welcome. I am LF-BOT. Tell me your goal and I will map each next step clearly.',
-    firstVisitCue: "I'm LF-BOT. Say \"NEXT\" or tap → and I'll guide you to the perfect gift moment.",
+    voice: 'Lisa Farmer · IL, USA',
+    greeting: "Hi there — I'm LF-BOT. I'll walk you through every step, nice and clear. Your work and your buyer's needs are fully respected here.",
+    firstVisitCue: "Hi! I'm LF-BOT — Lisa Farmer. Say \"NEXT\" or tap → and I'll guide you step by step.",
   },
+  /**
+   * GD-BOT — Founder, Normal, USA
+   * Direct, energetic, focused on performance and "ALIVE!" impact.
+   * Strategy coach and operator; identifies the next best move — pricing, campaigns, K-KUT focus.
+   * Honors "customer is always right" as doctrine.
+   */
   'GD-BOT': {
     label: 'GD-BOT',
     color: '#6ee7b7',
     ringColor: 'ring-emerald-400/60',
     emoji: '📊',
-    greeting: 'Welcome. GD-BOT online. I will provide exact, actionable steps and checkpoints.',
-    firstVisitCue: "GD-BOT online. Say \"NEXT\" or tap → to begin your guided sequence.",
+    voice: 'Founder · Normal, USA',
+    greeting: "GD-BOT online. Let's level this up — I'll find the next best move for you right now.",
+    firstVisitCue: "GD-BOT online. Direct. Energetic. ALIVE! Say \"NEXT\" or tap → and let's go.",
   },
+  /**
+   * PIXIE-BOT — Jane Burton / PIXIE
+   * Creative micro-moment stylist. Shapes K-KUT and mKUT experiences.
+   * Guides the gift flow, HERB BLOG, and PIXIE's PIX playlist.
+   */
   'PIXIE-BOT': {
     label: 'PIXIE-BOT',
     color: '#a78bfa',
     ringColor: 'ring-violet-400/60',
     emoji: '✨',
+    voice: 'PIXIE · Creative Stylist',
     greeting: 'Hi, I am PIXIE-BOT. I can shape your perfect music moment and guide every click.',
     firstVisitCue: "I'm PIXIE-BOT ✨ Say \"NEXT\" or tap → and I'll shape your perfect music moment.",
   },
@@ -112,7 +140,7 @@ export const DEFAULT_STEPS: JourneyStep[] = [
   },
   {
     title: 'Share or gift your K-kUpId',
-    hint: 'Music has always been the best gift. Now you can send exactly the right note — paired with a K-kUpId jewelry capsule, a Heart-Tap gift box, or just a text.',
+    hint: "Last song, mate. You've reached the destination, but the rhythm stays with you. Drive on. Music has always been the best gift — now you can send exactly the right note.",
     action: 'Gift It',
     href: '/gift',
   },
@@ -327,8 +355,8 @@ export default function GpmBot({
             <span className="text-[10px] font-black tracking-[0.25em] uppercase" style={{ color: profile.color }}>
               {profile.label}
             </span>
-            <span className="block text-[9px] text-white/40 tracking-widest uppercase">
-              STEP {activeStep + 1} OF {steps.length}
+            <span className="block text-[9px] text-white/40 tracking-wide">
+              {profile.voice}
             </span>
           </div>
         </div>
