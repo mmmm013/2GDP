@@ -32,9 +32,9 @@ export interface BestowalScript {
   event: string
   /** K-KUT or mini-KUT */
   asset_tier: AssetTier
-  /** Disco.ac or internal asset/track identifier */
+  /** Title-based slug — matches ASCAP as single source of truth (never a DISCO numeric ID) */
   asset_id: string
-  /** Disco.ac track URL (used as SMS delivery link) */
+  /** Internal GPMC track URL used as SMS delivery link */
   asset_url: string
   /** Primary vocalist credited on this bestowal */
   vocalist: string
@@ -88,14 +88,14 @@ Through this physical hardware, the sentiment is locked. Happy Valentine's from 
     trigger: 'ANNIVERSARY_KK',
     event: 'Anniversary — Eternal Resonance Tracking',
     asset_tier: 'K-KUT',
-    asset_id: '191226956',
-    asset_url: 'https://musicmaykers.disco.ac/e/t/191226956',
+    asset_id: 'AWESOME-ANNIVERSARY-KK',
+    asset_url: 'https://gputnammusic.com/k/awesome-anniversary',
     vocalist: 'KLEIGH',
     composer: 'Scherer',
     pillars: ['Performance', 'Profit'],
     sms_body:
-      'Sovereign Bestowal: Initiating Awesome Anniversary. Your resonance is locked. Tap your K-kUpId to receive: https://musicmaykers.disco.ac/e/t/191226956',
-    script: `Initiating the Awesome Anniversary bestowal. This proprietary K-KUT (Track 191226956) is manufactured to the Six Sigma standard.
+      'Sovereign Bestowal: Initiating Awesome Anniversary. Your resonance is locked. Tap your K-kUpId to receive: https://gputnammusic.com/k/awesome-anniversary',
+    script: `Initiating the Awesome Anniversary bestowal. This proprietary K-KUT is manufactured to the Six Sigma standard.
 
 Vocalist: KLEIGH
 Composer / Pianist: Scherer
@@ -111,14 +111,14 @@ Through your K-kUpId mechanism, this resonance marks a Level 1 Final Outcome of 
     trigger: 'BIRTHDAY_MK',
     event: 'Birthday — Identity Celebration Logic',
     asset_tier: 'mini-KUT',
-    asset_id: '191226874',
-    asset_url: 'https://musicmaykers.disco.ac/e/t/191226874',
+    asset_id: 'BEST-BIRTHDAY-SHORT-MK',
+    asset_url: 'https://gputnammusic.com/k/best-birthday-short',
     vocalist: '[Sovereign Selection]',
     composer: 'Scherer',
     pillars: ['People', 'Process'],
     sms_body:
-      'Sovereign Bestowal: Happy Birthday! Your Best Birthday-Short (mK) is ready for your role in the fleet. Tap to receive: https://musicmaykers.disco.ac/e/t/191226874',
-    script: `This is your Best Birthday-Short resonance (Track 191226874). A condensed mini-KUT designed for high-frequency People (Roles) recognition.
+      'Sovereign Bestowal: Happy Birthday! Your Best Birthday-Short (mK) is ready for your role in the fleet. Tap to receive: https://gputnammusic.com/k/best-birthday-short',
+    script: `This is your Best Birthday-Short resonance. A condensed mini-KUT designed for high-frequency People (Roles) recognition.
 
 Process: Delivered via the 4PE SMS Gateway.
 Performance: Honoring your role in the future of our companies.
