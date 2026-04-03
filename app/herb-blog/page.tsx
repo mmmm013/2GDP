@@ -19,12 +19,14 @@ export const metadata: Metadata = {
 const CATEGORIES = ['All', 'Herb Lore', 'Garden Diary', 'Plant Medicine', 'Nature Notes', 'Seasonal'];
 
 
+const SUPABASE_URL =
+  process.env.NEXT_PUBLIC_SUPABASE_URL ?? 'https://lbzpfqarraegkghxwbah.supabase.co';
+
 // Server-side anon read (matches RLS: brand='PIXIE' AND is_published=true)
 function getSupabase() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  );
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? '';
+  if (!key) return null;
+  return createClient(SUPABASE_URL, key);
 }
 
 interface BlogPost {
@@ -44,6 +46,7 @@ interface PlaylistAsset {
 
 async function fetchPublishedPosts(): Promise<BlogPost[]> {
   const supabase = getSupabase();
+  if (!supabase) return [];
   const { data } = await supabase
     .from('creator_assets')
     .select('id, label, file_url, uploaded_at, meta')
@@ -56,6 +59,7 @@ async function fetchPublishedPosts(): Promise<BlogPost[]> {
 
 async function fetchPublishedPlaylist(): Promise<PlaylistAsset | null> {
   const supabase = getSupabase();
+  if (!supabase) return null;
   const { data } = await supabase
     .from('creator_assets')
     .select('id, label, file_url, uploaded_at')
