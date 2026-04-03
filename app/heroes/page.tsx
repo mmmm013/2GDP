@@ -62,7 +62,7 @@ export default function HeroesPage() {
               <p className="text-lg leading-relaxed">{pillar.text}</p>
 
               {/* MIP1 RECOGNITION FORM CTA */}
-              <Link href="/mip1/form">
+              <Link href="/mip">
                 <button className="mt-6 px-6 py-2 border font-bold hover:bg-white hover:text-black transition-colors uppercase">
                   MIP1 RECOGNITION FORM
                 </button>
@@ -73,7 +73,7 @@ export default function HeroesPage() {
 
         {/* HELP US BUTTON: route OR mailto */}
         <div className="fixed bottom-10 right-10">
-          <Link href="/help">
+          <Link href="/contact">
             <button className="bg-amber-500 text-black px-8 py-4 rounded-full font-black text-xl shadow-2xl hover:scale-110 transition-transform">
               HELP US
             </button>
