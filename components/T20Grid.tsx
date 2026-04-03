@@ -229,8 +229,8 @@ export default function T20Grid() {
           })
         );
       }
-    } catch {
-      // Silent fail
+    } catch (err) {
+      console.error('T20Grid: failed to load tracks for activity', activity.id, err);
     }
   }, []);
 

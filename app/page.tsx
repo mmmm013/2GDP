@@ -85,7 +85,7 @@ export default function HomePage() {
 
           {/* Brand lockup over hero image */}
           <div className="absolute bottom-6 left-5 right-5 md:bottom-8 md:left-8 md:right-8">
-            <p className="text-[9px] md:text-[10px] uppercase tracking-[0.35em] text-[#C8A882]/70 mb-1.5 font-bold">
+            <p className="text-[11px] md:text-xs uppercase tracking-[0.35em] text-[#C8A882]/70 mb-1.5 font-bold">
               G Putnam Music · The One Stop Song Shop
             </p>
             <h1 className="text-2xl md:text-4xl font-black text-white leading-none drop-shadow-2xl">
