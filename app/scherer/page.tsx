@@ -5,7 +5,7 @@ import React, { useEffect, useState } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import GlobalPlayer from '@/components/GlobalPlayer';
-import { Bot, Tv, BadgeCheck, ShoppingCart } from 'lucide-react';
+import { Bot, Tv, BadgeCheck, ShoppingCart, Heart, Music2, MapPin } from 'lucide-react';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL as string,
@@ -77,7 +77,81 @@ export default function SchererPage() {
     <main className="min-h-screen flex flex-col text-white bg-black">
       <Header />
 
-      <section className="relative flex-1 max-w-5xl mx-auto px-6 py-12 space-y-10">
+      {/* ═══════════════════════════════════════════
+          KEZ PLZ — LOVE & RECOVERY CAMPAIGN HERO
+      ═══════════════════════════════════════════ */}
+      <section className="relative w-full bg-gradient-to-b from-[#1a0505] via-[#2d0a0a] to-black border-b border-red-900/30 py-16 px-4 overflow-hidden">
+        {/* Ambient glow */}
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-red-800/10 blur-3xl rounded-full" />
+        </div>
+
+        <div className="relative max-w-3xl mx-auto text-center space-y-6">
+          {/* Badge */}
+          <div className="inline-flex items-center gap-2 rounded-full bg-red-600/20 border border-red-500/30 px-4 py-1.5 text-xs font-black uppercase tracking-[0.2em] text-red-300">
+            <Heart className="w-3 h-3 fill-red-400 text-red-400" />
+            KEZ PLZ — A Campaign of Love &amp; Recovery
+          </div>
+
+          {/* Headline */}
+          <h1 className="text-4xl md:text-6xl font-black text-white leading-tight tracking-tight">
+            Michael Scherer<br />
+            <span className="text-red-400">Needs Us Now.</span>
+          </h1>
+
+          {/* Personal story */}
+          <p className="text-lg text-white/80 leading-relaxed max-w-2xl mx-auto">
+            Michael is a truly, deeply soulful person — a devout believer — and one hell of a
+            performer. His wife and three gorgeous daughters are fighting alongside him through
+            overwhelming, over-burdening medical bills that have made even lunches a struggle.
+            This great, wonderful family needs our help.
+          </p>
+
+          {/* Cities */}
+          <div className="flex flex-wrap justify-center gap-3 text-xs font-bold text-red-300/80 uppercase tracking-widest">
+            {['Decatur, IL', 'Hollywood, CA', 'Michigan', 'Nashville, TN'].map((city) => (
+              <span key={city} className="flex items-center gap-1">
+                <MapPin className="w-3 h-3" />
+                {city}
+              </span>
+            ))}
+          </div>
+
+          {/* Publishing note */}
+          <div className="bg-white/5 border border-white/10 rounded-2xl p-5 text-sm text-white/70 leading-relaxed max-w-xl mx-auto">
+            <Music2 className="w-4 h-4 text-amber-400 mx-auto mb-2" />
+            <p>
+              G Putnam is donating most of the publishing on Michael&apos;s originals, and
+              <strong className="text-white"> all of both sides</strong> on the great hits
+              they&apos;ve co-written together. Every stream, every purchase, every KEZ — it goes
+              to Michael&apos;s family directly. He is dynamite to work with. Truly a JOY.
+            </p>
+          </div>
+
+          {/* KEZ framing */}
+          <p className="text-sm font-black uppercase tracking-[0.2em] text-red-300">
+            🎹 KEZ = Keys for a Keyboard — Every key pressed keeps Michael playing.
+          </p>
+
+          {/* CTAs */}
+          <div className="flex flex-col sm:flex-row gap-4 justify-center pt-2">
+            <a
+              href="/gift"
+              className="bg-red-600 text-white px-10 py-4 rounded-full font-black uppercase tracking-wider text-base hover:bg-red-500 transition-colors shadow-2xl shadow-red-900/60"
+            >
+              🎹 Become a KEZ — Help Michael
+            </a>
+            <a
+              href="#catalog"
+              className="bg-white/10 border border-white/20 text-white px-10 py-4 rounded-full font-black uppercase tracking-wider text-base hover:bg-white/15 transition-colors"
+            >
+              Stream His Music ↓
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <section id="catalog" className="relative flex-1 max-w-5xl mx-auto px-6 py-12 space-y-10">
         {/* Product description */}
         <div className="space-y-4">
           <div className="inline-flex items-center gap-2 rounded-full bg-amber-600/20 px-3 py-1 text-xs font-semibold text-amber-200">
@@ -213,31 +287,42 @@ export default function SchererPage() {
         </div>
       </section>
 
-      {/* MSJ EMERGENCY SUPPORT SPOTLIGHT */}
-      <section className="w-full bg-gradient-to-r from-red-950 to-zinc-900 border-t border-red-800/30 py-10 px-4">
-        <div className="max-w-3xl mx-auto text-center">
-          <p className="text-xs font-black uppercase tracking-[0.25em] text-red-400 mb-2">KEZ — Keys for a Keyboard</p>
-          <h2 className="text-3xl font-black text-white mb-3">Michael Is Fighting Hard.</h2>
-          <p className="text-base text-white/70 leading-relaxed mb-4 max-w-xl mx-auto">
-            40+ TV placements. A catalog built over decades. Right now, Michael Scherer is facing
-            serious personal hardship. Every stream, every share, every dollar of support goes
-            directly toward keeping this music — and this artist — standing.
+      {/* ═══════════════════════════════════════════
+          KEZ PLZ FOOTER CALL TO ACTION
+      ═══════════════════════════════════════════ */}
+      <section className="w-full bg-gradient-to-r from-red-950 to-zinc-900 border-t border-red-800/30 py-14 px-4">
+        <div className="max-w-3xl mx-auto text-center space-y-5">
+          <Heart className="w-8 h-8 text-red-400 fill-red-400 mx-auto" />
+          <p className="text-xs font-black uppercase tracking-[0.25em] text-red-400">
+            KEZ PLZ — Keys for a Keyboard
           </p>
-          <p className="text-sm text-red-300/80 font-bold mb-6 max-w-md mx-auto">
-            KEZs are Michael&apos;s keyboard-keys crew. Every key pressed keeps him playing.
+          <h2 className="text-3xl font-black text-white">
+            A Devout Man. A Beautiful Family.<br />A Real Crisis.
+          </h2>
+          <p className="text-base text-white/70 leading-relaxed max-w-2xl mx-auto">
+            Michael Scherer — performer in Decatur IL, Hollywood CA, Michigan, and Nashville TN —
+            is one of the most soulful people in this business. His wife and three gorgeous daughters
+            are fighting through crushing medical debt. They need help with the basics right now.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <p className="text-sm text-red-300/80 font-bold max-w-xl mx-auto">
+            G Putnam has donated most of the publishing on Michael&apos;s originals and all of both
+            sides on their co-written hits. Every stream and every KEZ goes straight to this family.
+          </p>
+          <p className="text-xs text-white/40 font-bold uppercase tracking-widest">
+            🎹 Every Key Pressed Keeps Michael Playing
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center pt-2">
             <a
               href="/gift"
-              className="bg-red-600 text-white px-8 py-3 rounded-full font-black uppercase tracking-wider hover:bg-red-500 transition-colors shadow-xl"
+              className="bg-red-600 text-white px-10 py-4 rounded-full font-black uppercase tracking-wider hover:bg-red-500 transition-colors shadow-xl shadow-red-900/50"
             >
-              🎹 Become a KEZ — Support Michael
+              🎹 Become a KEZ
             </a>
             <a
               href="/join"
-              className="bg-white/10 border border-white/20 text-white px-8 py-3 rounded-full font-black uppercase tracking-wider hover:bg-white/20 transition-colors"
+              className="bg-white/10 border border-white/20 text-white px-10 py-4 rounded-full font-black uppercase tracking-wider hover:bg-white/20 transition-colors"
             >
-              Join as a KEZ →
+              Join the KEZ Crew →
             </a>
           </div>
         </div>
