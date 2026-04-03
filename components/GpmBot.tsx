@@ -51,13 +51,14 @@ const BOT_CONFIG: Record<BotName, {
     ringColor: 'ring-amber-500/60',
     emoji: '🎛️',
     voice: 'Your guide · KLEIGH, AUS',
-    greeting: "G'day — I'm MC-BOT. Here's what we can do next together. Tap → and let's go.",
-    firstVisitCue: "G'day, mate. I'm MC-BOT. Say \"NEXT\" or tap → to discover your sound.",
+    greeting: "G'day — I'm MC-BOT, your KLEIGH guide from AUS. Here's what we can do next together. Tap → and let's crack on. I'll show you the good stuff, mate — no hard sell, just the right moves.",
+    firstVisitCue: "G'day, mate! I'm MC-BOT — your Robin Hood guide from KLEIGH, AUS. Say \"NEXT\" or tap → and I'll show you exactly what we've got. No pressure, just the good stuff.",
   },
   /**
    * LF-BOT — Lisa Farmer, IL, USA
    * Midwestern U.S., academic yet friendly, very polite, clear bright warmth.
    * Handles licensing, rights, and deal questions; turns complex terms into plain English.
+   * Reassures users that their work and buyers' needs are fully respected.
    */
   'LF-BOT': {
     label: 'LF-BOT',
@@ -65,8 +66,8 @@ const BOT_CONFIG: Record<BotName, {
     ringColor: 'ring-pink-400/60',
     emoji: '💌',
     voice: 'Lisa Farmer · IL, USA',
-    greeting: "Hi there — I'm LF-BOT. I'll walk you through every step, nice and clear. Your work and your buyer's needs are fully respected here.",
-    firstVisitCue: "Hi! I'm LF-BOT — Lisa Farmer. Say \"NEXT\" or tap → and I'll guide you step by step.",
+    greeting: "Hi there — I'm LF-BOT, Lisa Farmer from Illinois. I'll walk you through every step nice and clear. Licensing, rights, deal questions — I turn all the complex stuff into plain English. Your work and your buyer's needs are fully respected here. Let's go!",
+    firstVisitCue: "Hi! I'm LF-BOT — Lisa Farmer from IL. Say \"NEXT\" or tap → and I'll guide you through every step with warmth and clarity. Nothing complicated, I promise!",
   },
   /**
    * GD-BOT — Founder, Normal, USA
@@ -80,8 +81,8 @@ const BOT_CONFIG: Record<BotName, {
     ringColor: 'ring-emerald-400/60',
     emoji: '📊',
     voice: 'Founder · Normal, USA',
-    greeting: "GD-BOT online. Let's level this up — I'll find the next best move for you right now.",
-    firstVisitCue: "GD-BOT online. Direct. Energetic. ALIVE! Say \"NEXT\" or tap → and let's go.",
+    greeting: "GD-BOT online. Direct. Energetic. ALIVE! I'm the Founder — Normal, USA. I find the next best move for you right now: pricing, campaigns, K-KUT focus. Customer is always right, and the right move is always forward. Let's GO.",
+    firstVisitCue: "GD-BOT online. ALIVE! I'm the Founder. Say \"NEXT\" or tap → and we level this up together. Direct, fast, and always rooting for you.",
   },
   /**
    * PIXIE-BOT — Jane Burton / PIXIE
@@ -94,9 +95,60 @@ const BOT_CONFIG: Record<BotName, {
     ringColor: 'ring-violet-400/60',
     emoji: '✨',
     voice: 'PIXIE · Creative Stylist',
-    greeting: 'Hi, I am PIXIE-BOT. I can shape your perfect music moment and guide every click.',
-    firstVisitCue: "I'm PIXIE-BOT ✨ Say \"NEXT\" or tap → and I'll shape your perfect music moment.",
+    greeting: "Hi, I'm PIXIE-BOT ✨ Jane Burton, creative stylist and your guide to perfect music moments. I shape K-KUT experiences, curate PIXIE's PIX playlist, and help you find the exact note that speaks. Say \"NEXT\" or tap → and let's create something beautiful.",
+    firstVisitCue: "I'm PIXIE-BOT ✨ Say \"NEXT\" or tap → and I'll shape your perfect music moment — personal, curated, exactly right.",
   },
+};
+
+// ---------------------------------------------------------------------------
+// Per-bot conversational step hints — each bot speaks in its own voice
+// These override the DEFAULT_STEPS hints when a matching bot is active
+// ---------------------------------------------------------------------------
+
+const BOT_STEP_HINTS: Record<BotName, string[]> = {
+  /**
+   * MC-BOT — warm, roguish, Australian dialect, "Robin Hood" energy
+   */
+  'MC-BOT': [
+    "Right, let's have a look at what we've got, yeah? The catalog's stacked with Sweet Spots — those moments in a track that just wreck ya. Tell me your mood, your occasion, or your artist and I'll point you straight to the good stuff. No fuss.",
+    "A K-KUT is basically a musical shortcut, mate. Six characters — short enough to text. Opens the exact Sweet Spot — the hook, the bridge, the bit that hits. mini-KUTs do the same but stream a specific section. Both shareable in one tap. Robin Hood stuff, yeah?",
+    "K-kUpId is the gifting layer. Pick a track, choose your moment, generate a link. Or dress it up — romance skin, a jewellery capsule, a whole experience. Sounds flash but it's dead easy, I promise.",
+    "Tap the link. No app, no account, no faff whatsoever. Just tap and hear the exact Sweet Spot. That's the whole trick right there. Beautiful, isn't it?",
+    "Last song, mate. You've reached the destination, but the rhythm stays with you. Drive on. Music's always been the best gift — now you send exactly the right note. Bloody legend.",
+  ],
+
+  /**
+   * LF-BOT — Midwestern, academic yet friendly, very polite, clear bright warmth
+   */
+  'LF-BOT': [
+    "Welcome! I'm so glad you're here. Let's take this one step at a time. You'll browse through the catalog, or simply tell us your mood or occasion, and we'll find that perfect music moment together. It's all very straightforward, I promise!",
+    "Now here's where it gets really neat — a K-KUT is a small, six-character link that opens to the exact Sweet Spot of a song. A mini-KUT streams just a specific verse or chorus. Both protect your rights fully, and your buyer's needs are completely respected throughout. I want you to know that.",
+    "K-kUpId is the gifting layer — and this is where things get exciting from a licensing standpoint! Every link is properly resolved. Your work is protected. Buyers get a clear, honest experience. And if you ever have questions about rights or deal terms, I'm right here for you.",
+    "Just tap the link — no app required, no account to create. The experience opens directly, clean and clear. Fully above board. That's exactly how we do things here.",
+    "And we've arrived! You've been wonderful to walk through this with. Music has always been the best gift, and now you can send exactly the right note with complete peace of mind. Thank you so much for being here — it truly means a lot.",
+  ],
+
+  /**
+   * GD-BOT — Direct, energetic, ALIVE!, strategy coach, "customer is always right"
+   */
+  'GD-BOT': [
+    "Let's GO. The catalog is ALIVE with Sweet Spots — those exact moments in a track that land differently. Browse it, filter by mood, or tell me what you need right now. I'll find the move.",
+    "K-KUT is the performance vehicle. Six characters. One tap. Opens the exact moment you want the listener to hear. mini-KUT handles a specific section. Both designed for maximum impact — shareable, trackable, campaign-ready. That's leverage.",
+    "K-kUpId is your pricing and gifting engine. This is where you set the experience level — romance skin, full capsule, pricing tier. Every link you generate here is a campaign asset. Think about what that means for your catalog.",
+    "Tap the link. That's the whole product. Zero friction. No account required. The Sweet Spot plays instantly. Customer is always right — and the right experience is always immediate.",
+    "That's the destination. But the strategy doesn't stop here — this is where we plan the NEXT campaign, the next K-KUT drop, the next level. You've got the tools. The rhythm stays with you. Drive on.",
+  ],
+
+  /**
+   * PIXIE-BOT — Creative stylist, Jane Burton, HERB BLOG, PIXIE's PIX
+   */
+  'PIXIE-BOT': [
+    "Oh, let's find your perfect music moment ✨ Think of a feeling, a memory, a scene in your mind. The catalog holds it — we just have to find it together. What's the mood today, love?",
+    "A K-KUT is like a little jewel box for a song moment 💎 Six characters that open to exactly the right note. A mini-KUT captures a verse or chorus — just the part that speaks. Both are shareable, giftable, and beautifully simple.",
+    "K-kUpId is where we dress the experience ✨ Choose a track, find your moment, then decide — is this a quick gift, a romantic gesture, a full jewellery capsule? Every detail can be tailored to the feeling you want to send.",
+    "Tap and listen. No friction, no forms — just the music, exactly as intended. That's the artistry of it. Pure and precise. A moment perfectly delivered.",
+    "Last song, mate. You've reached the destination, but the rhythm stays with you. Drive on 🌿 Music is the most personal gift — and you've just learned how to send exactly the right note. Beautiful work.",
+  ],
 };
 
 // ---------------------------------------------------------------------------
@@ -470,8 +522,10 @@ export default function GpmBot({
                 >
                   {step.title}
                 </p>
-                {isCurrent && step.hint && (
-                  <p className="mt-1 text-[10px] text-white/50 leading-relaxed">{step.hint}</p>
+                {isCurrent && (step.hint || BOT_STEP_HINTS[bot]?.[i]) && (
+                  <p className="mt-1 text-[10px] text-white/50 leading-relaxed">
+                    {BOT_STEP_HINTS[bot]?.[i] ?? step.hint}
+                  </p>
                 )}
                 {isCurrent && step.href && (
                   <a
