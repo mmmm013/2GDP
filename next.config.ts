@@ -1,8 +1,4 @@
 import type { NextConfig } from "next";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
-
-const repoRoot = path.dirname(fileURLToPath(import.meta.url));
 
 const nextConfig: NextConfig = {
   typescript: {
@@ -15,14 +11,7 @@ const nextConfig: NextConfig = {
     unoptimized: true,
   },
   turbopack: {
-    root: repoRoot,
-    excludes: [
-      '**/gputnam-music-final-site/**',
-      '**/2GDP/**',
-      '**/Global-Warehouse/**',
-      '**/.next/**',
-      '**/node_modules/**',
-    ],
+    root: process.cwd(),
   },
 };
 export default nextConfig;
