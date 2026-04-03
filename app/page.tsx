@@ -16,6 +16,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import HomeFP from '@/components/HomeFP';
 import T20Grid from '@/components/T20Grid';
+import PromoBar from '@/components/PromoBar';
 
 // ---------------------------------------------------------------------------
 // Hero image rotation — shuffle-based, one image on screen at a time
@@ -62,6 +63,9 @@ export default function HomePage() {
 
   return (
     <>
+      {/* PROMO BAR: rotating flash specials above the fold */}
+      <PromoBar />
+
       {/* ROW 1: STI Header with BTI-filled slots (Amber / gtmplt) */}
       <Header />
 

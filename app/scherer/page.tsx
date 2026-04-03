@@ -213,6 +213,33 @@ export default function SchererPage() {
         </div>
       </section>
 
+      {/* MSJ EMERGENCY SUPPORT SPOTLIGHT */}
+      <section className="w-full bg-gradient-to-r from-red-950 to-zinc-900 border-t border-red-800/30 py-10 px-4">
+        <div className="max-w-3xl mx-auto text-center">
+          <p className="text-xs font-black uppercase tracking-[0.25em] text-red-400 mb-2">Artist Support</p>
+          <h2 className="text-3xl font-black text-white mb-3">Michael Is Fighting Hard.</h2>
+          <p className="text-base text-white/70 leading-relaxed mb-6 max-w-xl mx-auto">
+            40+ TV placements. A catalog built over decades. Right now, Michael Scherer is facing
+            serious personal hardship. Every stream, every share, every dollar of support goes
+            directly toward keeping this music — and this artist — standing.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <a
+              href="/gift"
+              className="bg-red-600 text-white px-8 py-3 rounded-full font-black uppercase tracking-wider hover:bg-red-500 transition-colors shadow-xl"
+            >
+              ❤️ Support Michael Now
+            </a>
+            <a
+              href="/join"
+              className="bg-white/10 border border-white/20 text-white px-8 py-3 rounded-full font-black uppercase tracking-wider hover:bg-white/20 transition-colors"
+            >
+              Join as a KUB →
+            </a>
+          </div>
+        </div>
+      </section>
+
       <GlobalPlayer />
       <Footer />
     </main>
