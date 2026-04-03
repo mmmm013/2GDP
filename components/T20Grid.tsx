@@ -79,10 +79,12 @@ function chunkArray<T>(arr: T[], size: number): T[][] {
 function ActivityTile({
   activity,
   isActive,
+  isFlashing,
   onClick,
 }: {
   activity: Activity;
   isActive: boolean;
+  isFlashing: boolean;
   onClick: (a: Activity) => void;
 }) {
   return (
@@ -93,12 +95,14 @@ function ActivityTile({
         rounded-xl border transition-all duration-200
         min-h-[80px] md:min-h-[96px] px-2 py-3 w-full
         active:scale-95
+        ${isFlashing ? 'scale-105 brightness-150 duration-75' : ''}
         ${isActive
-          ? 'bg-[#2a1f0f] border-[#D4A017] shadow-[0_0_12px_rgba(212,160,23,0.4)]'
+          ? 'bg-[#2a1f0f] border-[#D4A017] shadow-[0_0_18px_rgba(212,160,23,0.6)]'
           : 'bg-[#1a1207] border-[#5C3A1E]/40 hover:border-[#C8A882]/60 hover:bg-[#221508]'
         }
       `}
       aria-label={`Stream ${activity.label}`}
+      style={isFlashing ? { boxShadow: `0 0 32px ${activity.accent}99` } : undefined}
     >
       {/* Color accent line at top */}
       <div
@@ -109,7 +113,7 @@ function ActivityTile({
         }}
       />
 
-      <span className="text-xl md:text-2xl leading-none" role="img" aria-hidden>
+      <span className={`text-xl md:text-2xl leading-none transition-transform duration-75 ${isFlashing ? 'scale-125' : ''}`} role="img" aria-hidden>
         {activity.emoji}
       </span>
       <span
@@ -144,6 +148,7 @@ function ActivityTile({
 
 export default function T20Grid() {
   const [activeId, setActiveId] = useState<string | null>(null);
+  const [flashingId, setFlashingId] = useState<string | null>(null);
 
   // Mobile carousel state
   // We work with shuffled groups of 3; cycle advances every 60s
@@ -182,7 +187,14 @@ export default function T20Grid() {
   }, []);
 
   const handleTileClick = useCallback(async (activity: Activity) => {
+    // Trigger flash animation
+    setFlashingId(activity.id);
+    setTimeout(() => setFlashingId(null), 400);
+
     setActiveId(activity.id);
+
+    // Notify MC-BOT of mood shift via custom event
+    window.dispatchEvent(new CustomEvent('t20-mood-change', { detail: { mood: activity.label, emoji: activity.emoji } }));
 
     const sb = sbRef.current;
     if (!sb) return;
@@ -270,6 +282,7 @@ export default function T20Grid() {
               key={activity.id}
               activity={activity}
               isActive={activeId === activity.id}
+              isFlashing={flashingId === activity.id}
               onClick={handleTileClick}
             />
           ))}
@@ -282,6 +295,7 @@ export default function T20Grid() {
               key={activity.id}
               activity={activity}
               isActive={activeId === activity.id}
+              isFlashing={flashingId === activity.id}
               onClick={handleTileClick}
             />
           ))}

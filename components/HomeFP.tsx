@@ -337,6 +337,25 @@ export default function HomeFP() {
     );
   }
 
+  // Health check: 0 tracks → show "coming soon" placeholder
+  if (!isLoading && tracks.length === 0) {
+    return (
+      <div className="w-full py-10 px-4 flex flex-col items-center justify-center gap-4 text-center">
+        <Radio size={32} className="text-[#D4A017]/40" />
+        <div>
+          <p className="text-sm font-bold text-[#C8A882]/70 uppercase tracking-widest">GPM Live Stream</p>
+          <p className="text-xs text-[#C8A882]/40 mt-1">Catalog loading soon — check back shortly</p>
+        </div>
+        <a
+          href="mailto:Gputnam@gputnammusic.com"
+          className="text-[10px] uppercase tracking-widest text-[#D4A017]/60 border border-[#D4A017]/20 rounded-full px-4 py-1.5 hover:border-[#D4A017]/50 transition-colors"
+        >
+          Contact us
+        </a>
+      </div>
+    );
+  }
+
   if (!current) {
     return null;
   }
@@ -345,12 +364,20 @@ export default function HomeFP() {
     <div className="w-full py-6 px-4 md:py-8 md:px-6">
       <div className="max-w-md mx-auto md:max-w-none">
 
-        {/* Stream identity */}
-        <div className="flex items-center gap-2 mb-5">
-          <span className="inline-block w-2 h-2 rounded-full bg-[#D4A017] animate-pulse" />
-          <span className="text-[10px] uppercase tracking-[0.3em] text-[#C8A882]/70 font-bold">
-            GPM Live Stream · 2-Hour No Repeat · All Original
-          </span>
+        {/* Stream identity + LIVE STREAM badge */}
+        <div className="flex items-center justify-between mb-5">
+          <div className="flex items-center gap-2">
+            <span className="inline-block w-2 h-2 rounded-full bg-[#D4A017] animate-pulse" />
+            <span className="text-[10px] uppercase tracking-[0.3em] text-[#C8A882]/70 font-bold">
+              GPM · 2-Hour No Repeat · All Original
+            </span>
+          </div>
+          {isPlaying && (
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-red-900/40 border border-red-500/40 animate-pulse">
+              <span className="w-1.5 h-1.5 rounded-full bg-red-400" />
+              <span className="text-[9px] font-black uppercase tracking-widest text-red-300">LIVE</span>
+            </span>
+          )}
         </div>
 
         {/* Now-playing card */}
@@ -358,11 +385,22 @@ export default function HomeFP() {
 
           {/* Track info */}
           <div className="px-6 pt-6 pb-4">
-            {autoplayBlocked && (
-              <p className="text-[#D4A017]/70 text-xs mb-3 tracking-wide">
-                Tap play to start your non-stop GPM stream ↓
-              </p>
-            )}
+          {/* Prominent autoplay CTA when browser blocks autoplay */}
+          {autoplayBlocked && (
+            <button
+              onClick={startOrToggle}
+              className="w-full mb-4 py-3 px-4 rounded-xl border-2 border-[#D4A017] bg-[#D4A017]/10 hover:bg-[#D4A017]/20 transition-all animate-pulse group"
+              aria-label="Start streaming"
+            >
+              <span className="flex items-center justify-center gap-2 text-[#D4A017] font-black text-sm tracking-widest uppercase">
+                <Play size={18} className="group-hover:scale-110 transition-transform" />
+                Tap to Start Your GPM Stream
+              </span>
+              <span className="block text-[10px] text-[#C8A882]/50 mt-0.5 tracking-wide">
+                Non-stop original music — no ads
+              </span>
+            </button>
+          )}
             {error && (
               <p className="text-amber-400/70 text-xs mb-2">{error}</p>
             )}

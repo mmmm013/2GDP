@@ -140,8 +140,28 @@ export default function GpmBot({
   const [showGreeting, setShowGreeting] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const [voiceStatus, setVoiceStatus] = useState('');
+  const [isFirstVisit, setIsFirstVisit] = useState(false);
   const recognitionRef = useRef<any>(null);
   const stepRefs = useRef<(HTMLDivElement | null)[]>([]);
+
+  // Detect first-time visitor and auto-expand with special greeting
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const key = `gpmbot_visited_${bot}`;
+    const visited = localStorage.getItem(key);
+    if (!visited) {
+      setIsFirstVisit(true);
+      setIsCollapsed(false);
+      localStorage.setItem(key, '1');
+    }
+  }, [bot]);
+
+  // Remove first-visit pulse ring after 3s
+  useEffect(() => {
+    if (!isFirstVisit) return;
+    const t = setTimeout(() => setIsFirstVisit(false), 3000);
+    return () => clearTimeout(t);
+  }, [isFirstVisit]);
 
   // Show greeting bubble once on mount
   useEffect(() => {
@@ -269,8 +289,8 @@ export default function GpmBot({
   // ── EXPANDED VIEW ─────────────────────────────────────────────────────────
   return (
     <div
-      className={`relative w-full max-w-sm rounded-2xl border bg-black/80 backdrop-blur-md overflow-hidden ${className}`}
-      style={{ borderColor: `${profile.color}30` }}
+      className={`relative w-full max-w-sm rounded-2xl border bg-black/80 backdrop-blur-md overflow-hidden ${isFirstVisit ? 'ring-2 ring-offset-1 ring-offset-black animate-pulse' : ''} ${className}`}
+      style={{ borderColor: `${profile.color}30`, ...(isFirstVisit ? { '--tw-ring-color': `${profile.color}80` } as React.CSSProperties : {}) }}
       onKeyDown={handleKeyDown}
       tabIndex={0}
       role="region"
@@ -330,11 +350,13 @@ export default function GpmBot({
       {/* Greeting Bubble */}
       {showGreeting && (
         <div
-          className="mx-4 mt-3 px-3 py-2.5 rounded-xl text-xs text-white/80 leading-relaxed animate-fade-in"
+          className="mx-4 mt-3 px-3 py-2.5 rounded-xl text-xs text-white/80 leading-relaxed"
           style={{ background: `${profile.color}15`, border: `1px solid ${profile.color}25` }}
         >
           <Zap className="inline w-3 h-3 mr-1 mb-0.5" style={{ color: profile.color }} />
-          {profile.greeting}
+          {isFirstVisit
+            ? `I'm ${profile.label}. Say "NEXT" or tap → to discover your sound.`
+            : profile.greeting}
         </div>
       )}
 
