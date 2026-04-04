@@ -20,7 +20,7 @@
  */
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { ChevronRight, ChevronDown, CheckCircle, Circle, Zap, X, Mic, MicOff } from 'lucide-react';
+import { ChevronRight, ChevronDown, CheckCircle, Circle, Zap, X, Mic, MicOff, Volume2, VolumeX } from 'lucide-react';
 
 // ---------------------------------------------------------------------------
 // Bot config — mirrors BOT_PROFILES in /api/public/kkut-guide
@@ -38,6 +38,9 @@ const BOT_CONFIG: Record<BotName, {
   firstVisitCue: string;
   /** Voice/persona descriptor shown as a sub-label */
   voice: string;
+  /** TTS tuning — pitch (0.5–2) and rate (0.5–2) for this persona */
+  ttsPitch: number;
+  ttsRate: number;
 }> = {
   /**
    * MC-BOT — KLEIGH, AUS
@@ -51,6 +54,8 @@ const BOT_CONFIG: Record<BotName, {
     ringColor: 'ring-amber-500/60',
     emoji: '🎛️',
     voice: 'Your guide · KLEIGH, AUS',
+    ttsPitch: 1.1,
+    ttsRate: 1.0,
     greeting: "G'day — I'm MC-BOT, your KLEIGH guide from AUS. Here's what we can do next together. Tap → and let's crack on. I'll show you the good stuff, mate — no hard sell, just the right moves.",
     firstVisitCue: "G'day, mate! I'm MC-BOT — your Robin Hood guide from KLEIGH, AUS. Say \"NEXT\" or tap → and I'll show you exactly what we've got. No pressure, just the good stuff.",
   },
@@ -66,6 +71,8 @@ const BOT_CONFIG: Record<BotName, {
     ringColor: 'ring-pink-400/60',
     emoji: '💌',
     voice: 'Lisa Farmer · IL, USA',
+    ttsPitch: 1.0,
+    ttsRate: 0.95,
     greeting: "Hi there — I'm LF-BOT, Lisa Farmer from Illinois. I'll walk you through every step nice and clear. Licensing, rights, deal questions — I turn all the complex stuff into plain English. Your work and your buyer's needs are fully respected here. Let's go!",
     firstVisitCue: "Hi! I'm LF-BOT — Lisa Farmer from IL. Say \"NEXT\" or tap → and I'll guide you through every step with warmth and clarity. Nothing complicated, I promise!",
   },
@@ -81,6 +88,8 @@ const BOT_CONFIG: Record<BotName, {
     ringColor: 'ring-emerald-400/60',
     emoji: '📊',
     voice: 'Founder · Normal, USA',
+    ttsPitch: 0.9,
+    ttsRate: 1.1,
     greeting: "GD-BOT online. Direct. Energetic. ALIVE! I'm the Founder — Normal, USA. I find the next best move for you right now: pricing, campaigns, K-KUT focus. Customer is always right, and the right move is always forward. Let's GO.",
     firstVisitCue: "GD-BOT online. ALIVE! I'm the Founder. Say \"NEXT\" or tap → and we level this up together. Direct, fast, and always rooting for you.",
   },
@@ -95,6 +104,8 @@ const BOT_CONFIG: Record<BotName, {
     ringColor: 'ring-violet-400/60',
     emoji: '✨',
     voice: 'PIXIE · Creative Stylist',
+    ttsPitch: 1.15,
+    ttsRate: 1.0,
     greeting: "Hi, I'm PIXIE-BOT ✨ Jane Burton, creative stylist and your guide to perfect music moments. I shape K-KUT experiences, curate PIXIE's PIX playlist, and help you find the exact note that speaks. Say \"NEXT\" or tap → and let's create something beautiful.",
     firstVisitCue: "I'm PIXIE-BOT ✨ Say \"NEXT\" or tap → and I'll shape your perfect music moment — personal, curated, exactly right.",
   },
@@ -228,8 +239,40 @@ export default function GpmBot({
   const [voiceStatus, setVoiceStatus] = useState('');
   const [isFirstVisit, setIsFirstVisit] = useState(false);
   const [moodAck, setMoodAck] = useState('');
+  const [ttsEnabled, setTtsEnabled] = useState(true);
+  const [isSpeaking, setIsSpeaking] = useState(false);
   const recognitionRef = useRef<any>(null);
   const stepRefs = useRef<(HTMLDivElement | null)[]>([]);
+
+  // ── TTS HELPER ────────────────────────────────────────────────────────────
+  const speak = useCallback((text: string) => {
+    if (typeof window === 'undefined' || !window.speechSynthesis) return;
+    if (!ttsEnabled) return;
+    // Cancel any in-progress utterance before speaking
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.pitch = profile.ttsPitch;
+    utterance.rate = profile.ttsRate;
+    utterance.volume = 1;
+    utterance.onstart = () => setIsSpeaking(true);
+    utterance.onend = () => setIsSpeaking(false);
+    utterance.onerror = () => setIsSpeaking(false);
+    window.speechSynthesis.speak(utterance);
+  }, [ttsEnabled, profile.ttsPitch, profile.ttsRate]);
+
+  // Load persisted TTS preference
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const saved = localStorage.getItem('gpmbot_tts');
+    if (saved === 'off') setTtsEnabled(false);
+  }, []);
+
+  // Persist TTS preference when it changes
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    localStorage.setItem('gpmbot_tts', ttsEnabled ? 'on' : 'off');
+    if (!ttsEnabled) window.speechSynthesis?.cancel();
+  }, [ttsEnabled]);
 
   // Detect first-time visitor and auto-expand with special greeting
   useEffect(() => {
@@ -263,15 +306,16 @@ export default function GpmBot({
     return () => window.removeEventListener('t20-mood-change', handler as EventListener);
   }, []);
 
-  // Show greeting bubble once on mount
+  // Show greeting bubble once on mount; speak it aloud
   useEffect(() => {
     if (isCollapsed) return;
     const t = setTimeout(() => {
       setShowGreeting(true);
       setGreeted(true);
+      speak(isFirstVisit ? profile.firstVisitCue : profile.greeting);
     }, 400);
     return () => clearTimeout(t);
-  }, [isCollapsed]);
+  }, [isCollapsed]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Auto-dismiss greeting after 6s
   useEffect(() => {
@@ -288,6 +332,25 @@ export default function GpmBot({
     }
     onStepChange?.(activeStep);
   }, [activeStep, onStepChange]);
+
+  // Speak the active step title + hint when the step changes (skip step 0 on mount — greeting already speaks)
+  const isFirstRenderRef = useRef(true);
+  useEffect(() => {
+    if (isFirstRenderRef.current) { isFirstRenderRef.current = false; return; }
+    const step = steps[activeStep];
+    const hint = BOT_STEP_HINTS[bot]?.[activeStep] ?? step?.hint ?? '';
+    const text = hint ? `${step.title}. ${hint}` : step.title;
+    speak(text);
+  }, [activeStep]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Cancel speech when bot is collapsed or unmounted
+  useEffect(() => {
+    if (isCollapsed) window.speechSynthesis?.cancel();
+  }, [isCollapsed]);
+
+  useEffect(() => {
+    return () => { window.speechSynthesis?.cancel(); };
+  }, []);
 
   // Keyboard navigation
   const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
@@ -413,6 +476,24 @@ export default function GpmBot({
           </div>
         </div>
         <div className="flex items-center gap-1.5">
+          {/* Speaking indicator / TTS mute toggle */}
+          <button
+            onClick={() => setTtsEnabled((v) => !v)}
+            className={`p-1.5 rounded-full transition-all ${
+              ttsEnabled && isSpeaking
+                ? 'animate-pulse'
+                : 'hover:bg-white/10'
+            }`}
+            style={ttsEnabled ? { background: `${profile.color}20`, color: profile.color } : {}}
+            aria-label={ttsEnabled ? 'Mute bot voice' : 'Unmute bot voice'}
+            title={ttsEnabled ? 'Bot voice on — click to mute' : 'Bot voice muted — click to unmute'}
+          >
+            {ttsEnabled ? (
+              <Volume2 className="w-3.5 h-3.5" style={{ color: profile.color }} />
+            ) : (
+              <VolumeX className="w-3.5 h-3.5 text-white/30" />
+            )}
+          </button>
           {/* Voice status flash */}
           {voiceStatus && (
             <span className="text-[9px] font-bold tracking-wider" style={{ color: profile.color }}>
