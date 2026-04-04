@@ -66,8 +66,8 @@ const BOT_CONFIG: Record<BotName, {
     ttsRate: 1.0,
     ttsLang: 'en-AU',
     greetingAudio: '/audio/mc_intro.m4a',
-    greeting: "G'day — I'm MC-BOT, your KLEIGH guide from AUS. Here's what we can do next together. Tap → and let's crack on. I'll show you the good stuff, mate — no hard sell, just the right moves.",
-    firstVisitCue: "G'day, mate! I'm MC-BOT — your Robin Hood guide from KLEIGH, AUS. Say \"NEXT\" or tap → and I'll show you exactly what we've got. No pressure, just the good stuff.",
+    greeting: "G'day — MC-BOT here, your KLEIGH guide from AUS. Stream live right now, or tap → to become one of the first people on Earth to hold a K-KUT. No hard sell — just the good stuff.",
+    firstVisitCue: "G'day, mate! I'm MC-BOT — KLEIGH, AUS. You've just stumbled onto something real: K-KUTs, mini-KUTs, and K-kUpIds — GPM's own inventions. Stream now, or make history. Say \"NEXT\" or tap → and I'll show you everything.",
   },
   /**
    * LF-BOT — Lisa Farmer, IL, USA
@@ -158,13 +158,14 @@ const BOT_CONFIG: Record<BotName, {
 const BOT_STEP_HINTS: Record<BotName, string[]> = {
   /**
    * MC-BOT — warm, roguish, Australian dialect, "Robin Hood" energy
+   * Embeds the invention story: 3 artists, ASCAP, charity/MSJ focus, first-ever recognition
    */
   'MC-BOT': [
-    "Right, let's have a look at what we've got, yeah? The catalog's stacked with Sweet Spots — those moments in a track that just wreck ya. Tell me your mood, your occasion, or your artist and I'll point you straight to the good stuff. No fuss.",
-    "A K-KUT is basically a musical shortcut, mate. Six characters — short enough to text. Opens the exact Sweet Spot — the hook, the bridge, the bit that hits. mini-KUTs do the same but stream a specific section. Both shareable in one tap. Robin Hood stuff, yeah?",
-    "K-kUpId is the gifting layer. Pick a track, choose your moment, generate a link. Or dress it up — romance skin, a jewellery capsule, a whole experience. Sounds flash but it's dead easy, I promise.",
-    "Tap the link. No app, no account, no faff whatsoever. Just tap and hear the exact Sweet Spot. That's the whole trick right there. Beautiful, isn't it?",
-    "Last song, mate. You've reached the destination, but the rhythm stays with you. Drive on. Music's always been the best gift — now you send exactly the right note. Bloody legend.",
+    "Stream GPM music right now — hit 'Stream Now' and you're in. Or tap 'Discover K-KUT' and become one of the first people on Earth to hold one. Three artists made every original you'll hear: Michael Scherer (jazz & pop composer), KLEIGH (pianist, canvas-painter, and performer), and Gregory D Putnam (lyricist, founder, and the one running all of this). Every song published by G Putnam Music, LLC in ASCAP. Real inventions. Real music. Your call, mate.",
+    "A K-KUT is an exact excerpt of a meaningful song moment — lyrical or instrumental. The hook, the bridge, the bit that wrecks ya. Six characters, short enough to text, opens that exact Sweet Spot. mini-KUTs stream a specific verse, chorus, or bridge. Every K-KUT holder right now is one of the first on Earth. Robin Hood stuff — and buyers are recognized.",
+    "K-kUpId is the gifting layer. Pick your track, choose your moment, generate the link — or dress it up with a romance skin, a jewellery capsule, or a full experience. Right now, most income runs through charity. The grave focus is on Michael Scherer and his family — a genuinely kind soul carrying overwhelming medical bills. What you buy today matters more than most purchases ever will.",
+    "Tap the link. No app. No account. No faff. Just tap and hear the exact Sweet Spot — that meaningful moment in a song that says what words can't. That's the invention, done beautifully.",
+    "Last song, mate. You've reached the destination, but the rhythm stays with you. Drive on. You're part of GPM history — a first-ever K-KUT holder, recognized. And what you gave today keeps Michael, KLEIGH, and all of us going. Bloody legend.",
   ],
 
   /**
@@ -220,40 +221,46 @@ const BOT_STEP_HINTS: Record<BotName, string[]> = {
 export interface JourneyStep {
   title: string;
   hint?: string;
-  /** Optional href — if set, the CTA button navigates there */
+  /** Optional href — if set, the primary CTA button navigates there */
   href?: string;
-  /** Optional action label for the CTA button */
+  /** Optional action label for the primary CTA button */
   action?: string;
+  /** Optional secondary CTA href — renders as a ghost/outline button alongside the primary */
+  altHref?: string;
+  /** Optional secondary CTA label */
+  altAction?: string;
 }
 
 export const DEFAULT_STEPS: JourneyStep[] = [
   {
-    title: 'Discover your music moment',
-    hint: 'You know that one moment in a song — the hook that wrecks you? We call that the Sweet Spot. Browse the catalog or tell me your mood, occasion, or artist.',
-    action: 'Browse Catalog',
+    title: 'Stream now — or discover a world first',
+    hint: "Stream GPM music instantly — no account needed. Or become one of the first people on Earth to hold a K-KUT, mini-KUT, or K-kUpId — GPM's own inventions. Every buyer is recognized. Your call.",
+    action: 'Stream Now ▶',
     href: '/#t20',
+    altHref: '/kupid',
+    altAction: 'Discover K-KUT →',
   },
   {
-    title: 'Choose a K-KUT or mini-KUT path',
-    hint: 'A K-KUT is a 6-character link — short enough to text — that opens a curated Sweet Spot. A mini-KUT streams a specific verse, bridge, or chorus. Both shareable in one tap.',
-    action: 'Explore K-KUTs',
+    title: 'The invention — K-KUT & mini-KUT',
+    hint: "A K-KUT is a 6-character link that opens the exact meaningful moment in an original song — lyrical or instrumental. A mini-KUT streams a specific verse or chorus. All originals from: Michael Scherer, KLEIGH, and Gregory D Putnam — every song published by G Putnam Music, LLC in ASCAP.",
+    action: 'K-KUT Tiers →',
     href: '/kupid',
   },
   {
     title: 'Generate or resolve your link',
-    hint: 'K-kUpId is the gifting layer. Pick your track. Choose your moment. Generate a link — or dress it up with a romance skin, a jewelry capsule, a whole experience.',
+    hint: "K-kUpId is the gifting layer. Pick your track. Choose your moment. Generate a link — or dress it up with a romance skin, a jewellery capsule, a whole experience. Every purchase supports the artists directly.",
     action: 'Create K-KUT',
     href: '/kkut/create',
   },
   {
     title: 'Open & play your experience',
-    hint: 'Tap the link. No app. No account. Just tap and hear the exact Sweet Spot. That\'s the whole move.',
+    hint: "Tap the link. No app. No account. Just tap and hear the exact Sweet Spot — the meaningful moment in a song that says what words can't. That's the invention.",
     action: 'Play a Track',
     href: '/k',
   },
   {
     title: 'Share or gift your K-kUpId',
-    hint: "Last song, mate. You've reached the destination, but the rhythm stays with you. Drive on. Music has always been the best gift — now you can send exactly the right note.",
+    hint: "You're part of GPM history — a first-ever K-KUT holder, recognized. Music has always been the best gift — now you can send exactly the right note. And what you gave today keeps the artists going.",
     action: 'Gift It',
     href: '/gift',
   },
@@ -748,6 +755,20 @@ export default function GpmBot({
                     onClick={(e) => e.stopPropagation()}
                   >
                     {step.action ?? 'Go'}
+                    <ChevronRight className="w-3 h-3" />
+                  </a>
+                )}
+                {isCurrent && step.altHref && (
+                  <a
+                    href={step.altHref}
+                    className="inline-flex items-center gap-1 mt-1 text-[10px] font-bold tracking-wider uppercase px-2.5 py-1 rounded-full transition-all hover:brightness-110"
+                    style={{
+                      color: profile.color,
+                      border: `1px solid ${profile.color}40`,
+                    }}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    {step.altAction ?? 'More'}
                     <ChevronRight className="w-3 h-3" />
                   </a>
                 )}
