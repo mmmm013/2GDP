@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { getActiveScheduledPromo } from '@/config/promoSchedule'
 
 async function rotatePromotion() {
   const supabase = createClient(
@@ -7,14 +8,42 @@ async function rotatePromotion() {
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   )
 
+  // ── 1. Check for an active scheduled promo first ──────────────────────────
+  const scheduledPromo = getActiveScheduledPromo()
+
+  if (scheduledPromo) {
+    // Upsert scheduled promo into active_promo table (or featured_rotation)
+    await supabase
+      .from('featured_rotation')
+      .upsert({
+        domain: 'gputnammusic.com',
+        promo_id: scheduledPromo.id,
+        promo_name: scheduledPromo.name,
+        promo_tagline: scheduledPromo.tagline,
+        promo_product_url: scheduledPromo.featuredProductUrl,
+        promo_gift_title: scheduledPromo.featuredGiftTitle,
+        sponsor_tier: scheduledPromo.sponsorTier,
+        source: 'scheduled',
+        updated_at: new Date().toISOString(),
+      })
+
+    return {
+      success: true,
+      source: 'scheduled',
+      promo: scheduledPromo.id,
+      tagline: scheduledPromo.tagline,
+    }
+  }
+
+  // ── 2. Fallback: random playlist rotation ────────────────────────────────
   const { data: current } = await supabase
     .from('featured_rotation')
     .select('current_playlist_id')
     .eq('domain', '2kleigh.com')
     .single()
 
-  const nextPlaylistId = current 
-    ? (current.current_playlist_id % 7) + 1 
+  const nextPlaylistId = current
+    ? (current.current_playlist_id % 7) + 1
     : 1
 
   await supabase
@@ -22,13 +51,15 @@ async function rotatePromotion() {
     .upsert({
       domain: '2kleigh.com',
       current_playlist_id: nextPlaylistId,
-      updated_at: new Date().toISOString()
+      source: 'random',
+      updated_at: new Date().toISOString(),
     })
 
   return {
     success: true,
+    source: 'random',
     previous_playlist: current?.current_playlist_id,
-    new_playlist: nextPlaylistId
+    new_playlist: nextPlaylistId,
   }
 }
 

@@ -21,6 +21,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/uru',
     '/valentines',
     '/scherer',
+    '/inventions',
+    '/kupid',
   ];
 
   return routes.map((route) => ({

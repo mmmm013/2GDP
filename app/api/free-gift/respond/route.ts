@@ -80,10 +80,47 @@ export async function POST(request: Request) {
     console.error('[free-gift/respond] counter increment error', rpcError)
   }
 
-  return NextResponse.json({
+  // Build response — include upsell CTA when user claims a free gift
+  const response: Record<string, unknown> = {
     responseId,
     issuanceId,
     action,
     respondedAt,
-  })
+  }
+
+  if (action === 'claim') {
+    // Fetch the issuance so we know which gift type was claimed
+    const { data: issuance } = await supabase
+      .from('free_gift_issuances')
+      .select('gift_type, gift_title')
+      .eq('id', issuanceId)
+      .single()
+
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://gputnammusic.com'
+
+    if (issuance?.gift_type === 'K-KUT' || issuance?.gift_type === 'mini-KUT') {
+      response.upsell = {
+        message: 'Love your free K-KUT? Unlock the full experience with your own locket.',
+        cta: 'Upgrade to a K-KUT Locket',
+        url: `${baseUrl}/kupid`,
+        type: 'upgrade',
+      }
+    } else if (issuance?.gift_type === 'K-kUpId') {
+      response.upsell = {
+        message: 'Your K-kUpId is ready. Pair it with a K-KUT for the ultimate gift experience.',
+        cta: 'Add a K-KUT',
+        url: `${baseUrl}/kupid`,
+        type: 'pair',
+      }
+    } else {
+      response.upsell = {
+        message: 'Discover the full GPM catalog — K-KUTs, mini-KUTs, and lockets.',
+        cta: 'Explore K-KUTs',
+        url: `${baseUrl}/kupid`,
+        type: 'explore',
+      }
+    }
+  }
+
+  return NextResponse.json(response)
 }

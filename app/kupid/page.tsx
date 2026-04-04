@@ -1,15 +1,55 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import GlobalPlayer from '@/components/GlobalPlayer';
 import Link from 'next/link';
 import { KUPID_TIERS } from '@/lib/kupid-protocol';
 import GpmBot, { type JourneyStep } from '@/components/GpmBot';
+import InventionBadge from '@/components/InventionBadge';
 
 export default function KupidPage() {
   const [isVDay, setIsVDay] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
+
+  // Audio preview state
+  const [previewLoading, setPreviewLoading] = useState(false);
+  const [previewTitle, setPreviewTitle] = useState<string | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  const stopPreview = useCallback(() => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current = null;
+    }
+    setPreviewTitle(null);
+  }, []);
+
+  const playExcerpt = useCallback(async () => {
+    if (previewLoading) return;
+    if (previewTitle) { stopPreview(); return; }
+
+    setPreviewLoading(true);
+    try {
+      const res = await fetch('/api/ww-excerpt');
+      if (!res.ok) return;
+      const data = await res.json() as { title?: string; previewUrl?: string };
+      if (!data.previewUrl) return;
+
+      stopPreview();
+      const audio = new Audio(data.previewUrl);
+      audio.volume = 0.8;
+      audio.play().catch(() => null);
+      audioRef.current = audio;
+      setPreviewTitle(data.title ?? 'W&W Excerpt');
+      audio.addEventListener('ended', stopPreview);
+    } finally {
+      setPreviewLoading(false);
+    }
+  }, [previewLoading, previewTitle, stopPreview]);
+
+  // Clean up on unmount
+  useEffect(() => () => stopPreview(), [stopPreview]);
 
   // K-KUT purchase journey steps for LF-BOT
   const kupidSteps: JourneyStep[] = [
@@ -62,9 +102,7 @@ export default function KupidPage() {
 
       {/* Hero Section */}
       <section className="pt-20 pb-6 px-4 text-center">
-        <span className="inline-block px-4 py-1 rounded-full text-xs font-bold tracking-widest uppercase bg-amber-500/20 text-amber-400 border border-amber-500/30 mb-4">
-          Patented Invention
-        </span>
+        <InventionBadge size="lg" href="/inventions" className="mx-auto mb-4" />
         <h1 className="text-5xl md:text-7xl font-bold mb-2 text-[#C8A882]">K-KUTs</h1>
         <p className="text-xl md:text-2xl bg-gradient-to-r from-amber-400 to-orange-500 bg-clip-text text-transparent font-semibold">
           Own the Sweet Spot
@@ -72,6 +110,28 @@ export default function KupidPage() {
         <p className="mt-4 text-white/60 max-w-lg mx-auto">
           Every track has a moment that moves you. K-KUTs capture that Sweet Spot &mdash; the curated highlight paired to a patent-pending locket or charm. It&apos;s almost like a hug, delivered through music.
         </p>
+
+        {/* W&W Audio Excerpt Preview */}
+        <div className="mt-5">
+          <button
+            onClick={playExcerpt}
+            disabled={previewLoading}
+            className={`inline-flex items-center gap-2 px-5 py-2 rounded-full border font-semibold text-sm transition-all ${
+              previewTitle
+                ? 'border-amber-400 bg-amber-400/20 text-amber-300'
+                : 'border-white/20 bg-white/5 text-white/70 hover:bg-white/10'
+            } disabled:opacity-50`}
+          >
+            {previewLoading ? (
+              <><span className="animate-spin">⟳</span> Loading excerpt…</>
+            ) : previewTitle ? (
+              <><span>⏹</span> Stop — {previewTitle}</>
+            ) : (
+              <><span>▶</span> Hear a W&amp;W excerpt</>
+            )}
+          </button>
+          <p className="text-[10px] text-white/30 mt-1.5">Random 30s clip from Wounded &amp; Willings PIX</p>
+        </div>
       </section>
 
       {/* V-Day Banner */}
@@ -136,6 +196,11 @@ export default function KupidPage() {
               <span className={`inline-block px-3 py-0.5 rounded text-[10px] font-bold tracking-widest bg-gradient-to-r ${tier.color} text-black w-fit mb-3`}>
                 {tier.badge}
               </span>
+              {(tier.id === 'mini-kut' || tier.id === 'klean-kut' || tier.id === 'genesis' || tier.id === 'sovereign') && (
+                <div className="mb-2">
+                  <InventionBadge size="sm" href="/inventions" />
+                </div>
+              )}
               <p className={`text-3xl font-bold bg-gradient-to-r ${tier.color} bg-clip-text text-transparent mb-1`}>
                 {tier.price}
               </p>
