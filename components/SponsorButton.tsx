@@ -4,7 +4,7 @@ import React from 'react';
 
 export default function SponsorButton() {
   // LINK FIXED: Kleigh SponsorCubs Payment Link
-  const STRIPE_LINK = "https://buy.stripe.com/4gM14n4KD8Zg1zI8Z09IQ03";
+  const STRIPE_LINK = "https://buy.stripe.com/4gM14n4KD8Zg1zI8ZO9IQ03";
 
   return (
     <div className="flex flex-col items-center justify-center py-8 bg-neutral-900/50 rounded-xl backdrop-blur-sm mx-4 my-8">
