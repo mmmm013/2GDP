@@ -1,12 +1,184 @@
+'use client';
+
+import { useState, useEffect, useRef, useCallback } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import KleighT20Grid from '@/components/KleighT20Grid';
 import { Mic2, BookOpen, Heart } from 'lucide-react';
 
-export const metadata = {
-  title: 'KLEIGH | G Putnam Music',
-  description: 'KLEIGH — The Legacy Collection. Become a KUB and stream the vault.',
-};
+// ─────────────────────────────────────────────────────────────────────────────
+// KLEIGH-BOT: Voice-activated step guide (MC-BOT persona, KLEIGH palette)
+// Placed in STI row (below Header) — mirrors gputnammusic.com McBot pattern.
+// Voice commands: next / back / vault / kub / join / go / done
+// ─────────────────────────────────────────────────────────────────────────────
+const BOT_STEPS = [
+  { title: 'Welcome to KLEIGH',    hint: 'The legacy vocal collection — all original tracks from KLEIGH. Say \'vault\' to stream or \'next\' to explore.', href: '#audio-vault' },
+  { title: 'Play The Vault',       hint: 'Stream KLEIGH PIX exclusively by mood. Every track is hand-picked and 100% original.', href: '#audio-vault' },
+  { title: '🐨 Become a KUB',     hint: 'KUB is KLEIGH\'s koala-tier sponsorship. Your support goes directly to the artist — real impact.', href: '/gift' },
+  { title: 'Behind The Music',     hint: 'Hear the stories, struggles, and turning points behind each vocal track — in his own words.', href: '#behind-music' },
+  { title: 'Join the Community',   hint: 'Connect with other KUBs and support the KLEIGH legacy. Community access starts here.', href: '/join' },
+];
+
+function KleighBot() {
+  const [step, setStep]       = useState(0);
+  const [collapsed, setColl]  = useState(false);
+  const [listening, setLis]   = useState(false);
+  const [voiceStatus, setVS]  = useState('');
+  const recRef                = useRef<any>(null);
+
+  const speak = useCallback((text: string) => {
+    if (typeof window === 'undefined' || !window.speechSynthesis) return;
+    const utt = new SpeechSynthesisUtterance(text);
+    utt.lang = 'en-AU'; utt.pitch = 1.1; utt.rate = 1.0;
+    window.speechSynthesis.cancel();
+    window.speechSynthesis.speak(utt);
+  }, []);
+
+  const handleCmd = useCallback((transcript: string) => {
+    const cmd = transcript.toLowerCase();
+    if (cmd.includes('next') || cmd.includes('forward'))     { setStep(s => Math.min(s + 1, BOT_STEPS.length - 1)); setVS('→ Next'); }
+    else if (cmd.includes('back') || cmd.includes('prev'))   { setStep(s => Math.max(s - 1, 0)); setVS('← Back'); }
+    else if (cmd.includes('done') || cmd.includes('collapse') || cmd.includes('close')) { setColl(true); setVS('Done ✓'); }
+    else if (cmd.includes('expand') || cmd.includes('open')) { setColl(false); setVS('Expanded'); }
+    else if (cmd.includes('vault') || cmd.includes('stream') || cmd.includes('play') || cmd.includes('music')) {
+      window.location.href = '#audio-vault'; setVS('Vault →');
+    }
+    else if (cmd.includes('kub') || cmd.includes('sponsor') || cmd.includes('koala') || cmd.includes('gift')) {
+      window.location.href = '/gift'; setVS('KUB →');
+    }
+    else if (cmd.includes('join') || cmd.includes('community') || cmd.includes('member')) {
+      window.location.href = '/join'; setVS('Join →');
+    }
+    else if (cmd.includes('go') || cmd.includes('action')) {
+      const href = BOT_STEPS[step]?.href;
+      if (href) window.location.href = href;
+      setVS('Going →');
+    }
+    setTimeout(() => setVS(''), 2000);
+  }, [step]);
+
+  // Proactive TTS greeting on first mount — once per session only
+  useEffect(() => {
+    if (typeof window === 'undefined' || !window.speechSynthesis) return;
+    if (sessionStorage.getItem('kleighbot_greeted')) return;
+    const timer = setTimeout(() => {
+      speak("G'day — KLEIGH vault is open. Say 'vault' to stream, 'kub' to become a sponsor, or 'next' to explore.");
+      sessionStorage.setItem('kleighbot_greeted', '1');
+    }, 1500);
+    return () => clearTimeout(timer);
+  }, [speak]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SR) return;
+    if (!recRef.current) {
+      const r = new SR();
+      r.continuous = true; r.lang = 'en-US'; r.interimResults = false;
+      r.onresult = (e: any) => handleCmd(e.results[e.results.length - 1][0].transcript);
+      r.onerror = () => {};
+      r.onend = () => { if (listening) { try { r.start(); } catch (_) {} } };
+      recRef.current = r;
+    }
+    if (listening) { try { recRef.current.start(); } catch (_) {} }
+    else { try { recRef.current.stop(); } catch (_) {} }
+    return () => { try { recRef.current?.stop(); } catch (_) {} };
+  }, [listening, handleCmd]);
+
+  const ACCENT = '#C8A882';
+  const BG     = '#2C241B';
+
+  if (collapsed) {
+    return (
+      <button onClick={() => setColl(false)}
+        className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs font-bold tracking-widest uppercase transition-all hover:brightness-110"
+        style={{ borderColor: `${ACCENT}40`, color: ACCENT, background: `${ACCENT}10` }}>
+        🤖 KLEIGH-BOT · STEP {step + 1}/{BOT_STEPS.length}
+        <span className="opacity-30 text-[9px]">🎤</span>
+        <span className="opacity-60">▼</span>
+      </button>
+    );
+  }
+
+  return (
+    <div className="w-full max-w-xs rounded-2xl border bg-black/80 backdrop-blur-md overflow-hidden"
+      style={{ borderColor: `${ACCENT}30` }}>
+      {/* Bot header */}
+      <div className="flex items-center justify-between px-4 py-3 border-b" style={{ borderColor: `${ACCENT}20`, background: `${ACCENT}08` }}>
+        <div className="flex items-center gap-2">
+          <span className="text-lg">🤖</span>
+          <div>
+            <span className="text-[10px] font-black tracking-[0.25em] uppercase" style={{ color: ACCENT }}>KLEIGH-BOT</span>
+            <span className="block text-[9px] text-white/40 tracking-widest uppercase">STEP {step + 1} OF {BOT_STEPS.length}</span>
+          </div>
+        </div>
+        <div className="flex items-center gap-1.5">
+          {voiceStatus && <span className="text-[9px] font-bold tracking-wider" style={{ color: ACCENT }}>{voiceStatus}</span>}
+          <button onClick={() => setLis(v => !v)}
+            className={`p-1.5 rounded-full transition-all ${listening ? 'animate-pulse' : 'hover:bg-white/10'}`}
+            style={listening ? { background: `${ACCENT}30`, color: ACCENT } : {}}
+            title={listening ? 'Voice active — say: vault / kub / join / next / back / go / done' : 'Enable voice control'}
+            aria-label={listening ? 'Stop voice control' : 'Start voice control'}>
+            <span className="text-sm">{listening ? '🎤' : '🎙️'}</span>
+          </button>
+          <button onClick={() => setColl(true)} className="p-1 rounded-full hover:bg-white/10 transition-colors" aria-label="Collapse">
+            <span className="text-white/40 text-xs">✕</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Steps */}
+      <div className="p-3 space-y-1.5">
+        {BOT_STEPS.map((s, i) => {
+          const active = i === step;
+          const done   = i < step;
+          return (
+            <button key={i} onClick={() => setStep(i)}
+              className={`w-full text-left rounded-xl px-3 py-2.5 transition-all ${active ? 'border' : done ? 'opacity-40' : 'opacity-50 hover:opacity-70'}`}
+              style={active ? { background: `${ACCENT}15`, borderColor: `${ACCENT}30` } : {}}>
+              <div className="flex items-start gap-2">
+                <span className="mt-0.5 text-xs font-bold" style={{ color: active ? ACCENT : done ? `${ACCENT}70` : '#ffffff40' }}>
+                  {done ? '✓' : active ? '▶' : String(i + 1)}
+                </span>
+                <div className="min-w-0 flex-1">
+                  <div className={`text-[11px] font-bold leading-tight ${active ? 'text-white' : 'text-white/60'}`}>{s.title}</div>
+                  {active && s.hint && <div className="text-[10px] text-white/50 mt-1 leading-relaxed">{s.hint}</div>}
+                </div>
+                {active && s.hint && (
+                  <div className="relative flex-shrink-0 w-2 h-2 mt-1 rounded-full" style={{ background: ACCENT }}>
+                    <div className="absolute inset-0 rounded-full animate-ping" style={{ background: `${ACCENT}60` }} />
+                  </div>
+                )}
+              </div>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Nav buttons */}
+      <div className="flex items-center justify-between gap-2 px-3 pb-3">
+        <button disabled={step === 0} onClick={() => setStep(s => s - 1)}
+          className="flex-1 py-2 rounded-xl text-[11px] font-bold uppercase tracking-wider border disabled:opacity-30 hover:bg-white/10 transition-all"
+          style={{ borderColor: `${ACCENT}20`, color: `${ACCENT}60` }}>
+          ← Back
+        </button>
+        {BOT_STEPS[step]?.href ? (
+          <a href={BOT_STEPS[step].href}
+            className="flex-1 py-2 rounded-xl text-[11px] font-bold uppercase tracking-wider text-center transition-all"
+            style={{ background: ACCENT, color: BG }}>
+            Go →
+          </a>
+        ) : (
+          <button disabled={step === BOT_STEPS.length - 1} onClick={() => setStep(s => s + 1)}
+            className="flex-1 py-2 rounded-xl text-[11px] font-bold uppercase tracking-wider disabled:opacity-30 transition-all"
+            style={{ background: ACCENT, color: BG }}>
+            Next →
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
 
 // BEHIND THE MUSIC: Vocalist stories from his own words
 const TRACK_STORIES = [
@@ -46,6 +218,11 @@ export default function KleighPage() {
   return (
     <main className="min-h-screen bg-[#FFFDF5] text-[#2C241B]">
       <Header />
+
+      {/* KLEIGH-BOT: voice-activated step guide (anchored top-right, STI row) */}
+      <div className="flex justify-end px-4 pt-3 pb-1">
+        <KleighBot />
+      </div>
 
       {/* ══════════════════════════════════════════════
           HERO — Artist KLEIGH
@@ -136,7 +313,7 @@ export default function KleighPage() {
       {/* ══════════════════════════════════════════════
           BEHIND THE MUSIC — BTI ASSETS
       ══════════════════════════════════════════════ */}
-      <section className="py-16 bg-[#2C241B] text-[#FFFDF5]">
+      <section id="behind-music" className="py-16 bg-[#2C241B] text-[#FFFDF5]">
         <div className="max-w-4xl mx-auto px-6">
           <div className="flex items-center gap-3 mb-10">
             <BookOpen size={28} className="text-[#C8A882]" />
