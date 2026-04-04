@@ -26,7 +26,7 @@ import { ChevronRight, ChevronDown, CheckCircle, Circle, Zap, X, Mic, MicOff, Vo
 // Bot config — mirrors BOT_PROFILES in /api/public/kkut-guide
 // ---------------------------------------------------------------------------
 
-export type BotName = 'MC-BOT' | 'LF-BOT' | 'GD-BOT' | 'PIXIE-BOT';
+export type BotName = 'MC-BOT' | 'LF-BOT' | 'GD-BOT' | 'PIXIE-BOT' | 'OPS-BOT';
 
 const BOT_CONFIG: Record<BotName, {
   label: string;
@@ -62,8 +62,8 @@ const BOT_CONFIG: Record<BotName, {
     voice: 'Your guide · KLEIGH, AUS',
     ttsPitch: 1.1,
     ttsRate: 1.0,
-    // Audio file to be added when KLEIGH vocal sample is available
-    greetingAudio: undefined,
+    /** Recorded vocal sample — KLEIGH / MC-BOT intro */
+    greetingAudio: '/audio/mc_intro.m4a',
     greeting: "G'day — I'm MC-BOT, your KLEIGH guide from AUS. Here's what we can do next together. Tap → and let's crack on. I'll show you the good stuff, mate — no hard sell, just the right moves.",
     firstVisitCue: "G'day, mate! I'm MC-BOT — your Robin Hood guide from KLEIGH, AUS. Say \"NEXT\" or tap → and I'll show you exactly what we've got. No pressure, just the good stuff.",
   },
@@ -106,6 +106,25 @@ const BOT_CONFIG: Record<BotName, {
     firstVisitCue: "GD-BOT online. ALIVE! I'm the Founder. Say \"NEXT\" or tap → and we level this up together. Direct, fast, and always rooting for you.",
   },
   /**
+   * OPS-BOT — Ops & Admin
+   * Efficient, no-nonsense operations guide. Handles admin tasks,
+   * account management, order status, and internal workflow support.
+   * Backs MC-BOT; escalates to LF-BOT for legal/deal questions.
+   */
+  'OPS-BOT': {
+    label: 'OPS-BOT',
+    color: '#93c5fd',
+    ringColor: 'ring-blue-400/60',
+    emoji: '⚙️',
+    voice: 'OPS-BOT · Ops & Admin',
+    ttsPitch: 1.0,
+    ttsRate: 1.05,
+    // Audio file to be added when OPS-BOT vocal sample is available
+    greetingAudio: undefined,
+    greeting: "OPS-BOT here. Let's keep things moving — I handle the admin side: accounts, order status, workflow questions, and anything that keeps the engine running. No fuss, just results. What do you need?",
+    firstVisitCue: "OPS-BOT online. I'm your operations guide — accounts, orders, workflow. Say \"NEXT\" or tap → and let's get it sorted.",
+  },
+  /**
    * PIXIE-BOT — Jane Burton / PIXIE
    * Creative micro-moment stylist. Shapes K-KUT and mKUT experiences.
    * Guides the gift flow, HERB BLOG, and PIXIE's PIX playlist.
@@ -118,8 +137,8 @@ const BOT_CONFIG: Record<BotName, {
     voice: 'PIXIE · Creative Stylist',
     ttsPitch: 1.15,
     ttsRate: 1.0,
-    // Audio file to be added when Jane Burton / PIXIE vocal sample is available
-    greetingAudio: undefined,
+    /** Recorded vocal sample — Jane Burton / PIXIE-BOT intro */
+    greetingAudio: '/audio/pixie_intro.m4a',
     greeting: "Hi, I'm PIXIE-BOT ✨ Jane Burton, creative stylist and your guide to perfect music moments. I shape K-KUT experiences, curate PIXIE's PIX playlist, and help you find the exact note that speaks. Say \"NEXT\" or tap → and let's create something beautiful.",
     firstVisitCue: "I'm PIXIE-BOT ✨ Say \"NEXT\" or tap → and I'll shape your perfect music moment — personal, curated, exactly right.",
   },
@@ -162,6 +181,17 @@ const BOT_STEP_HINTS: Record<BotName, string[]> = {
     "K-kUpId is your pricing and gifting engine. This is where you set the experience level — romance skin, full capsule, pricing tier. Every link you generate here is a campaign asset. Think about what that means for your catalog.",
     "Tap the link. That's the whole product. Zero friction. No account required. The Sweet Spot plays instantly. Customer is always right — and the right experience is always immediate.",
     "That's the destination. But the strategy doesn't stop here — this is where we plan the NEXT campaign, the next K-KUT drop, the next level. You've got the tools. The rhythm stays with you. Drive on.",
+  ],
+
+  /**
+   * OPS-BOT — Efficient, Ops & Admin, workflow and account support
+   */
+  'OPS-BOT': [
+    "Let's locate what you need. Browse the catalog or share your order number, account question, or workflow task and I'll route it to the right place fast.",
+    "K-KUTs and mini-KUTs are fulfilled instantly after generation — no manual steps. If you need to track a link, pull up a license record, or confirm a delivery, I can look that up right now.",
+    "K-kUpId gift links are auto-resolved at the point of tap. If anything needs manual review — a billing question, a delivery issue — flag it here and I'll get it handled.",
+    "Tap the link to confirm it resolves correctly. If anything's off — wrong track, wrong moment, access issue — let me know and I'll sort it immediately.",
+    "All done. Order closed, workflow clear. If anything comes up — account, billing, license, delivery — OPS-BOT is here. Keep the rhythm going.",
   ],
 
   /**
