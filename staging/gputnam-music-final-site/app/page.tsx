@@ -147,11 +147,11 @@ function GpmFooter() {
 // MC-BOT: Voice-activated step guide (voice: next / back / go / done)
 // ─────────────────────────────────────────────────────────────────────────────
 const BOT_STEPS = [
-  { title: 'Welcome to G Putnam Music',     hint: 'Stream original music, gift tracks, or join as a sponsor. Everything here is 100% original.' },
+  { title: 'Welcome to G Putnam Music',     hint: 'Stream original music, gift tracks, or join as a sponsor. Everything here is 100% original.', href: '#stream' },
   { title: 'Browse the catalog',            hint: 'Explore tracks by mood, artist, or activity. The T20 grid below shows what\'s streaming right now.', href: '/artists' },
   { title: 'Give a K-KUT as a gift',        hint: 'Buy a micro-license for any track and gift it to someone special.', href: '/gift' },
   { title: 'Become a sponsor',              hint: 'Support original music directly. Sponsors get exclusive early access and rewards.', href: '/join' },
-  { title: 'Play a track',                  hint: 'Tap any card below or use the stream player to hear what\'s on right now.' },
+  { title: 'Play a track',                  hint: 'Tap any card below or use the stream player to hear what\'s on right now.', href: '#stream' },
 ];
 
 function McBot() {
@@ -174,6 +174,22 @@ function McBot() {
     }
     setTimeout(() => setVS(''), 2000);
   }, [step]);
+
+  // Proactive TTS greeting on first mount (MC-BOT speaks to the visitor automatically)
+  useEffect(() => {
+    if (typeof window === 'undefined' || !window.speechSynthesis) return;
+    const timer = setTimeout(() => {
+      const utt = new SpeechSynthesisUtterance(
+        "G'day — MC-BOT here. " + BOT_STEPS[0].hint + " Tap 'Go' to stream now, or say 'next' to keep going."
+      );
+      utt.lang = 'en-AU';
+      utt.pitch = 1.1;
+      utt.rate = 1.0;
+      window.speechSynthesis.cancel();
+      window.speechSynthesis.speak(utt);
+    }, 1500);
+    return () => clearTimeout(timer);
+  }, []); // fire once on mount
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -352,7 +368,14 @@ function HomeFP() {
             )}
           </>
         ) : (
-          <div className="text-[#C8A882]/40 text-sm">Stream unavailable — check ENV config.</div>
+          <div className="space-y-3">
+            <div className="text-[#C8A882]/40 text-sm">Stream unavailable — check ENV config.</div>
+            <a href="/artists"
+              className="inline-block px-4 py-2 rounded-xl text-[11px] font-bold uppercase tracking-widest transition-all"
+              style={{ background: '#D4A017', color: '#1a1207' }}>
+              Browse Catalog →
+            </a>
+          </div>
         )}
       </div>
 
@@ -513,7 +536,7 @@ export default function HomePage() {
         </div>
 
         {/* RIGHT: GPM Featured Playlist — non-stop stream */}
-        <div className="flex flex-col justify-center bg-[#110d06] border-l border-[#5C3A1E]/20">
+        <div id="stream" className="flex flex-col justify-center bg-[#110d06] border-l border-[#5C3A1E]/20">
           <HomeFP />
         </div>
       </section>
