@@ -41,6 +41,12 @@ const BOT_CONFIG: Record<BotName, {
   /** TTS tuning — pitch (0.5–2) and rate (0.5–2) for this persona */
   ttsPitch: number;
   ttsRate: number;
+  /**
+   * Real recorded audio file for the greeting (served from /public/audio/).
+   * When set, the audio file plays first; SpeechSynthesis fires only as fallback
+   * if the file fails to load or the browser blocks autoplay.
+   */
+  greetingAudio?: string;
 }> = {
   /**
    * MC-BOT — KLEIGH, AUS
@@ -56,6 +62,8 @@ const BOT_CONFIG: Record<BotName, {
     voice: 'Your guide · KLEIGH, AUS',
     ttsPitch: 1.1,
     ttsRate: 1.0,
+    // Audio file to be added when KLEIGH vocal sample is available
+    greetingAudio: undefined,
     greeting: "G'day — I'm MC-BOT, your KLEIGH guide from AUS. Here's what we can do next together. Tap → and let's crack on. I'll show you the good stuff, mate — no hard sell, just the right moves.",
     firstVisitCue: "G'day, mate! I'm MC-BOT — your Robin Hood guide from KLEIGH, AUS. Say \"NEXT\" or tap → and I'll show you exactly what we've got. No pressure, just the good stuff.",
   },
@@ -73,6 +81,8 @@ const BOT_CONFIG: Record<BotName, {
     voice: 'Lisa Farmer · IL, USA',
     ttsPitch: 1.0,
     ttsRate: 0.95,
+    /** Recorded vocal sample — Lisa C. Farmer (LF-BOT) intro */
+    greetingAudio: '/audio/lcf_intro.m4a',
     greeting: "Hi there — I'm LF-BOT, Lisa Farmer from Illinois. I'll walk you through every step nice and clear. Licensing, rights, deal questions — I turn all the complex stuff into plain English. Your work and your buyer's needs are fully respected here. Let's go!",
     firstVisitCue: "Hi! I'm LF-BOT — Lisa Farmer from IL. Say \"NEXT\" or tap → and I'll guide you through every step with warmth and clarity. Nothing complicated, I promise!",
   },
@@ -90,6 +100,8 @@ const BOT_CONFIG: Record<BotName, {
     voice: 'Founder · Normal, USA',
     ttsPitch: 0.9,
     ttsRate: 1.1,
+    /** Recorded vocal sample — Greg Putnam / Founder (GD-BOT) intro */
+    greetingAudio: '/audio/gpm_intro.m4a',
     greeting: "GD-BOT online. Direct. Energetic. ALIVE! I'm the Founder — Normal, USA. I find the next best move for you right now: pricing, campaigns, K-KUT focus. Customer is always right, and the right move is always forward. Let's GO.",
     firstVisitCue: "GD-BOT online. ALIVE! I'm the Founder. Say \"NEXT\" or tap → and we level this up together. Direct, fast, and always rooting for you.",
   },
@@ -106,6 +118,8 @@ const BOT_CONFIG: Record<BotName, {
     voice: 'PIXIE · Creative Stylist',
     ttsPitch: 1.15,
     ttsRate: 1.0,
+    // Audio file to be added when Jane Burton / PIXIE vocal sample is available
+    greetingAudio: undefined,
     greeting: "Hi, I'm PIXIE-BOT ✨ Jane Burton, creative stylist and your guide to perfect music moments. I shape K-KUT experiences, curate PIXIE's PIX playlist, and help you find the exact note that speaks. Say \"NEXT\" or tap → and let's create something beautiful.",
     firstVisitCue: "I'm PIXIE-BOT ✨ Say \"NEXT\" or tap → and I'll shape your perfect music moment — personal, curated, exactly right.",
   },
@@ -243,6 +257,8 @@ export default function GpmBot({
   const [isSpeaking, setIsSpeaking] = useState(false);
   const recognitionRef = useRef<any>(null);
   const stepRefs = useRef<(HTMLDivElement | null)[]>([]);
+  /** Dedicated <audio> element for the real recorded greeting sample */
+  const greetingAudioRef = useRef<HTMLAudioElement | null>(null);
 
   // ── TTS HELPER ────────────────────────────────────────────────────────────
   const speak = useCallback((text: string) => {
@@ -260,6 +276,45 @@ export default function GpmBot({
     window.speechSynthesis.speak(utterance);
   }, [ttsEnabled, profile.ttsPitch, profile.ttsRate]);
 
+  // ── GREETING AUDIO HELPER ─────────────────────────────────────────────────
+  /**
+   * Play the bot's real recorded greeting audio (if one exists).
+   * Falls back to SpeechSynthesis if:
+   *   - No greetingAudio path is configured
+   *   - The audio element fails to load / autoplay is blocked
+   *   - TTS is muted (neither plays)
+   */
+  const playGreeting = useCallback((text: string) => {
+    if (!ttsEnabled) return;
+    const src = profile.greetingAudio;
+    if (src) {
+      // Re-use or create the greeting audio element
+      if (!greetingAudioRef.current) {
+        greetingAudioRef.current = new Audio();
+      }
+      const audio = greetingAudioRef.current;
+      audio.src = src;
+      audio.volume = 1;
+      audio.onplay = () => setIsSpeaking(true);
+      audio.onended = () => setIsSpeaking(false);
+      audio.onerror = () => {
+        // Audio file failed — fall back to SpeechSynthesis
+        setIsSpeaking(false);
+        speak(text);
+      };
+      const playPromise = audio.play();
+      if (playPromise !== undefined) {
+        playPromise.catch(() => {
+          // Autoplay blocked — fall back to SpeechSynthesis
+          speak(text);
+        });
+      }
+    } else {
+      // No recorded sample for this bot — use SpeechSynthesis
+      speak(text);
+    }
+  }, [ttsEnabled, profile.greetingAudio, speak]);
+
   // Load persisted TTS preference
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -267,11 +322,17 @@ export default function GpmBot({
     if (saved === 'off') setTtsEnabled(false);
   }, []);
 
-  // Persist TTS preference when it changes
+  // Persist TTS preference when it changes; stop all audio when muted
   useEffect(() => {
     if (typeof window === 'undefined') return;
     localStorage.setItem('gpmbot_tts', ttsEnabled ? 'on' : 'off');
-    if (!ttsEnabled) window.speechSynthesis?.cancel();
+    if (!ttsEnabled) {
+      window.speechSynthesis?.cancel();
+      if (greetingAudioRef.current) {
+        greetingAudioRef.current.pause();
+        greetingAudioRef.current.currentTime = 0;
+      }
+    }
   }, [ttsEnabled]);
 
   // Detect first-time visitor and auto-expand with special greeting
@@ -306,13 +367,13 @@ export default function GpmBot({
     return () => window.removeEventListener('t20-mood-change', handler as EventListener);
   }, []);
 
-  // Show greeting bubble once on mount; speak it aloud
+  // Show greeting bubble once on mount; play real audio then TTS fallback
   useEffect(() => {
     if (isCollapsed) return;
     const t = setTimeout(() => {
       setShowGreeting(true);
       setGreeted(true);
-      speak(isFirstVisit ? profile.firstVisitCue : profile.greeting);
+      playGreeting(isFirstVisit ? profile.firstVisitCue : profile.greeting);
     }, 400);
     return () => clearTimeout(t);
   }, [isCollapsed]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -343,13 +404,25 @@ export default function GpmBot({
     speak(text);
   }, [activeStep]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Cancel speech when bot is collapsed or unmounted
+  // Cancel all audio when bot is collapsed or unmounted
   useEffect(() => {
-    if (isCollapsed) window.speechSynthesis?.cancel();
+    if (isCollapsed) {
+      window.speechSynthesis?.cancel();
+      if (greetingAudioRef.current) {
+        greetingAudioRef.current.pause();
+        greetingAudioRef.current.currentTime = 0;
+      }
+    }
   }, [isCollapsed]);
 
   useEffect(() => {
-    return () => { window.speechSynthesis?.cancel(); };
+    return () => {
+      window.speechSynthesis?.cancel();
+      if (greetingAudioRef.current) {
+        greetingAudioRef.current.pause();
+        greetingAudioRef.current.src = '';
+      }
+    };
   }, []);
 
   // Keyboard navigation
