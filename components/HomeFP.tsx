@@ -355,7 +355,7 @@ export default function HomeFP() {
     const onStartSession = (e: CustomEvent) => {
       // Re-shuffle queue when a T20 tile starts a session
       if (queue.length > 0) {
-        const played = new Set(Array.from(playedAtRef.current.keys()));
+        const played = new Set<string>(Array.from(playedAtRef.current.keys()) as string[]);
         setQueue(buildT20Queue(queue, played));
         setQueueIndex(0);
         setIsPlaying(true);
