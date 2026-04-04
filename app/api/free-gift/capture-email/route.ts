@@ -8,17 +8,53 @@
  *   issuanceId   string  required  UUID of the free_gift_issuances row
  *   email        string  required  User's email address
  *   sessionId    string  optional  Caller-supplied session ID
+ *
+ * Rate-limit: 5 requests per IP per 15-minute window (in-memory, resets on cold start).
  */
 
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { randomUUID } from 'crypto'
+
+// ---------------------------------------------------------------------------
+// Simple in-process IP rate limiter
+// ---------------------------------------------------------------------------
+const RATE_WINDOW_MS = 15 * 60 * 1000 // 15 minutes
+const RATE_LIMIT     = 5               // max requests per window per IP
+
+interface RateEntry { count: number; windowStart: number }
+const rateMap = new Map<string, RateEntry>()
+
+function isRateLimited(ip: string): boolean {
+  const now  = Date.now()
+  const entry = rateMap.get(ip)
+  if (!entry || now - entry.windowStart > RATE_WINDOW_MS) {
+    rateMap.set(ip, { count: 1, windowStart: now })
+    return false
+  }
+  entry.count++
+  return entry.count > RATE_LIMIT
+}
+
+function getClientIp(req: NextRequest): string {
+  return (
+    req.headers.get('x-forwarded-for')?.split(',')[0].trim() ??
+    req.headers.get('x-real-ip') ??
+    'unknown'
+  )
+}
+// ---------------------------------------------------------------------------
 
 function isValidEmail(email: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
 }
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
+  const ip = getClientIp(request)
+  if (isRateLimited(ip)) {
+    return NextResponse.json({ error: 'Too many requests. Please try again later.' }, { status: 429 })
+  }
+
   let body: Record<string, unknown>
   try {
     body = await request.json()
