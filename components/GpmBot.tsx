@@ -20,6 +20,7 @@
  */
 
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import { ChevronRight, ChevronDown, CheckCircle, Circle, Zap, X, Mic, MicOff, Volume2, VolumeX } from 'lucide-react';
 
 // ---------------------------------------------------------------------------
@@ -38,9 +39,10 @@ const BOT_CONFIG: Record<BotName, {
   firstVisitCue: string;
   /** Voice/persona descriptor shown as a sub-label */
   voice: string;
-  /** TTS tuning — pitch (0.5–2) and rate (0.5–2) for this persona */
+  /** TTS tuning — pitch (0.5–2), rate (0.5–2), and BCP-47 lang tag for this persona */
   ttsPitch: number;
   ttsRate: number;
+  ttsLang: string;
   /**
    * Real recorded audio file for the greeting (served from /public/audio/).
    * When set, the audio file plays first; SpeechSynthesis fires only as fallback
@@ -62,7 +64,7 @@ const BOT_CONFIG: Record<BotName, {
     voice: 'Your guide · KLEIGH, AUS',
     ttsPitch: 1.1,
     ttsRate: 1.0,
-    /** Recorded vocal sample — KLEIGH / MC-BOT intro */
+    ttsLang: 'en-AU',
     greetingAudio: '/audio/mc_intro.m4a',
     greeting: "G'day — I'm MC-BOT, your KLEIGH guide from AUS. Here's what we can do next together. Tap → and let's crack on. I'll show you the good stuff, mate — no hard sell, just the right moves.",
     firstVisitCue: "G'day, mate! I'm MC-BOT — your Robin Hood guide from KLEIGH, AUS. Say \"NEXT\" or tap → and I'll show you exactly what we've got. No pressure, just the good stuff.",
@@ -81,6 +83,7 @@ const BOT_CONFIG: Record<BotName, {
     voice: 'Lisa Farmer · IL, USA',
     ttsPitch: 1.0,
     ttsRate: 0.95,
+    ttsLang: 'en-US',
     /** Recorded vocal sample — Lisa C. Farmer (LF-BOT) intro */
     greetingAudio: '/audio/lcf_intro.m4a',
     greeting: "Hi there — I'm LF-BOT, Lisa Farmer from Illinois. I'll walk you through every step nice and clear. Licensing, rights, deal questions — I turn all the complex stuff into plain English. Your work and your buyer's needs are fully respected here. Let's go!",
@@ -100,6 +103,7 @@ const BOT_CONFIG: Record<BotName, {
     voice: 'Founder · Normal, USA',
     ttsPitch: 0.9,
     ttsRate: 1.1,
+    ttsLang: 'en-US',
     /** Recorded vocal sample — Greg Putnam / Founder (GD-BOT) intro */
     greetingAudio: '/audio/gpm_intro.m4a',
     greeting: "GD-BOT online. Direct. Energetic. ALIVE! I'm the Founder — Normal, USA. I find the next best move for you right now: pricing, campaigns, K-KUT focus. Customer is always right, and the right move is always forward. Let's GO.",
@@ -119,6 +123,7 @@ const BOT_CONFIG: Record<BotName, {
     voice: 'OPS-BOT · Ops & Admin',
     ttsPitch: 1.0,
     ttsRate: 1.05,
+    ttsLang: 'en-US',
     // Audio file to be added when OPS-BOT vocal sample is available
     greetingAudio: undefined,
     greeting: "OPS-BOT here. Let's keep things moving — I handle the admin side: accounts, order status, workflow questions, and anything that keeps the engine running. No fuss, just results. What do you need?",
@@ -137,6 +142,7 @@ const BOT_CONFIG: Record<BotName, {
     voice: 'PIXIE · Creative Stylist',
     ttsPitch: 1.15,
     ttsRate: 1.0,
+    ttsLang: 'en-GB',
     /** Recorded vocal sample — Jane Burton / PIXIE-BOT intro */
     greetingAudio: '/audio/pixie_intro.m4a',
     greeting: "Hi, I'm PIXIE-BOT ✨ Jane Burton, creative stylist and your guide to perfect music moments. I shape K-KUT experiences, curate PIXIE's PIX playlist, and help you find the exact note that speaks. Say \"NEXT\" or tap → and let's create something beautiful.",
@@ -274,6 +280,7 @@ export default function GpmBot({
   className = '',
 }: GpmBotProps) {
   const profile = BOT_CONFIG[bot];
+  const router = useRouter();
 
   const [activeStep, setActiveStep] = useState(0);
   const [isCollapsed, setIsCollapsed] = useState(startCollapsed);
@@ -289,6 +296,8 @@ export default function GpmBot({
   const stepRefs = useRef<(HTMLDivElement | null)[]>([]);
   /** Dedicated <audio> element for the real recorded greeting sample */
   const greetingAudioRef = useRef<HTMLAudioElement | null>(null);
+  /** Ref mirror of isListening — lets onend read current value without stale closure */
+  const isListeningRef = useRef(false);
 
   // ── TTS HELPER ────────────────────────────────────────────────────────────
   const speak = useCallback((text: string) => {
@@ -297,6 +306,7 @@ export default function GpmBot({
     // Cancel any in-progress utterance before speaking
     window.speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = profile.ttsLang;
     utterance.pitch = profile.ttsPitch;
     utterance.rate = profile.ttsRate;
     utterance.volume = 1;
@@ -304,7 +314,7 @@ export default function GpmBot({
     utterance.onend = () => setIsSpeaking(false);
     utterance.onerror = () => setIsSpeaking(false);
     window.speechSynthesis.speak(utterance);
-  }, [ttsEnabled, profile.ttsPitch, profile.ttsRate]);
+  }, [ttsEnabled, profile.ttsLang, profile.ttsPitch, profile.ttsRate]);
 
   // ── GREETING AUDIO HELPER ─────────────────────────────────────────────────
   /**
@@ -397,9 +407,15 @@ export default function GpmBot({
     return () => window.removeEventListener('t20-mood-change', handler as EventListener);
   }, []);
 
+  // Keep isListeningRef in sync so SpeechRecognition onend reads current value
+  useEffect(() => {
+    isListeningRef.current = isListening;
+  }, [isListening]);
+
   // Show greeting bubble once on mount; play real audio then TTS fallback
   useEffect(() => {
     if (isCollapsed) return;
+    if (greeted) return; // prevent re-firing every time the bot is expanded
     const t = setTimeout(() => {
       setShowGreeting(true);
       setGreeted(true);
@@ -480,13 +496,13 @@ export default function GpmBot({
       setIsCollapsed(false);
       setVoiceStatus('Expanded');
     } else if (cmd.includes('go') || cmd.includes('action') || cmd.includes('click')) {
-      // trigger the current step's href if available
+      // trigger the current step's href via Next.js router (no full-page reload)
       const step = steps[activeStep];
-      if (step?.href) window.location.href = step.href;
+      if (step?.href) router.push(step.href);
       setVoiceStatus('Going →');
     }
     setTimeout(() => setVoiceStatus(''), 2000);
-  }, [steps, activeStep]);
+  }, [steps, activeStep, router]);
 
   // Set up / tear down SpeechRecognition when isListening changes
   useEffect(() => {
@@ -499,16 +515,25 @@ export default function GpmBot({
       r.continuous = true;
       r.lang = 'en-US';
       r.interimResults = false;
-      r.onresult = (event: any) => {
-        const t = event.results[event.results.length - 1][0].transcript;
-        handleVoiceCommand(t);
+      // onerror: surface feedback and reset the mic toggle
+      r.onerror = () => {
+        setIsListening(false);
+        setVoiceStatus('Mic error');
+        setTimeout(() => setVoiceStatus(''), 2000);
       };
-      r.onerror = () => { /* silent */ };
+      // onend: restart if still in listening mode — read via ref to avoid stale closure
       r.onend = () => {
-        if (isListening) { try { r.start(); } catch (_) { /* already started */ } }
+        if (isListeningRef.current) { try { r.start(); } catch (_) { /* already started */ } }
       };
       recognitionRef.current = r;
     }
+
+    // Always refresh onresult with the latest handleVoiceCommand closure
+    // (recognitionRef.current is created once; onresult must be updated each render)
+    recognitionRef.current.onresult = (event: any) => {
+      const t = event.results[event.results.length - 1][0].transcript;
+      handleVoiceCommand(t);
+    };
 
     if (isListening) {
       try { recognitionRef.current.start(); } catch (_) { /* already running */ }
