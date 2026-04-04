@@ -37,6 +37,30 @@ export async function POST(req: NextRequest) {
       break;
     }
 
+    case 'customer.subscription.deleted': {
+      const sub = event.data.object as Stripe.Subscription;
+      const { error } = await supabaseAdmin
+        .from('gpm_donations')
+        .update({ status: 'cancelled' })
+        .eq('stripe_customer_id', sub.customer as string);
+      if (error) console.error('[webhook] Failed to mark subscription cancelled:', error);
+      break;
+    }
+
+    case 'invoice.payment_failed': {
+      const invoice = event.data.object as Stripe.Invoice;
+      const customerId =
+        typeof invoice.customer === 'string' ? invoice.customer : invoice.customer?.id;
+      if (customerId) {
+        const { error } = await supabaseAdmin
+          .from('gpm_donations')
+          .update({ status: 'payment_failed' })
+          .eq('stripe_customer_id', customerId);
+        if (error) console.error('[webhook] Failed to mark invoice payment_failed:', error);
+      }
+      break;
+    }
+
     default:
       console.log(`Unhandled event type: ${event.type}`);
   }
@@ -48,7 +72,33 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
   const tier = session.metadata?.tier;
   if (!tier) return;
 
-  // Idempotency guard: skip if this session was already completed
+  const donorEmail =
+    session.customer_email ||
+    session.metadata?.donorEmail ||
+    null;
+
+  // Subscriptions: no pending record was created upfront — INSERT now
+  if (session.mode === 'subscription') {
+    const { error } = await supabaseAdmin.from('gpm_donations').upsert(
+      {
+        stripe_session_id: session.id,
+        stripe_customer_id: session.customer as string,
+        donor_email: donorEmail,
+        tier,
+        status: 'completed',
+        completed_at: new Date().toISOString(),
+        amount_cents: 0,
+        is_anonymous: false,
+        grand_prize_eligible: false,
+      },
+      { onConflict: 'stripe_session_id' }
+    );
+    if (error) console.error('[webhook] Failed to upsert subscription record:', error);
+    console.log(`Subscription completed: ${tier} tier, session ${session.id}`);
+    return;
+  }
+
+  // One-time payment: update the pending record inserted at checkout creation
   const { data: existing } = await supabaseAdmin
     .from('gpm_donations')
     .select('status')
@@ -66,6 +116,8 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     .update({
       status: 'completed',
       stripe_payment_intent: session.payment_intent as string,
+      stripe_customer_id: (session.customer as string) || null,
+      donor_email: donorEmail,
       completed_at: new Date().toISOString(),
     })
     .eq('stripe_session_id', session.id);

@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
   const { data: donation } = await supabase
     .from('gpm_donations')
     .select('stripe_customer_id')
-    .eq('email', email)
+    .eq('donor_email', email)
     .not('stripe_customer_id', 'is', null)
     .order('created_at', { ascending: false })
     .limit(1)
