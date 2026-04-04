@@ -18,7 +18,7 @@ const TIER_LABELS: Record<string, string> = {
 export async function POST(req: NextRequest) {
   const Stripe = (await import('stripe')).default;
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-    apiVersion: '2025-12-15.clover',
+    apiVersion: '2026-02-25.clover',
   });
   try {
     const body = await req.json();
