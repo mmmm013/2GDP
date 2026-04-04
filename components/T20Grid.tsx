@@ -196,6 +196,9 @@ export default function T20Grid() {
     // Notify MC-BOT of mood shift via custom event
     window.dispatchEvent(new CustomEvent('t20-mood-change', { detail: { mood: activity.label, emoji: activity.emoji } }));
 
+    // Start T20 session — HomeFP picks this up to initialise the 2-hr queue
+    window.dispatchEvent(new CustomEvent('start-t20-session', { detail: { mood: activity.mood, label: activity.label, emoji: activity.emoji } }));
+
     const sb = sbRef.current;
     if (!sb) return;
 
