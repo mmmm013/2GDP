@@ -26,7 +26,7 @@ import { ChevronRight, ChevronDown, CheckCircle, Circle, Zap, X, Mic, MicOff } f
 // Bot config — mirrors BOT_PROFILES in /api/public/kkut-guide
 // ---------------------------------------------------------------------------
 
-export type BotName = 'MC-BOT' | 'LF-BOT' | 'GD-BOT' | 'PIXIE-BOT';
+export type BotName = 'MC-BOT' | 'LF-BOT' | 'GD-BOT' | 'PIXIE-BOT' | 'OPS-BOT';
 
 const BOT_CONFIG: Record<BotName, {
   label: string;
@@ -38,6 +38,8 @@ const BOT_CONFIG: Record<BotName, {
   firstVisitCue: string;
   /** Voice/persona descriptor shown as a sub-label */
   voice: string;
+  /** Optional greeting audio file path — played once on mount. Falls back to SpeechSynthesis. */
+  greetingAudio?: string;
 }> = {
   /**
    * MC-BOT — KLEIGH, AUS
@@ -53,6 +55,7 @@ const BOT_CONFIG: Record<BotName, {
     voice: 'Your guide · KLEIGH, AUS',
     greeting: "G'day — I'm MC-BOT, your KLEIGH guide from AUS. Here's what we can do next together. Tap → and let's crack on. I'll show you the good stuff, mate — no hard sell, just the right moves.",
     firstVisitCue: "G'day, mate! I'm MC-BOT — your Robin Hood guide from KLEIGH, AUS. Say \"NEXT\" or tap → and I'll show you exactly what we've got. No pressure, just the good stuff.",
+    greetingAudio: '/audio/mc_intro.m4a',
   },
   /**
    * LF-BOT — Lisa Farmer, IL, USA
@@ -62,12 +65,13 @@ const BOT_CONFIG: Record<BotName, {
    */
   'LF-BOT': {
     label: 'LF-BOT',
-    color: '#f9a8d4',
-    ringColor: 'ring-pink-400/60',
+    color: '#4ade80',
+    ringColor: 'ring-green-400/60',
     emoji: '💌',
     voice: 'Lisa Farmer · IL, USA',
     greeting: "Hi there — I'm LF-BOT, Lisa Farmer from Illinois. I'll walk you through every step nice and clear. Licensing, rights, deal questions — I turn all the complex stuff into plain English. Your work and your buyer's needs are fully respected here. Let's go!",
     firstVisitCue: "Hi! I'm LF-BOT — Lisa Farmer from IL. Say \"NEXT\" or tap → and I'll guide you through every step with warmth and clarity. Nothing complicated, I promise!",
+    greetingAudio: '/audio/lcf_intro.m4a',
   },
   /**
    * GD-BOT — Founder, Normal, USA
@@ -83,6 +87,7 @@ const BOT_CONFIG: Record<BotName, {
     voice: 'Founder · Normal, USA',
     greeting: "GD-BOT online. Direct. Energetic. ALIVE! I'm the Founder — Normal, USA. I find the next best move for you right now: pricing, campaigns, K-KUT focus. Customer is always right, and the right move is always forward. Let's GO.",
     firstVisitCue: "GD-BOT online. ALIVE! I'm the Founder. Say \"NEXT\" or tap → and we level this up together. Direct, fast, and always rooting for you.",
+    greetingAudio: '/audio/gpm_intro.m4a',
   },
   /**
    * PIXIE-BOT — Jane Burton / PIXIE
@@ -97,6 +102,22 @@ const BOT_CONFIG: Record<BotName, {
     voice: 'PIXIE · Creative Stylist',
     greeting: "Hi, I'm PIXIE-BOT ✨ Jane Burton, creative stylist and your guide to perfect music moments. I shape K-KUT experiences, curate PIXIE's PIX playlist, and help you find the exact note that speaks. Say \"NEXT\" or tap → and let's create something beautiful.",
     firstVisitCue: "I'm PIXIE-BOT ✨ Say \"NEXT\" or tap → and I'll shape your perfect music moment — personal, curated, exactly right.",
+    greetingAudio: '/audio/pixie_intro.m4a',
+  },
+  /**
+   * OPS-BOT — Ops & Admin
+   * Platform operations, admin tooling, and behind-the-scenes process guide.
+   * Cool, precise, systems-first energy. Keeps everything running smoothly.
+   */
+  'OPS-BOT': {
+    label: 'OPS-BOT',
+    color: '#93c5fd',
+    ringColor: 'ring-blue-300/60',
+    emoji: '⚙️',
+    voice: 'Ops & Admin',
+    greeting: "OPS-BOT online. I manage the platform rails — admin flows, operations, and system health. Tap → and I'll walk you through what's running under the hood.",
+    firstVisitCue: "OPS-BOT online ⚙️ Say \"NEXT\" or tap → and I'll show you the ops layer. Clean. Precise. Always on.",
+    greetingAudio: undefined,
   },
 };
 
@@ -148,6 +169,17 @@ const BOT_STEP_HINTS: Record<BotName, string[]> = {
     "K-kUpId is where we dress the experience ✨ Choose a track, find your moment, then decide — is this a quick gift, a romantic gesture, a full jewellery capsule? Every detail can be tailored to the feeling you want to send.",
     "Tap and listen. No friction, no forms — just the music, exactly as intended. That's the artistry of it. Pure and precise. A moment perfectly delivered.",
     "Last song, mate. You've reached the destination, but the rhythm stays with you. Drive on 🌿 Music is the most personal gift — and you've just learned how to send exactly the right note. Beautiful work.",
+  ],
+
+  /**
+   * OPS-BOT — Ops & Admin, systems-first, precise
+   */
+  'OPS-BOT': [
+    "Let's run the diagnostics. The platform has several operational layers — catalog, subscriptions, creators, and bots. I'll walk you through each one so you know exactly what's running and where.",
+    "The creator portal is biometric-gated (WebAuthn). Enrollments happen at /creator/enroll. Active portals live at /creator/[brand]. Asset uploads hit /api/creator/upload. All locked down tight.",
+    "Subscriptions run through Stripe. K-KUTs are the membership tier engine — JOEY, CLIMBER, ALPHA, ELDER. The billing portal at /api/billing-portal handles self-serve cancel and billing updates.",
+    "The free-gift cron rotates at /api/cron/free-gift. Promotions rotate at /api/cron/rotate-promotions. Both are scheduled — check Vercel Cron to confirm uptime.",
+    "System check complete ⚙️ All rails accounted for. If something looks off, hit the admin panel or ping the Founder. Platform stays ALIVE when the ops layer stays clean.",
   ],
 };
 
@@ -272,6 +304,15 @@ export default function GpmBot({
     }, 400);
     return () => clearTimeout(t);
   }, [isCollapsed]);
+
+  // Play greeting audio once on first expand (falls back silently if file not present)
+  useEffect(() => {
+    if (isCollapsed || greeted) return;
+    const src = profile.greetingAudio;
+    if (!src) return;
+    const audio = new Audio(src);
+    audio.play().catch(() => { /* no-op — file may not be uploaded yet */ });
+  }, [isCollapsed, greeted, profile.greetingAudio]);
 
   // Auto-dismiss greeting after 6s
   useEffect(() => {

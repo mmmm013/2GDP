@@ -1,6 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { Heart, TreePine, Mountain, Crown, Check, Users, ShieldCheck, Compass, Zap, Gift } from 'lucide-react';
+import { Heart, TreePine, Mountain, Crown, Check, Users, ShieldCheck, Compass, Zap, Gift, Settings } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import Link from 'next/link';
@@ -25,6 +25,70 @@ const FLASH_SPECIALS = [
   { emoji: '⭐', title: 'Hero Sponsor', desc: 'Your name on a Hero Story of your choice. $10 one-time. Limited slots.', href: '/heroes', cta: 'SPONSOR' },
   { emoji: '🎁', title: 'Surprise Pack', desc: 'Random artist merch + track unlock. $2.99. Different every week.', href: '/gift', cta: 'SURPRISE ME' },
 ];
+
+function ManageSubscription() {
+  const [email, setEmail] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleManage = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email.trim()) return;
+    setLoading(true);
+    setError('');
+    try {
+      const res = await fetch('/api/billing-portal', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email.trim() }),
+      });
+      const data = await res.json();
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        setError(data.error || 'No active subscription found for this email.');
+      }
+    } catch {
+      setError('Failed to connect. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="w-full bg-[#FFF8E1] border-t-2 border-[#3E2723]/10 py-10 px-4">
+      <div className="max-w-md mx-auto text-center">
+        <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-[#3E2723] mb-4">
+          <Settings size={22} className="text-[#FFD54F]" />
+        </div>
+        <h2 className="text-xl font-black text-[#3E2723] mb-1 uppercase tracking-tight">Manage Your Subscription</h2>
+        <p className="text-sm text-[#3E2723]/60 font-bold mb-5">
+          Already a K-KUT? Enter your email to update billing, change plans, or cancel anytime.
+        </p>
+        <form onSubmit={handleManage} className="flex flex-col sm:flex-row gap-3">
+          <input
+            type="email"
+            required
+            placeholder="your@email.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="flex-1 border-2 border-[#3E2723]/20 rounded-xl px-4 py-3 text-sm font-bold bg-white text-[#3E2723] placeholder:text-[#3E2723]/30 focus:outline-none focus:border-[#3E2723]/60"
+          />
+          <button
+            type="submit"
+            disabled={loading}
+            className="bg-[#3E2723] text-[#FFD54F] px-6 py-3 rounded-xl font-black text-sm uppercase tracking-wider hover:bg-black transition-colors disabled:opacity-50"
+          >
+            {loading ? 'Loading…' : 'Manage →'}
+          </button>
+        </form>
+        {error && (
+          <p className="mt-3 text-sm font-bold text-red-600">{error}</p>
+        )}
+      </div>
+    </div>
+  );
+}
 
 export default function JoinPage() {
   const [loading, setLoading] = useState<string | null>(null);
@@ -245,6 +309,9 @@ export default function JoinPage() {
           </div>
         </div>
       </div>
+
+      {/* MANAGE SUBSCRIPTION */}
+      <ManageSubscription />
 
       <Footer />
     </main>
