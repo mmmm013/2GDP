@@ -1,30 +1,30 @@
 # GPMC Repository Architecture
 
 **Repository:** `mmmm013/GPMC`  
-**Last Updated:** 2026-04-03  
+**Last Updated:** 2026-04-04  
 **Status:** Active
 
 ---
 
 ## Overview
 
-This document describes the G Putnam Music platform architecture and repository organization under GPEx (Groom Process Excellarators).
+This document describes the G Putnam Music platform architecture and repository organization under **GPME** (G Putnam Music Experience).
 
 ---
 
 ## Business Structure
 
-### Parent Company
-- **GPEx** (Groom Process Excellarators)
-  - Parent company overseeing all operations
-  - Name currently unstable, subject to change
+### Top-Level Brand / Platform
+- **GPME** — G Putnam Music Experience
+  - The umbrella Experience brand encompassing all G Putnam Music inventions, music, and digital operations
+  - Formerly referred to as GPEx internally
 
 ### Business Units
 
 #### 1. Music Operations
 - **GPMC** — G Putnam Music Catalog
 - **GPMCC** — G Putnam Music Commercial Catalog
-- **GPME** — G Putnam Music Engine (shared music library)
+- **GPMK** — G Putnam Music Kernel (shared music library & platform engine)
 
 #### 2. Konsulting Operations
 - **The Vektor [Konsulting]** — Separate from all music operations. Lives in its own repository. Has ZERO connection to GPMC or music.
@@ -39,7 +39,7 @@ This document describes the G Putnam Music platform architecture and repository 
 
 ### Contains
 - Music platform frontend (Next.js App Router)
-- GPME music library (`config/kleighLibrary.ts`, `lib/`)
+- GPMK music library (`config/kleighLibrary.ts`, `lib/`)
 - Creator portal (WebAuthn biometric auth)
 - K-KUT / PIX / FP streaming catalog
 - Free-gift cron system

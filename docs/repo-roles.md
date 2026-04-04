@@ -16,9 +16,9 @@ It is reserved for industry-agnostic platform logic, engine modules, internal ar
 
 Public-facing consumer copy should avoid exposing internal kernel naming.
 
-## Public GPMD sites
+## Public GPMD sites (under GPME)
 
-Any public GPMD implementation should live in a separate site repository and consume platform outputs, data views, or APIs.
+Any public GPMD (G Putnam Music Digital) implementation sits within the GPME (G Putnam Music Experience) umbrella and should live in a separate site repository, consuming platform outputs, data views, or APIs from GPMC.
 
 For music-specific consumer experiences, the designated final-site repository should own:
 
