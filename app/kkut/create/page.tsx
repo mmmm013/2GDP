@@ -80,19 +80,26 @@ export default function KKKCreatorPage() {
       const destination = buildDestination(type, id);
       setShortCode(code);
       setMkutId('');
-      setGeneratedKUT(`kkupid.com/k/${code}`);
-      // Fire-and-forget: persist code → destination mapping
-      fetch('/api/k/create', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ code, destination, item_type: type, item_id: id }),
-      }).catch(() => { /* creator still works if offline */ });
+      // Persist code → destination; block share link until confirmed stored
+      try {
+        const res = await fetch('/api/k/create', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ code, destination, item_type: type, item_id: id }),
+        });
+        if (!res.ok) throw new Error('Store failed');
+        setGeneratedKUT(`${window.location.origin}/k/${code}`);
+      } catch {
+        setGeneratedKUT('');
+        alert('Could not save your K-KUT link — check your connection and try again.');
+        return;
+      }
     }
   };
 
   const copyToClipboard = async () => {
-    const toCopy = kutMode === 'mkut' ? generatedKUT : `https://${generatedKUT}`;
-    await navigator.clipboard.writeText(toCopy);
+    // generatedKUT is now always a fully-qualified URL (https://...)
+    await navigator.clipboard.writeText(generatedKUT);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };

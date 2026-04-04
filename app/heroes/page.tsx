@@ -57,11 +57,27 @@ walks in his footsteps.`,
 export default function HeroesPage() {
   const [form, setForm] = useState({ name: '', hero: '', category: '', story: '' });
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Future: POST to Supabase stories table
-    setSubmitted(true);
+    setSubmitting(true);
+    setSubmitError('');
+    try {
+      const res = await fetch('/api/heroes/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error ?? 'Submission failed');
+      setSubmitted(true);
+    } catch (err: unknown) {
+      setSubmitError(err instanceof Error ? err.message : 'Could not save your story — please try again.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -206,10 +222,14 @@ export default function HeroesPage() {
 
               <button
                 type="submit"
-                className="self-start mt-2 bg-amber-500 text-black px-8 py-3 rounded-full font-black uppercase tracking-widest hover:bg-amber-400 transition-colors shadow-lg"
+                disabled={submitting}
+                className="self-start mt-2 bg-amber-500 text-black px-8 py-3 rounded-full font-black uppercase tracking-widest hover:bg-amber-400 transition-colors shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Submit Hero Story
+                {submitting ? 'Saving…' : 'Submit Hero Story'}
               </button>
+              {submitError && (
+                <p className="mt-2 text-red-400 text-sm">{submitError}</p>
+              )}
             </form>
           )}
         </div>

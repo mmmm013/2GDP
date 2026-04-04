@@ -22,11 +22,27 @@ export default function TaleTellPage() {
     shareToHeroes: false,
   });
   const [step, setStep] = useState<'rules' | 'write' | 'done'>('rules');
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Future: POST to Supabase tales table
-    setStep('done');
+    setSubmitting(true);
+    setSubmitError('');
+    try {
+      const res = await fetch('/api/tt/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error ?? 'Submission failed');
+      setStep('done');
+    } catch (err: unknown) {
+      setSubmitError(err instanceof Error ? err.message : 'Could not save your story — please try again.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -169,20 +185,26 @@ export default function TaleTellPage() {
               </span>
             </label>
 
-            <div className="flex gap-4 pt-2">
-              <button
-                type="button"
-                onClick={() => setStep('rules')}
-                className="px-5 py-2 border border-zinc-600 font-bold uppercase text-xs tracking-widest hover:border-white transition-colors rounded-full"
-              >
-                ← Back
-              </button>
-              <button
-                type="submit"
-                className="flex-1 bg-amber-500 text-black px-8 py-3 rounded-full font-black uppercase tracking-widest hover:bg-amber-400 transition-colors shadow-lg"
-              >
-                Save My Tale
-              </button>
+            <div className="flex gap-4 pt-2 flex-col">
+              <div className="flex gap-4">
+                <button
+                  type="button"
+                  onClick={() => setStep('rules')}
+                  className="px-5 py-2 border border-zinc-600 font-bold uppercase text-xs tracking-widest hover:border-white transition-colors rounded-full"
+                >
+                  ← Back
+                </button>
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  className="flex-1 bg-amber-500 text-black px-8 py-3 rounded-full font-black uppercase tracking-widest hover:bg-amber-400 transition-colors shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {submitting ? 'Saving…' : 'Save My Tale'}
+                </button>
+              </div>
+              {submitError && (
+                <p className="text-red-400 text-sm">{submitError}</p>
+              )}
             </div>
           </form>
         )}

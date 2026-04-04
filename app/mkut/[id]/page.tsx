@@ -7,7 +7,7 @@ import { useParams } from 'next/navigation'
 //   mkut-{type}-{itemId}-{timestamp}  (e.g. mkut-sti-abc123-1712000000)
 //
 // This is a PREFAB SHELL. Content slots are populated from the public
-// mKUT record. Audio is streamed via the play-m-kut edge function.
+// mKUT record. Audio is streamed via the play-k-kut edge function.
 // The container itself is fixed; only the content slots change.
 
 type MKutRecord = {
@@ -93,7 +93,7 @@ export default function MKutPlayer() {
       ? { pix_pck_id: parsed.pix_pck_id, tag: parsed.tag }
       : { k_kut_id: parsed.k_kut_id }
 
-    fetch(`${EDGE_BASE}/functions/v1/play-m-kut`, {
+    fetch(`${EDGE_BASE}/functions/v1/play-k-kut`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(edgeBody),

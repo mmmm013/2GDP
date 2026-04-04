@@ -11,11 +11,11 @@ export default function UruPage() {
 
   useEffect(() => {
     async function fetchSnippets() {
-      // THE MAGIC QUERY: Find assets shorter than 11 seconds
+      // Query gpm_tracks for short assets — duration stored in milliseconds, so 11s = 11000ms
       const { data } = await supabase
-        .from('tracks')
-        .select('*')
-        .lte('duration', 11)
+        .from('gpm_tracks')
+        .select('id, title, duration_ms')
+        .lte('duration_ms', 11000)
         .limit(10);
       if (data) setSnippets(data);
     }
@@ -47,7 +47,7 @@ export default function UruPage() {
                 <div className="flex flex-wrap justify-center gap-2">
                   {snippets.map(s => (
                     <span key={s.id} className="bg-[#3E2723] text-[#FFD54F] px-3 py-1 rounded text-xs font-bold flex items-center gap-1">
-                      <Music size={10} /> {s.duration}s
+                      <Music size={10} /> {s.title ?? `${Math.round((s.duration_ms ?? 0) / 1000)}s`}
                     </span>
                   ))}
                 </div>
