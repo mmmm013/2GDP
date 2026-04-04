@@ -16,6 +16,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import HomeFP from '@/components/HomeFP';
 import T20Grid from '@/components/T20Grid';
+import GlobalPlayer from '@/components/GlobalPlayer';
 import PromoBar from '@/components/PromoBar';
 import GpmBot from '@/components/GpmBot';
 
@@ -114,6 +115,13 @@ export default function HomePage() {
           <HomeFP />
         </div>
       </section>
+
+      {/* MC BOT Player — receives play-track events from T20Grid */}
+      <div className="w-full px-4 py-2 bg-[#110d06] border-t border-[#5C3A1E]/20">
+        <div className="max-w-7xl mx-auto">
+          <GlobalPlayer />
+        </div>
+      </div>
 
       {/* ROW 3: TOP 20 Streaming Activities (BTI body row 2) */}
       <T20Grid />
