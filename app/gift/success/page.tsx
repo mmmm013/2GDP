@@ -18,6 +18,7 @@ function GiftSuccessContent() {
   const sessionId = searchParams.get('session_id')
   const [session, setSession] = useState<SessionData | null>(null)
   const [loading, setLoading] = useState(true)
+  const [shared, setShared] = useState(false)
 
   useEffect(() => {
     if (!sessionId) { setLoading(false); return }
@@ -32,6 +33,34 @@ function GiftSuccessContent() {
   const tierLabel = session?.tier
     ? session.tier.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
     : 'Gift'
+
+  async function handleShare() {
+    const shareText = session?.donorName
+      ? `${session.donorName} just gifted a ${tierLabel} through G Putnam Music — a new way to share music personally. 🎵`
+      : `Just gifted a ${tierLabel} through G Putnam Music — a new way to share music personally. 🎵`
+    const shareUrl = 'https://gputnammusic.com/kupid'
+
+    if (typeof navigator !== 'undefined' && navigator.share) {
+      try {
+        await navigator.share({ title: 'G Putnam Music Gift', text: shareText, url: shareUrl })
+        setShared(true)
+      } catch {
+        // user cancelled share — not an error
+      }
+    } else {
+      // Fallback: copy to clipboard
+      try {
+        await navigator.clipboard.writeText(`${shareText}\n${shareUrl}`)
+        setShared(true)
+      } catch {
+        // clipboard not available
+        window.open(
+          `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`,
+          '_blank'
+        )
+      }
+    }
+  }
 
   return (
     <section className="pt-24 pb-16 px-4 max-w-2xl mx-auto text-center">
@@ -73,11 +102,28 @@ function GiftSuccessContent() {
 
           {session?.donorEmail && (
             <p className="mt-4 text-sm text-white/40">
-              A confirmation will be sent to <span className="text-white/60">{session.donorEmail}</span>.
+              A confirmation will be sent to{' '}
+              <span className="text-white/60">{session.donorEmail}</span>.
             </p>
           )}
 
-          <div className="mt-10 flex flex-wrap justify-center gap-4">
+          {/* ── Share CTA ──────────────────────────────────────────────── */}
+          <div className="mt-8 rounded-xl border border-amber-500/20 bg-amber-500/5 p-5">
+            <p className="text-sm font-semibold text-amber-300 mb-2">
+              🎵 Tell someone about it
+            </p>
+            <p className="text-xs text-white/50 mb-4">
+              You just gifted music in a brand-new way. Share the experience.
+            </p>
+            <button
+              onClick={handleShare}
+              className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 text-black font-bold text-sm hover:opacity-90 transition-opacity"
+            >
+              {shared ? '✓ Shared!' : '📤 Share This Gift'}
+            </button>
+          </div>
+
+          <div className="mt-8 flex flex-wrap justify-center gap-4">
             <Link
               href="/kupid"
               className="px-6 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 text-black font-bold text-sm hover:opacity-90 transition-opacity"
