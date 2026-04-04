@@ -1,11 +1,11 @@
 'use client';
 
 import { createClient } from '@supabase/supabase-js';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import GlobalPlayer from '@/components/GlobalPlayer';
-import { Bot, Tv, BadgeCheck, ShoppingCart, Heart, Music2, MapPin } from 'lucide-react';
+import { Bot, Tv, BadgeCheck, ShoppingCart, Heart, Music2, MapPin, Play, Square, Download } from 'lucide-react';
 
 function getSupabase() {
   return createClient(
@@ -29,9 +29,46 @@ interface SchererTrack {
   sync_tier: string | null;
 }
 
+const PREVIEW_DURATION_S = 30;
+
 export default function SchererPage() {
   const [tracks, setTracks] = useState<SchererTrack[]>([]);
   const [loading, setLoading] = useState(true);
+  const [previewingId, setPreviewingId] = useState<string | null>(null);
+  const previewAudioRef = useRef<HTMLAudioElement | null>(null);
+  const previewTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const stopPreview = () => {
+    if (previewAudioRef.current) {
+      previewAudioRef.current.pause();
+      previewAudioRef.current.currentTime = 0;
+      previewAudioRef.current = null;
+    }
+    if (previewTimerRef.current) {
+      clearTimeout(previewTimerRef.current);
+      previewTimerRef.current = null;
+    }
+    setPreviewingId(null);
+  };
+
+  const handlePreview = (track: SchererTrack) => {
+    if (!track.audio_url) return;
+    if (previewingId === track.id) {
+      stopPreview();
+      return;
+    }
+    stopPreview();
+    const audio = new Audio(track.audio_url);
+    audio.volume = 0.85;
+    audio.play().catch(() => null);
+    previewAudioRef.current = audio;
+    setPreviewingId(track.id);
+    previewTimerRef.current = setTimeout(stopPreview, PREVIEW_DURATION_S * 1000);
+    audio.addEventListener('ended', stopPreview);
+  };
+
+  // Clean up on unmount
+  useEffect(() => () => stopPreview(), []);
 
   useEffect(() => {
     const loadTracks = async () => {
@@ -150,6 +187,19 @@ export default function SchererPage() {
               Stream His Music ↓
             </a>
           </div>
+
+          {/* Quick recurring support — lowest friction */}
+          <div className="pt-2">
+            <p className="text-xs text-white/40 uppercase tracking-widest mb-2">or — lowest friction:</p>
+            <a
+              href="/api/create-subscription?tier=kez_monthly"
+              className="inline-flex items-center gap-2 rounded-full bg-amber-600/90 border border-amber-500/40 text-black px-8 py-3 text-sm font-black uppercase tracking-wider hover:bg-amber-500 transition-colors shadow-lg"
+            >
+              <Heart className="w-4 h-4 fill-black" />
+              Quick KEZ — $5/month recurring
+            </a>
+            <p className="text-[11px] text-white/30 mt-2">Cancel any time. All proceeds to Michael&apos;s family.</p>
+          </div>
         </div>
       </section>
 
@@ -209,9 +259,20 @@ export default function SchererPage() {
         <div className="space-y-4">
           <div className="flex items-center justify-between gap-4">
             <h2 className="text-xl font-semibold">Featured TV Thoroughbreds</h2>
-            <span className="text-xs text-neutral-400">
-              Curated by MSJ-BOT · {tracks.length} active TV assets
-            </span>
+            <div className="flex items-center gap-3">
+              <span className="text-xs text-neutral-400">
+                Curated by MSJ-BOT · {tracks.length} active TV assets
+              </span>
+              <a
+                href="/api/msj-catalog"
+                download="msj-tv-thoroughbreds.csv"
+                className="inline-flex items-center gap-1.5 rounded-full bg-white/10 border border-white/20 px-3 py-1.5 text-[11px] font-semibold text-white/80 hover:bg-white/20 transition-colors"
+                title="Download catalog as CSV for music supervision tools"
+              >
+                <Download className="w-3 h-3" />
+                Export CSV
+              </a>
+            </div>
           </div>
 
           {loading && (
@@ -234,7 +295,25 @@ export default function SchererPage() {
                 className="flex flex-col md:flex-row md:items-center gap-3 rounded-lg border border-white/10 bg-neutral-900/60 px-4 py-3"
               >
                 <div className="flex-1 space-y-1">
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    {/* 30-second inline preview */}
+                    {track.audio_url && (
+                      <button
+                        onClick={() => handlePreview(track)}
+                        className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-bold transition-colors flex-shrink-0 ${
+                          previewingId === track.id
+                            ? 'bg-red-600 text-white'
+                            : 'bg-white/10 text-white/70 hover:bg-white/20'
+                        }`}
+                        title={previewingId === track.id ? 'Stop preview' : '30-second preview'}
+                      >
+                        {previewingId === track.id ? (
+                          <><Square className="w-2.5 h-2.5 fill-white" /> Stop</>
+                        ) : (
+                          <><Play className="w-2.5 h-2.5 fill-white" /> 30s</>
+                        )}
+                      </button>
+                    )}
                     <button
                       onClick={() => handlePlay(track)}
                       className="text-sm font-semibold hover:underline"

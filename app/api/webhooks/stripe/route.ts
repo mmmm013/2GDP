@@ -48,6 +48,18 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
   const tier = session.metadata?.tier;
   if (!tier) return;
 
+  // Idempotency guard: skip if this session was already completed
+  const { data: existing } = await supabaseAdmin
+    .from('gpm_donations')
+    .select('status')
+    .eq('stripe_session_id', session.id)
+    .single();
+
+  if (existing?.status === 'completed') {
+    console.log(`[webhook] Duplicate event for session ${session.id} — skipping`);
+    return;
+  }
+
   // Update donation status to completed
   const { error: updateError } = await supabaseAdmin
     .from('gpm_donations')

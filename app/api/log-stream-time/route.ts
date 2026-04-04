@@ -59,6 +59,15 @@ export async function POST(request: Request) {
     )
   }
 
+  // Cap to 4 hours per call to prevent bot inflation of stream counts
+  const MAX_SECONDS_PER_CALL = 14_400 // 4 hours
+  if (seconds > MAX_SECONDS_PER_CALL) {
+    return NextResponse.json(
+      { error: `seconds must not exceed ${MAX_SECONDS_PER_CALL} per call` },
+      { status: 400 }
+    )
+  }
+
   if (!pixPckId && !parentVtId) {
     return NextResponse.json(
       { error: 'pixPckId or parentVtId is required' },
