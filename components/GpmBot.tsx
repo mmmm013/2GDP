@@ -77,8 +77,8 @@ const BOT_CONFIG: Record<BotName, {
    */
   'LF-BOT': {
     label: 'LF-BOT',
-    color: '#f9a8d4',
-    ringColor: 'ring-pink-400/60',
+    color: '#4ade80',
+    ringColor: 'ring-green-400/60',
     emoji: '💌',
     voice: 'Lisa Farmer · IL, USA',
     ttsPitch: 1.0,
