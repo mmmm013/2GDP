@@ -52,22 +52,7 @@ Deno.serve(async (req: Request) => {
         .eq('status', 'active')
         .single();
 
-      if (error || !data) {
-        // Fallback: check sb.k_kuts table
-        const { data: skk, error: skkErr } = await supabaseAdmin
-          .from('sb.k_kuts')
-          .select('id, org_id, title, artist, kk_type, file_path, status, start_ms, end_ms')
-          .eq('kk_type', 'K-kut')
-          .eq('status', 'active')
-          .limit(1)
-          .single();
-        if (skkErr || !skk) return bad('K-kut not found', 404);
-        return ok({
-          signed_url: null,
-          meta: { ...skk, variant: VARIANT, note: 'Use file_path with storage.createSignedUrl; run 4PE ingestion to populate k_kut_assets' },
-          expires_in: 0,
-        });
-      }
+      if (error || !data) return bad('K-kut not found for pix_pck_id + tag', 404);
       asset = data;
     }
 
