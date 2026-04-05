@@ -53,7 +53,7 @@ const BOT_CONFIG: Record<BotName, {
     ringColor: 'ring-amber-500/60',
     emoji: '🎛️',
     voice: 'Your guide · KLEIGH, AUS',
-    greetingAudio: '/audio/mc_intro.m4a',
+    greetingAudio: '/audio/mc_bot_intro.m4a',
     greeting: "G'day — I'm MC-BOT, your KLEIGH guide from AUS. Here's what we can do next together. Tap → and let's crack on. I'll show you the good stuff, mate — no hard sell, just the right moves.",
     firstVisitCue: "G'day, mate! I'm MC-BOT — your Robin Hood guide from KLEIGH, AUS. Say \"NEXT\" or tap → and I'll show you exactly what we've got. No pressure, just the good stuff.",
   },
