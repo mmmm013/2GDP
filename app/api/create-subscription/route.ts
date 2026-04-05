@@ -16,11 +16,23 @@ const TIER_LABELS: Record<string, string> = {
 };
 
 export async function POST(req: NextRequest) {
-  const Stripe = (await import('stripe')).default;
-  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-    apiVersion: '2025-12-15.clover',
-  });
   try {
+    const stripeKey = process.env.STRIPE_SECRET_KEY;
+    if (!stripeKey) {
+      return NextResponse.json(
+        {
+          error: 'Subscription checkout unavailable: STRIPE_SECRET_KEY is not configured',
+          missingEnv: ['STRIPE_SECRET_KEY'],
+        },
+        { status: 503 }
+      );
+    }
+
+    const Stripe = (await import('stripe')).default;
+    const stripe = new Stripe(stripeKey, {
+      apiVersion: '2025-12-15.clover',
+    });
+
     const body = await req.json();
     const { tier } = body;
 
