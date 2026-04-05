@@ -63,7 +63,7 @@ export default function GiftPage() {
             { title: 'Pick a Heart-Tap tier', hint: 'Every tier ships a Digital Mixed Bag of exclusive gifts. Scroll down to compare.', action: 'See Tiers', href: '#tiers' },
             { title: 'Personalize your message', hint: 'Add a name, email, and a heartfelt note. Anonymous option available.', },
             { title: 'Complete checkout', hint: 'Secure Stripe checkout. Your recipient gets their gift bag delivered digitally.' },
-            { title: 'Share the link or locket', hint: 'Forward the confirmation, or pair it with a K-kUpId locket for the ultimate gift.', action: 'K-kUpId Lockets', href: '/kupid' },
+            { title: 'Share the link or gift page', hint: 'Forward the confirmation, or pair it with a K-kUpId digital moment for the ultimate gift.', action: 'K-kUpId', href: '/kupid' },
           ]}
           startCollapsed={false}
           className="max-w-xs w-full"

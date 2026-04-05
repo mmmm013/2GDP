@@ -69,7 +69,7 @@ const JOURNEY_PROTOCOL = {
     { step: 2, title: 'Choose a K-KUT or mini-KUT path', hint: 'K-KUT = sweet-spot link. mini-KUT = short clip.' },
     { step: 3, title: 'Generate or resolve your link', hint: 'Create 6-char code at kkupid.com/kkut/create.' },
     { step: 4, title: 'Open & play your experience', hint: 'Tap link — no app needed, just hear it.' },
-    { step: 5, title: 'Share or gift your K-kUpId', hint: 'Send, pair with jewelry, or add to a Heart-Tap gift.' },
+    { step: 5, title: 'Share or gift your K-kUpId', hint: 'Send it instantly, or add it to a Heart-Tap gift.' },
   ],
   ui_behavior: {
     active_step: 'full contrast, animated pulse ring, bold label',
@@ -118,7 +118,7 @@ const GUIDE = {
     'We call that the Sweet Spot. And we built a way to gift it.',
     'A K-KUT is a 6-character link - short enough to text - that opens a curated excerpt of a G Putnam Music track. No app. No account. Just tap and hear it.',
     'A mini-KUT, or mKUT, goes further. It streams a specific verse, bridge, or chorus - the exact moment, packaged.',
-    'K-kUpId is the gifting layer. Pick a song. Choose your moment. Generate a link - or dress it up with a romance skin, a jewelry capsule, a whole experience.',
+    'K-kUpId is the gifting layer. Pick a song. Choose your moment. Generate a link, then share it as a complete digital experience.',
     'Music has always been the best gift. Now you can send exactly the right note.',
   ],
 };

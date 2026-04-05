@@ -16,7 +16,7 @@ const scriptLines = [
   'We call that the Sweet Spot. And we built a way to gift it.',
   'A K-KUT is a 6-character link - short enough to text - that opens a curated excerpt of a G Putnam Music track. No app. No account. Just tap and hear it.',
   'A mini-KUT, or mKUT, goes further. It streams a specific verse, bridge, or chorus - the exact moment, packaged.',
-  'K-kUpId is the gifting layer. Pick a song. Choose your moment. Generate a link - or dress it up with a romance skin, a jewelry capsule, a whole experience.',
+  'K-kUpId is the gifting layer. Pick a song. Choose your moment. Generate a link, then share it instantly as a complete digital experience.',
   'Music has always been the best gift. Now you can send exactly the right note.',
 ];
 

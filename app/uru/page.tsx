@@ -5,6 +5,7 @@ import { Fingerprint, Lock, Music, ArrowRight, ShieldCheck, DollarSign, Play } f
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { supabase } from '@/lib/supabaseClient';
+import BraveEaglePromo from '@/components/BraveEaglePromo';
 
 export default function UruPage() {
   const [snippets, setSnippets] = useState<any[]>([]);
@@ -25,6 +26,14 @@ export default function UruPage() {
   return (
     <main className="min-h-screen w-full bg-gradient-to-b from-[#FFD54F] to-[#FF8F00] text-[#3E2723] font-sans selection:bg-[#3E2723] selection:text-[#FFD54F]">
       <Header />
+      <BraveEaglePromo
+        links={[
+          { href: '/heroes', label: 'Back to Heroes' },
+          { href: '/mip', label: 'MIP1 Recognition Form' },
+          { href: '/tt', label: 'TT Tale Tell' },
+          { href: '/gift', label: 'Gift Support' },
+        ]}
+      />
 
       <div className="container mx-auto px-4 mt-16 text-center max-w-3xl">
         <div className="inline-block p-6 rounded-full bg-[#3E2723] mb-8 shadow-xl"><Fingerprint size={48} className="text-[#FFD54F]" strokeWidth={1.5} /></div>

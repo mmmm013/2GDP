@@ -132,7 +132,7 @@ const BOT_STEP_HINTS: Record<BotName, string[]> = {
   'MC-BOT': [
     "Right, let's have a look at what we've got, yeah? The catalog's stacked with Sweet Spots — those moments in a track that just wreck ya. Tell me your mood, your occasion, or your artist and I'll point you straight to the good stuff. No fuss.",
     "A K-KUT is basically a musical shortcut, mate. Six characters — short enough to text. Opens the exact Sweet Spot — the hook, the bridge, the bit that hits. mini-KUTs do the same but stream a specific section. Both shareable in one tap. Robin Hood stuff, yeah?",
-    "K-kUpId is the gifting layer. Pick a track, choose your moment, generate a link. Or dress it up — romance skin, a jewellery capsule, a whole experience. Sounds flash but it's dead easy, I promise.",
+    "K-kUpId is the gifting layer. Pick a track, choose your moment, and generate a link you can send right away. Sounds flash but it's dead easy, I promise.",
     "Tap the link. No app, no account, no faff whatsoever. Just tap and hear the exact Sweet Spot. That's the whole trick right there. Beautiful, isn't it?",
     "Last song, mate. You've reached the destination, but the rhythm stays with you. Drive on. Music's always been the best gift — now you send exactly the right note. Bloody legend.",
   ],
@@ -164,8 +164,8 @@ const BOT_STEP_HINTS: Record<BotName, string[]> = {
    */
   'PIXIE-BOT': [
     "Oh, let's find your perfect music moment ✨ Think of a feeling, a memory, a scene in your mind. The catalog holds it — we just have to find it together. What's the mood today, love?",
-    "A K-KUT is like a little jewel box for a song moment 💎 Six characters that open to exactly the right note. A mini-KUT captures a verse or chorus — just the part that speaks. Both are shareable, giftable, and beautifully simple.",
-    "K-kUpId is where we dress the experience ✨ Choose a track, find your moment, then decide — is this a quick gift, a romantic gesture, a full jewellery capsule? Every detail can be tailored to the feeling you want to send.",
+    "A K-KUT is like a little gift box for a song moment 💎 Six characters that open to exactly the right note. A mini-KUT captures a verse or chorus — just the part that speaks. Both are shareable, giftable, and beautifully simple.",
+    "K-kUpId is where we dress the experience ✨ Choose a track, find your moment, then decide — is this a quick gift, a romantic gesture, or a full digital moment? Every detail can be tailored to the feeling you want to send.",
     "Tap and listen. No friction, no forms — just the music, exactly as intended. That's the artistry of it. Pure and precise. A moment perfectly delivered.",
     "Last song, mate. You've reached the destination, but the rhythm stays with you. Drive on 🌿 Music is the most personal gift — and you've just learned how to send exactly the right note. Beautiful work.",
   ],
@@ -211,7 +211,7 @@ export const DEFAULT_STEPS: JourneyStep[] = [
   },
   {
     title: 'Generate or resolve your link',
-    hint: 'K-kUpId is the gifting layer. Pick your track. Choose your moment. Generate a link — or dress it up with a romance skin, a jewelry capsule, a whole experience.',
+    hint: 'K-kUpId is the gifting layer. Pick your track. Choose your moment. Generate a link, then share the full digital experience.',
     action: 'Create K-KUT',
     href: '/kkut/create',
   },

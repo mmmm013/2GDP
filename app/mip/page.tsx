@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { Shield, Zap, Mic, Lock, Download, Play, Pause, FileText, ToggleLeft, ToggleRight, CheckCircle, Copy } from 'lucide-react';
 import { supabase } from '@/lib/supabaseClient';
+import BraveEaglePromo from '@/components/BraveEaglePromo';
 
 export default function MipPage() {
   const [accessGranted, setAccessGranted] = useState(false);
@@ -87,6 +88,14 @@ export default function MipPage() {
   // --- VIEW 2: DASHBOARD ---
   return (
     <main className={`min-h-screen w-full transition-colors duration-500 ${mode === 'rckls' ? 'bg-[#b71c1c]' : mode === 'clover' ? 'bg-[#2E7D32]' : 'bg-[#212121]'} text-white pb-24`}>
+         <BraveEaglePromo
+            links={[
+               { href: '/heroes', label: 'Back to Heroes' },
+               { href: '/uru', label: 'URU Mood List' },
+               { href: '/tt', label: 'TT Tale Tell' },
+               { href: '/gift', label: 'Gift Support' },
+            ]}
+         />
       
       {/* NAV */}
       <nav className="p-4 bg-black/40 backdrop-blur-md flex justify-between items-center sticky top-0 z-50 border-b border-white/5">

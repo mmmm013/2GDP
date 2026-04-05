@@ -343,7 +343,7 @@ export default function KKKCreatorPage() {
             K-KUTs are permanent 6-character links. mKUTs use canonical IDs for prefab container routing.
           </p>
           <Link href="/kupid" className="inline-flex items-center gap-2 text-[#8B4513] hover:text-[#8B4513]/80 font-bold transition-colors">
-            <span>←</span> Back to K-KUTs Lockets
+            <span>←</span> Back to K-KUT Hub
           </Link>
         </div>
       </div>

@@ -82,7 +82,7 @@ function GiftSuccessContent() {
               href="/kupid"
               className="px-6 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 text-black font-bold text-sm hover:opacity-90 transition-opacity"
             >
-              Explore K-KUTs Lockets
+              Explore K-KUT & mini-KUT
             </Link>
             <Link
               href="/"

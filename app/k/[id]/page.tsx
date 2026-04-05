@@ -12,7 +12,7 @@ type RouteTarget = {
 // A K-KUT short code is 4-10 alphanumeric chars with no hyphens.
 const isShortCode = (id: string): boolean => /^[a-z0-9]{4,10}$/i.test(id)
 
-type OpenMode = 'kkut' | 'mkut' | 'jewelry' | 'romance'
+type OpenMode = 'kkut' | 'mkut' | 'romance'
 
 const isRomanceSkin = (id: string, querySkin: string | null): boolean => {
   if (querySkin === 'romance' || querySkin === 'love' || querySkin === 'rom') return true
@@ -24,16 +24,6 @@ const isRomanceSkin = (id: string, querySkin: string | null): boolean => {
     normalized.startsWith('heart-')
   )
 }
-const isJewelrySignal = (id: string, queryMode: string | null): boolean => {
-  if (queryMode === 'jewelry' || queryMode === 'jlr') return true
-  const normalized = id.toLowerCase()
-  return (
-    normalized.startsWith('jlr-') ||
-    normalized.startsWith('charm-') ||
-    normalized.startsWith('locket-')
-  )
-}
-
 const isMiniKutSignal = (id: string, queryMk: string | null): boolean => {
   if (queryMk === '1' || queryMk === 'true' || queryMk === 'mkut') return true
   const normalized = id.toLowerCase()
@@ -49,7 +39,7 @@ const resolveRoute = (kutId: string): RouteTarget => {
   const rawParts = kutId.split('-').filter(Boolean)
   const parts = [...rawParts]
 
-  // Strip jewelry wrappers (jlr-, charm-, locket-)
+  // Strip legacy wrappers from older shared links.
   if (parts[0] === 'jlr' || parts[0] === 'charm' || parts[0] === 'locket') {
     parts.shift()
   }
@@ -88,7 +78,6 @@ function KUTRedirectContent() {
   const [resolvedTarget, setResolvedTarget] = useState<RouteTarget | null>(null)
 
   const mode = useMemo<OpenMode>(() => {
-    if (isJewelrySignal(id, searchParams.get('mode'))) return 'jewelry'
     if (isRomanceSkin(id, searchParams.get('skin'))) return 'romance'
     if (isMiniKutSignal(id, searchParams.get('mk'))) return 'mkut'
     return 'kkut'
@@ -131,130 +120,13 @@ function KUTRedirectContent() {
   // --- Navigate once target is resolved + delay expires ---
   useEffect(() => {
     if (!resolvedTarget) return
-    const delayMs = mode === 'mkut' ? 1100 : mode === 'jewelry' ? 2000 : mode === 'romance' ? 1900 : 1650
+    const delayMs = mode === 'mkut' ? 1100 : mode === 'romance' ? 1900 : 1650
     const timer = window.setTimeout(() => {
       setIsNavigating(true)
       router.push(resolvedTarget.href)
     }, delayMs)
     return () => window.clearTimeout(timer)
   }, [resolvedTarget, mode, router])
-
-  if (mode === 'jewelry') {
-    return (
-      <div className="jlr-shell min-h-screen flex items-center justify-center px-6">
-        <div className="jlr-card max-w-sm w-full rounded-3xl p-8 text-center">
-          <div className="locket-wrap" aria-hidden="true">
-            <div className="locket-chain" />
-            <div className="locket-body">
-              <div className="locket-half locket-left" />
-              <div className="locket-half locket-right" />
-              <div className="locket-glow">
-                <span className="locket-note">♪</span>
-              </div>
-            </div>
-          </div>
-
-          <p className="mt-6 text-[10px] tracking-[0.45em] font-semibold text-[#C8A882] uppercase">G Putnam Music</p>
-          <h1 className="mt-2 text-2xl font-black text-[#f5e6d0] tracking-tight">
-            {isNavigating ? 'Opening your gift…' : 'For You'}
-          </h1>
-          <p className="mt-3 text-sm text-[#d9c3a0] italic">A moment of music, sealed in gold.</p>
-          <p className="mt-5 text-[10px] uppercase tracking-[0.3em] text-[#b08d6a]">
-            {isNavigating ? `Entering ${resolvedTarget?.label ?? '…'}` : 'Your capsule is opening'}
-          </p>
-        </div>
-
-        <style jsx>{`
-          .jlr-shell {
-            background:
-              radial-gradient(700px 360px at 50% -5%, rgba(200, 168, 130, 0.18), transparent 60%),
-              linear-gradient(150deg, #1a0f0a 0%, #0f0a06 55%, #1c1108 100%);
-          }
-          .jlr-card {
-            background: rgba(18, 10, 6, 0.82);
-            border: 1px solid rgba(200, 168, 130, 0.28);
-            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(200, 168, 130, 0.1);
-          }
-          .locket-wrap {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin-bottom: 4px;
-          }
-          .locket-chain {
-            width: 2px;
-            height: 28px;
-            background: linear-gradient(180deg, transparent, #C8A882 60%, #a87c4e);
-            border-radius: 1px;
-          }
-          .locket-body {
-            position: relative;
-            width: 72px;
-            height: 72px;
-            border-radius: 50%;
-            border: 1.5px solid rgba(200, 168, 130, 0.5);
-            overflow: hidden;
-            box-shadow: 0 0 18px rgba(200, 168, 130, 0.22), inset 0 1px 0 rgba(255, 244, 224, 0.12);
-          }
-          .locket-half {
-            position: absolute;
-            top: 0;
-            width: 50%;
-            height: 100%;
-            background: linear-gradient(135deg, #6b4423 0%, #3d2417 60%, #2a1810 100%);
-          }
-          .locket-left {
-            left: 0;
-            transform-origin: right center;
-            border-radius: 999px 0 0 999px;
-            animation: locket-open-left 1.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-          }
-          .locket-right {
-            right: 0;
-            transform-origin: left center;
-            border-radius: 0 999px 999px 0;
-            animation: locket-open-right 1.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-          }
-          .locket-glow {
-            position: absolute;
-            inset: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: radial-gradient(circle, rgba(200, 168, 130, 0.35) 0%, transparent 70%);
-            animation: locket-glow-in 1.5s ease-out forwards;
-            opacity: 0;
-          }
-          .locket-note {
-            font-size: 1.5rem;
-            color: #f5e0c0;
-            text-shadow: 0 0 8px rgba(200, 168, 130, 0.8);
-            animation: note-rise 1.6s ease-out 0.4s forwards;
-            opacity: 0;
-          }
-          @keyframes locket-open-left {
-            0%   { transform: perspective(180px) rotateY(0deg); }
-            35%  { transform: perspective(180px) rotateY(-5deg); }
-            100% { transform: perspective(180px) rotateY(-88deg); }
-          }
-          @keyframes locket-open-right {
-            0%   { transform: perspective(180px) rotateY(0deg); }
-            35%  { transform: perspective(180px) rotateY(5deg); }
-            100% { transform: perspective(180px) rotateY(88deg); }
-          }
-          @keyframes locket-glow-in {
-            0%   { opacity: 0; }
-            50%  { opacity: 0; }
-            100% { opacity: 1; }
-          }
-          @keyframes note-rise {
-            0%   { opacity: 0; transform: translateY(6px); }
-            100% { opacity: 1; transform: translateY(0px); }
-          }
-        `}</style>
-      </div>
-    )
-  }
 
   if (mode === 'romance') {
     return (

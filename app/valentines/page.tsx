@@ -3,11 +3,10 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import type { Metadata } from 'next';
 import MakeupTracks from './MakeupTracks';
-import { LOCKET_OPTIONS } from '@/lib/kupid-protocol';
 
 export const metadata: Metadata = {
   title: "Valentine's Day Gifts | G Putnam Music",
-  description: 'Send the gift of music this Valentine\'s Day. Heart-Tap digital gifts and K-KUTs Sovereign Lockets from G Putnam Music.',
+  description: 'Send the gift of music this Valentine\'s Day. Heart-Tap digital gifts and personalized K-KUT moments from G Putnam Music.',
 };
 
 const GIFT_OPTIONS = [
@@ -58,7 +57,7 @@ export default function ValentinesPage() {
             Valentine&apos;s Day
           </h1>
           <p className="text-white/60 max-w-md mx-auto">
-            Give the gift of music. From $1.99 digital gifts to patented K-KUTs lockets.
+            Give the gift of music. From $1.99 digital gifts to personalized K-KUT moments.
           </p>
           <p className="text-white/40 text-sm mt-2">G Putnam Music &bull; Limited Time</p>
         </section>
@@ -96,54 +95,6 @@ export default function ValentinesPage() {
           </div>
         </section>
 
-        {/* Divider */}
-        <div className="max-w-md mx-auto border-t border-white/10 my-8" />
-
-        {/* K-KUTs Locket Section */}
-        <section className="px-4 pb-8">
-          <h2 className="text-2xl font-bold text-center mb-1">
-            <span>&#128274;</span> K-KUTs Sovereign Locket
-          </h2>
-          <p className="text-center text-white/50 text-sm mb-1">
-            A patent-pending music-frequency locket. The lock-and-key to creative energy.
-          </p>
-          <p className="text-center text-white/30 text-xs mb-6">
-            Patent-Pending &bull; 2 Inventions &bull; 3 Trademarks &bull; One-Time Purchase
-          </p>
-          <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-4">
-            {LOCKET_OPTIONS.map((locket) => (
-              <Link key={locket.title} href={locket.href} className="group block">
-                <div className={`relative rounded-xl border border-white/10 bg-white/5 p-5 hover:bg-white/10 transition-colors ${
-                  locket.badge === 'HISTORIC' ? 'ring-1 ring-yellow-400/40 bg-gradient-to-b from-yellow-900/10 to-transparent' : ''
-                }`}>
-                  {locket.featured && (
-                    <div className="absolute -top-2 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full text-[10px] font-bold tracking-wider bg-orange-500 text-black">
-                      MOST POPULAR
-                    </div>
-                  )}
-                  {locket.badge === 'HISTORIC' && (
-                    <div className="absolute -top-2 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full text-[10px] font-bold tracking-wider bg-yellow-400 text-black">
-                      MAKES HISTORY
-                    </div>
-                  )}
-                  <span className="text-[10px] font-bold tracking-widest text-amber-400">{locket.badge}</span>
-                  <h3 className="font-semibold text-white mt-1">{locket.title}</h3>
-                  <p className="text-amber-400 font-bold text-xl">{locket.price}</p>
-                  <p className="text-white/50 text-sm mt-1">{locket.description}</p>
-                </div>
-              </Link>
-            ))}
-          </div>
-          <div className="text-center mt-6">
-            <Link
-              href="/kupid"
-              className="inline-block px-8 py-3 rounded-full border border-amber-400/40 text-amber-400 font-bold hover:bg-amber-400/10 transition-all"
-            >
-              Explore K-KUTs &rarr;
-            </Link>
-          </div>
-        </section>
-
         {/* Makeup Tracks Section */}
         <MakeupTracks />
 
@@ -165,7 +116,7 @@ export default function ValentinesPage() {
                 href="/kupid"
                 className="px-6 py-3 rounded-full border border-amber-400/40 text-amber-400 font-bold hover:bg-amber-400/10 transition-all"
               >
-                K-KUTs Lockets from $333
+                Explore K-KUT & mini-KUT
               </Link>
             </div>
           </div>

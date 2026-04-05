@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import BraveEaglePromo from '@/components/BraveEaglePromo';
 
 // BRANDING CONSTANTS
 const COLORS = {
@@ -67,6 +68,14 @@ export default function HeroesPage() {
   return (
     <div className="min-h-screen bg-black text-white font-sans">
       <Header />
+      <BraveEaglePromo
+        links={[
+          { href: '/mip', label: 'MIP1 Recognition Form' },
+          { href: '/uru', label: 'URU Mood List' },
+          { href: '/tt', label: 'TT Tale Tell' },
+          { href: '/gift', label: 'Gift Support' },
+        ]}
+      />
       <div className="max-w-5xl mx-auto px-6 py-16">
 
         {/* PAGE HEADER */}

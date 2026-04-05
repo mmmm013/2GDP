@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import BraveEaglePromo from '@/components/BraveEaglePromo';
 
 const TT_RULES = [
   'Stories are private by default — only you can see your story unless you choose to share.',
@@ -32,6 +33,14 @@ export default function TaleTellPage() {
   return (
     <div className="min-h-screen bg-[#0D0D0D] text-white font-sans">
       <Header />
+      <BraveEaglePromo
+        links={[
+          { href: '/heroes', label: 'Back to Heroes' },
+          { href: '/mip', label: 'MIP1 Recognition Form' },
+          { href: '/uru', label: 'URU Mood List' },
+          { href: '/gift', label: 'Gift Support' },
+        ]}
+      />
       <div className="max-w-3xl mx-auto px-6 py-16">
 
         {/* HEADER */}
