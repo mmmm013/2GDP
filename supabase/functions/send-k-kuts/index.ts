@@ -26,8 +26,10 @@ import { supabaseAdmin } from "../_shared/supabaseClient.ts";
 import { bad, ok, preflight } from "../_shared/responses.ts";
 
 const DEFAULT_EXPIRY = 300;
-const SUPABASE_FUNCTION_URL = Deno.env.get('SUPABASE_URL') + '/functions/v1';
-const SERVICE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
+const SUPABASE_URL = Deno.env.get('SUPABASE_URL');
+if (!SUPABASE_URL) throw new Error('SUPABASE_URL is required');
+const SUPABASE_FUNCTION_URL = `${SUPABASE_URL}/functions/v1`;
+const SERVICE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 
 async function resolveAsset(
   id: string | undefined,

@@ -53,23 +53,7 @@ Deno.serve(async (req: Request) => {
         .eq('status', 'active')
         .single();
 
-      if (error || !data) {
-        // Fallback: check public.k_kut table
-        const { data: kk, error: kkErr } = await supabaseAdmin
-          .from('k_kut')
-          .select('id, pix_pck_id, label, start_ms, end_ms, is_exact_excerpt')
-          .eq('pix_pck_id', body.pix_pck_id)
-          .eq('label', body.tag)
-          .eq('is_exact_excerpt', true)
-          .single();
-        if (kkErr || !kk) return bad('K-KUT not found for pix_pck_id + tag', 404);
-        // Return metadata only - no direct storage_path on this table
-        return ok({
-          signed_url: null,
-          meta: { ...kk, variant: VARIANT, note: 'storage_path not set; run 4PE ingestion to populate k_kut_assets' },
-          expires_in: 0,
-        });
-      }
+      if (error || !data) return bad('K-KUT not found for pix_pck_id + tag', 404);
       asset = data;
     }
 

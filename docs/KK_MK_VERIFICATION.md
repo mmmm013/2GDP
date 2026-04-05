@@ -275,5 +275,67 @@ grep -r "createClient" --include="*.tsx" app/
 
 ---
 
+## LT-PIX mini-KUT Minimum Rule
+
+**Adopted:** 2026-04-05  
+**Rule:** Every **LT-PIX** (`pix_pck` row with `pck_type = 'LT'`) must have **at least 40 active mini-KUT assets** in `public.k_kut_assets` at all times.
+
+### Definition of Terms
+
+| Term | Database representation |
+|------|------------------------|
+| **LT-PIX** | Row in `public.pix_pck` where `pck_type = 'LT'` (Long Track package) |
+| **mini-KUT** | Row in `public.k_kut_assets` where `status = 'active'` and `pix_pck_id` matches the LT-PIX |
+
+### Enforcement Layers
+
+**1. DB-level trigger — `trg_lt_pix_mkut_minimum` on `public.k_kut_assets`**
+
+Fires `AFTER DELETE` and `AFTER UPDATE OF status`.  When a row is deleted or its status changes away from `'active'`, the trigger counts remaining active assets for the same `pix_pck_id`.  If the owning `pix_pck` is type `'LT'` and the count would fall below 40, the operation is aborted with:
+
+```
+ERROR: LT-PIX minimum violated: pix_pck <id> (LT) would have only <n> active mini-KUT(s); minimum is 40.
+SQLSTATE: 23514  (check_violation)
+```
+
+**2. Coverage view — `public.v_lt_pix_mkut_coverage`**
+
+```sql
+SELECT * FROM public.v_lt_pix_mkut_coverage;
+-- Columns: pix_pck_id, title, org_id, active_mkut_cnt, meets_minimum
+```
+
+Returns one row per LT-PIX with the current active count and a boolean `meets_minimum` flag.  Use this for operational monitoring or admin dashboards.
+
+**3. Admin API endpoint — `GET /api/admin/lt-pix-mkut-check`**
+
+Requires `Authorization: Bearer <CRON_SECRET>` in production.  Returns:
+
+```json
+{
+  "checked_at": "2026-04-05T02:00:00.000Z",
+  "total_lt_pix": 12,
+  "passing": 10,
+  "failing": 2,
+  "results": [
+    { "pix_pck_id": "...", "title": "...", "org_id": "...", "active_mkut_cnt": 35, "meets_minimum": false },
+    ...
+  ]
+}
+```
+
+Failing packages are listed first, sorted by `active_mkut_cnt` ascending.
+
+### Migration
+
+Applied by `supabase/migrations/20260405000001_pix_pck_lt_mkut_guard.sql`.  Covers:
+- `CREATE TABLE public.pix_pck` (with `pck_type IN ('LT','ST','EP')`)
+- FK `k_kut_assets.pix_pck_id → public.pix_pck(id) ON DELETE RESTRICT`
+- Trigger function `public.enforce_lt_pix_mkut_minimum()`
+- View `public.v_lt_pix_mkut_coverage`
+
+---
+
 **Report Generated:** 2026-03-28  
+**Updated:** 2026-04-05 — LT-PIX mini-KUT minimum rule added  
 **Next Review:** After environment variables configured and data uploaded
