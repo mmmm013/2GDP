@@ -26,7 +26,7 @@ import { ChevronRight, ChevronDown, CheckCircle, Circle, Zap, X, Mic, MicOff } f
 // Bot config — mirrors BOT_PROFILES in /api/public/kkut-guide
 // ---------------------------------------------------------------------------
 
-export type BotName = 'MC-BOT' | 'LF-BOT' | 'GD-BOT' | 'PIXIE-BOT';
+export type BotName = 'MC-BOT' | 'LF-BOT' | 'GD-BOT' | 'PIXIE-BOT' | 'OPS-BOT';
 
 const BOT_CONFIG: Record<BotName, {
   label: string;
@@ -62,8 +62,8 @@ const BOT_CONFIG: Record<BotName, {
    */
   'LF-BOT': {
     label: 'LF-BOT',
-    color: '#f9a8d4',
-    ringColor: 'ring-pink-400/60',
+    color: '#4ade80',
+    ringColor: 'ring-green-400/60',
     emoji: '💌',
     voice: 'Lisa Farmer · IL, USA',
     greeting: "Hi there — I'm LF-BOT, Lisa Farmer from Illinois. I'll walk you through every step nice and clear. Licensing, rights, deal questions — I turn all the complex stuff into plain English. Your work and your buyer's needs are fully respected here. Let's go!",
@@ -97,6 +97,20 @@ const BOT_CONFIG: Record<BotName, {
     voice: 'PIXIE · Creative Stylist',
     greeting: "Hi, I'm PIXIE-BOT ✨ Jane Burton, creative stylist and your guide to perfect music moments. I shape K-KUT experiences, curate PIXIE's PIX playlist, and help you find the exact note that speaks. Say \"NEXT\" or tap → and let's create something beautiful.",
     firstVisitCue: "I'm PIXIE-BOT ✨ Say \"NEXT\" or tap → and I'll shape your perfect music moment — personal, curated, exactly right.",
+  },
+  /**
+   * OPS-BOT — Ops & Admin
+   * System operator persona. Handles admin queries, cron health, and platform status.
+   * Calm, precise, and informative. greetingAudio pending vocal recording.
+   */
+  'OPS-BOT': {
+    label: 'OPS-BOT',
+    color: '#93c5fd',
+    ringColor: 'ring-blue-300/60',
+    emoji: '⚙️',
+    voice: 'Ops & Admin · Platform',
+    greeting: "OPS-BOT online. Platform status nominal. I monitor cron jobs, migration health, and admin alerts. Ask me anything about system status or pipeline health. Let's keep things running clean.",
+    firstVisitCue: "OPS-BOT here ⚙️ Say \"NEXT\" or tap → and I'll walk you through the platform dashboard — clean, fast, no guesswork.",
   },
 };
 
@@ -148,6 +162,17 @@ const BOT_STEP_HINTS: Record<BotName, string[]> = {
     "K-kUpId is where we dress the experience ✨ Choose a track, find your moment, then decide — is this a quick gift, a romantic gesture, a full jewellery capsule? Every detail can be tailored to the feeling you want to send.",
     "Tap and listen. No friction, no forms — just the music, exactly as intended. That's the artistry of it. Pure and precise. A moment perfectly delivered.",
     "Last song, mate. You've reached the destination, but the rhythm stays with you. Drive on 🌿 Music is the most personal gift — and you've just learned how to send exactly the right note. Beautiful work.",
+  ],
+
+  /**
+   * OPS-BOT — Calm, precise, system-aware; Ops & Admin persona
+   */
+  'OPS-BOT': [
+    "Platform check — everything starts here. I monitor cron job health, migration status, and admin alerts in real time. No guesswork, just clean signal.",
+    "Cron jobs fire on schedule: rotate-promotions every 3 hours, free-gift every hour. Any deviation shows up in Vercel logs. I watch them all.",
+    "Migration pipeline is versioned and sequential. Each migration in supabase/migrations/ runs exactly once. Rollbacks are manual — flag me if anything needs unwinding.",
+    "API health: all endpoints return 200 in normal operation. /api/health is your quick check. /api/admin/lt-pix-mkut-check verifies LT-PIX mini-KUT coverage. Both are CRON_SECRET-guarded.",
+    "Status nominal. All systems operational. Keep an eye on the Vercel dashboard for edge function timing. If you need a full audit, I'm right here.",
   ],
 };
 
