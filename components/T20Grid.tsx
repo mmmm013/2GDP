@@ -200,6 +200,7 @@ export default function T20Grid() {
     if (!sb) return;
 
     try {
+      type TrackRow = { id: string; title: string; artist: string; url: string };
       // Fetch tracks matching this mood
       let { data: tracks } = await sb
         .from('tracks')
@@ -207,7 +208,7 @@ export default function T20Grid() {
         .ilike('mood', `%${activity.mood}%`)
         .not('url', 'is', null)
         .neq('url', '')
-        .limit(30);
+        .limit(30) as { data: TrackRow[] | null; error: unknown };
 
       if (!tracks || tracks.length === 0) {
         // Fallback: any track
@@ -216,7 +217,7 @@ export default function T20Grid() {
           .select('id, title, artist, url')
           .not('url', 'is', null)
           .neq('url', '')
-          .limit(10);
+          .limit(10) as { data: TrackRow[] | null; error: unknown };
         tracks = fallback ?? [];
       }
 
