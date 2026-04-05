@@ -103,6 +103,7 @@ export default function Header() {
           <Link href="/uru" className="text-sm text-[#C4A882] hover:text-[#C8A882] font-medium tracking-wide transition-colors">{menuUru}</Link>
           <Link href="/tt" className="text-sm text-[#C4A882] hover:text-[#C8A882] font-medium tracking-wide transition-colors">{menuTT}</Link>
           <Link href="/scherer" className="text-sm text-[#C4A882] hover:text-[#C8A882] font-medium tracking-wide transition-colors">{menuMsj}</Link>
+          <Link href="/commercial" className="text-sm text-[#C4A882] hover:text-[#C8A882] font-medium tracking-wide transition-colors">GPMCC</Link>
           <a href="https://2kleigh.com" target="_blank" rel="noopener noreferrer" className="text-sm text-[#C4A882] hover:text-[#C8A882] font-medium tracking-wide transition-colors">KLEIGH</a>
           <Link href="/join" className="text-sm bg-[#C8A882] text-[#2A1506] px-4 py-1.5 rounded-full font-bold text-center hover:bg-[#D07CC8] transition-colors tracking-wide">{menuJoin}</Link>
         </div>
@@ -127,6 +128,7 @@ export default function Header() {
           <Link href="/uru" onClick={() => setMenuOpen(false)} className="text-sm text-[#C4A882] hover:text-[#C8A882] font-medium tracking-wide min-h-[44px] flex items-center">{menuUru}</Link>
           <Link href="/tt" onClick={() => setMenuOpen(false)} className="text-sm text-[#C4A882] hover:text-[#C8A882] font-medium tracking-wide min-h-[44px] flex items-center">{menuTT}</Link>
           <Link href="/scherer" onClick={() => setMenuOpen(false)} className="text-sm text-[#C4A882] hover:text-[#C8A882] font-medium tracking-wide min-h-[44px] flex items-center">{menuMsj}</Link>
+          <Link href="/commercial" onClick={() => setMenuOpen(false)} className="text-sm text-[#C4A882] hover:text-[#C8A882] font-medium tracking-wide min-h-[44px] flex items-center">GPMCC</Link>
           <a href="https://2kleigh.com" target="_blank" rel="noopener noreferrer" onClick={() => setMenuOpen(false)} className="text-sm text-[#C4A882] hover:text-[#C8A882] font-medium tracking-wide min-h-[44px] flex items-center">KLEIGH</a>
           <Link href="/join" onClick={() => setMenuOpen(false)} className="text-sm bg-[#C8A882] text-[#2A1506] px-4 py-3 rounded-full font-bold text-center hover:bg-[#D07CC8] transition-colors tracking-wide mt-2">{menuJoin}</Link>
         </div>
