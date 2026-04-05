@@ -76,6 +76,20 @@ CREATE TRIGGER trg_pix_pck_updated_at
 
 DO $$
 BEGIN
+  -- Backfill missing pix_pck rows for existing k_kut_assets references.
+  INSERT INTO public.pix_pck (id, title, pck_type, org_id, is_active)
+  SELECT
+    a.pix_pck_id,
+    'Recovered Package ' || LEFT(a.pix_pck_id::text, 8),
+    'ST',
+    MIN(a.org_id::text)::uuid AS org_id,
+    true
+  FROM public.k_kut_assets a
+  LEFT JOIN public.pix_pck p ON p.id = a.pix_pck_id
+  WHERE a.pix_pck_id IS NOT NULL
+    AND p.id IS NULL
+  GROUP BY a.pix_pck_id;
+
   IF NOT EXISTS (
     SELECT 1 FROM pg_constraint WHERE conname = 'k_kut_assets_pix_pck_fk'
   ) THEN

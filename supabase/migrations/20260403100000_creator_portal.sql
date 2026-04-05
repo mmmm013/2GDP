@@ -103,7 +103,7 @@ REVOKE ALL ON TABLE public.webauthn_challenges FROM anon, PUBLIC;
 DO $$ BEGIN
   IF NOT EXISTS (
     SELECT 1 FROM pg_policies
-    WHERE schemaname='public' AND tablename='creator_portals' AND polname='creator_portals_self_read'
+    WHERE schemaname='public' AND tablename='creator_portals' AND policyname='creator_portals_self_read'
   ) THEN
     CREATE POLICY creator_portals_self_read ON public.creator_portals
       FOR SELECT TO authenticated
@@ -114,7 +114,7 @@ END $$;
 DO $$ BEGIN
   IF NOT EXISTS (
     SELECT 1 FROM pg_policies
-    WHERE schemaname='public' AND tablename='creator_portals' AND polname='creator_portals_self_update'
+    WHERE schemaname='public' AND tablename='creator_portals' AND policyname='creator_portals_self_update'
   ) THEN
     CREATE POLICY creator_portals_self_update ON public.creator_portals
       FOR UPDATE TO authenticated
@@ -127,7 +127,7 @@ END $$;
 DO $$ BEGIN
   IF NOT EXISTS (
     SELECT 1 FROM pg_policies
-    WHERE schemaname='public' AND tablename='creator_assets' AND polname='creator_assets_self_read'
+    WHERE schemaname='public' AND tablename='creator_assets' AND policyname='creator_assets_self_read'
   ) THEN
     CREATE POLICY creator_assets_self_read ON public.creator_assets
       FOR SELECT TO authenticated
@@ -138,7 +138,7 @@ END $$;
 DO $$ BEGIN
   IF NOT EXISTS (
     SELECT 1 FROM pg_policies
-    WHERE schemaname='public' AND tablename='creator_assets' AND polname='creator_assets_self_insert'
+    WHERE schemaname='public' AND tablename='creator_assets' AND policyname='creator_assets_self_insert'
   ) THEN
     CREATE POLICY creator_assets_self_insert ON public.creator_assets
       FOR INSERT TO authenticated
@@ -149,7 +149,7 @@ END $$;
 DO $$ BEGIN
   IF NOT EXISTS (
     SELECT 1 FROM pg_policies
-    WHERE schemaname='public' AND tablename='creator_assets' AND polname='creator_assets_self_update'
+    WHERE schemaname='public' AND tablename='creator_assets' AND policyname='creator_assets_self_update'
   ) THEN
     CREATE POLICY creator_assets_self_update ON public.creator_assets
       FOR UPDATE TO authenticated
@@ -161,7 +161,7 @@ END $$;
 DO $$ BEGIN
   IF NOT EXISTS (
     SELECT 1 FROM pg_policies
-    WHERE schemaname='public' AND tablename='creator_assets' AND polname='creator_assets_self_delete'
+    WHERE schemaname='public' AND tablename='creator_assets' AND policyname='creator_assets_self_delete'
   ) THEN
     CREATE POLICY creator_assets_self_delete ON public.creator_assets
       FOR DELETE TO authenticated
@@ -173,7 +173,7 @@ END $$;
 DO $$ BEGIN
   IF NOT EXISTS (
     SELECT 1 FROM pg_policies
-    WHERE schemaname='public' AND tablename='creator_assets' AND polname='creator_assets_pixie_public_read'
+    WHERE schemaname='public' AND tablename='creator_assets' AND policyname='creator_assets_pixie_public_read'
   ) THEN
     CREATE POLICY creator_assets_pixie_public_read ON public.creator_assets
       FOR SELECT TO anon
