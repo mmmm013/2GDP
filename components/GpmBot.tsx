@@ -21,12 +21,14 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { ChevronRight, ChevronDown, CheckCircle, Circle, Zap, X, Mic, MicOff } from 'lucide-react';
+import { safePlay } from '@/lib/audio/safePlay';
+import { AUDIO_UI_MESSAGES } from '@/lib/audio/messages';
 
 // ---------------------------------------------------------------------------
 // Bot config — mirrors BOT_PROFILES in /api/public/kkut-guide
 // ---------------------------------------------------------------------------
 
-export type BotName = 'MC-BOT' | 'LF-BOT' | 'GD-BOT' | 'PIXIE-BOT' | 'OPS-BOT';
+export type BotName = 'MC-BOT' | 'LF-BOT' | 'GD-BOT' | 'PIXIE-BOT' | 'OPS-BOT' | 'P-LEC-BOT';
 
 const BOT_CONFIG: Record<BotName, {
   label: string;
@@ -53,7 +55,7 @@ const BOT_CONFIG: Record<BotName, {
     ringColor: 'ring-amber-500/60',
     emoji: '🎛️',
     voice: 'Your guide · KLEIGH, AUS',
-    greetingAudio: '/audio/mc_intro.m4a',
+    greetingAudio: '/audio/mc_bot_intro.m4a',
     greeting: "G'day — I'm MC-BOT, your KLEIGH guide from AUS. Here's what we can do next together. Tap → and let's crack on. I'll show you the good stuff, mate — no hard sell, just the right moves.",
     firstVisitCue: "G'day, mate! I'm MC-BOT — your Robin Hood guide from KLEIGH, AUS. Say \"NEXT\" or tap → and I'll show you exactly what we've got. No pressure, just the good stuff.",
   },
@@ -118,6 +120,19 @@ const BOT_CONFIG: Record<BotName, {
     greeting: "OPS-BOT online. Platform status nominal. I monitor cron jobs, migration health, and admin alerts. Ask me anything about system status or pipeline health. Let's keep things running clean.",
     firstVisitCue: "OPS-BOT here ⚙️ Say \"NEXT\" or tap → and I'll walk you through the platform dashboard — clean, fast, no guesswork.",
   },
+  /**
+   * P-LEC-BOT — Sniper intake watchdog
+   * Tags all incoming bots, reports intake, and holds tracking until GPME admin release by email.
+   */
+  'P-LEC-BOT': {
+    label: 'P-LEC-BOT',
+    color: '#fca5a5',
+    ringColor: 'ring-rose-400/70',
+    emoji: '🎯',
+    voice: 'Sniper Watchdog · Intake Control',
+    greeting: 'P-LEC-BOT online. Sniper intake is active: I tag all incoming bots, report every arrival, and maintain hold until GPME admin clears by email.',
+    firstVisitCue: 'P-LEC-BOT active 🎯 Say "NEXT" or tap → for intake watch status and control policy.',
+  },
 };
 
 // ---------------------------------------------------------------------------
@@ -180,6 +195,18 @@ const BOT_STEP_HINTS: Record<BotName, string[]> = {
     "API health: all endpoints return 200 in normal operation. /api/health is your quick check. /api/admin/lt-pix-mkut-check verifies LT-PIX mini-KUT coverage. Both are CRON_SECRET-guarded.",
     "Status nominal. All systems operational. Keep an eye on the Vercel dashboard for edge function timing. If you need a full audit, I'm right here.",
   ],
+
+  /**
+   * P-LEC-BOT — Sniper watchdog for incoming bot traffic and edit-power policy.
+   */
+  'P-LEC-BOT': [
+    'Sniper intake online. Every incoming bot is tagged immediately and logged for traceability.',
+    'All arrivals are reported in full. No silent pass-through and no untracked sessions.',
+    'Tracking persistence is strict: once tagged, monitoring remains active until explicit GPME admin release by email.',
+    'Internal edit-power is not open access. It is available only through Rent a Ripper: annual term or 1-year monthly-payment term, with signed agreement required.',
+    'Termination is breakable by either side, but only through email with GPME admin. Policy enforced.',
+    'Execution objective: create new free time and reduce stress by preventing inaccuracies, mis-timings, miscommunication, and mis-information before release.',
+  ],
 };
 
 // ---------------------------------------------------------------------------
@@ -205,14 +232,14 @@ export const DEFAULT_STEPS: JourneyStep[] = [
   },
   {
     title: 'Choose a K-KUT or mini-KUT path',
-    hint: 'A K-KUT is a 6-character link — short enough to text — that opens a curated Sweet Spot. A mini-KUT streams a specific verse, bridge, or chorus. Both shareable in one tap.',
+    hint: 'K-KUT and mini-KUT options are pre-made and ready to launch in one tap. In GPME, customization is read-only.',
     action: 'Explore K-KUTs',
     href: '/kupid',
   },
   {
-    title: 'Generate or resolve your link',
-    hint: 'K-kUpId is the gifting layer. Pick your track. Choose your moment. Generate a link, then share the full digital experience.',
-    action: 'Create K-KUT',
+    title: 'Select or resolve your link',
+    hint: 'K-kUpId is the gifting layer. Select a pre-made KK/mK/KPD, then share the full digital experience. MIP2 custom work is handled outside GPME by request.',
+    action: 'Open Pre-Made K-KUT',
     href: '/kkut/create',
   },
   {
@@ -319,8 +346,11 @@ export default function GpmBot({
     if (src) {
       const audio = new Audio(src);
       audioRef.current = audio;
-      audio.play().catch(() => {
-        // File not yet deployed — fall back to TTS
+      safePlay(audio, 'GpmBot-greeting', { track: profile.label, url: src }).then((result) => {
+        if (result.ok) return;
+        setVoiceStatus(AUDIO_UI_MESSAGES.playbackBlocked);
+        setTimeout(() => setVoiceStatus(''), 2000);
+        // File missing or playback blocked — fall back to TTS
         if (typeof window !== 'undefined' && window.speechSynthesis) {
           const utt = new SpeechSynthesisUtterance(profile.greeting);
           window.speechSynthesis.speak(utt);
