@@ -38,6 +38,8 @@ const BOT_CONFIG: Record<BotName, {
   firstVisitCue: string;
   /** Voice/persona descriptor shown as a sub-label */
   voice: string;
+  /** Path to greeting audio file in /public/audio/ — undefined = TTS fallback */
+  greetingAudio?: string;
 }> = {
   /**
    * MC-BOT — KLEIGH, AUS
@@ -51,6 +53,7 @@ const BOT_CONFIG: Record<BotName, {
     ringColor: 'ring-amber-500/60',
     emoji: '🎛️',
     voice: 'Your guide · KLEIGH, AUS',
+    greetingAudio: '/audio/mc_intro.m4a',
     greeting: "G'day — I'm MC-BOT, your KLEIGH guide from AUS. Here's what we can do next together. Tap → and let's crack on. I'll show you the good stuff, mate — no hard sell, just the right moves.",
     firstVisitCue: "G'day, mate! I'm MC-BOT — your Robin Hood guide from KLEIGH, AUS. Say \"NEXT\" or tap → and I'll show you exactly what we've got. No pressure, just the good stuff.",
   },
@@ -66,6 +69,7 @@ const BOT_CONFIG: Record<BotName, {
     ringColor: 'ring-green-400/60',
     emoji: '💌',
     voice: 'Lisa Farmer · IL, USA',
+    greetingAudio: '/audio/lcf_intro.m4a',
     greeting: "Hi there — I'm LF-BOT, Lisa Farmer from Illinois. I'll walk you through every step nice and clear. Licensing, rights, deal questions — I turn all the complex stuff into plain English. Your work and your buyer's needs are fully respected here. Let's go!",
     firstVisitCue: "Hi! I'm LF-BOT — Lisa Farmer from IL. Say \"NEXT\" or tap → and I'll guide you through every step with warmth and clarity. Nothing complicated, I promise!",
   },
@@ -81,6 +85,7 @@ const BOT_CONFIG: Record<BotName, {
     ringColor: 'ring-emerald-400/60',
     emoji: '📊',
     voice: 'Founder · Normal, USA',
+    greetingAudio: '/audio/gpm_intro.m4a',
     greeting: "GD-BOT online. Direct. Energetic. ALIVE! I'm the Founder — Normal, USA. I find the next best move for you right now: pricing, campaigns, K-KUT focus. Customer is always right, and the right move is always forward. Let's GO.",
     firstVisitCue: "GD-BOT online. ALIVE! I'm the Founder. Say \"NEXT\" or tap → and we level this up together. Direct, fast, and always rooting for you.",
   },
@@ -95,6 +100,7 @@ const BOT_CONFIG: Record<BotName, {
     ringColor: 'ring-violet-400/60',
     emoji: '✨',
     voice: 'PIXIE · Creative Stylist',
+    greetingAudio: '/audio/pixie_intro.m4a',
     greeting: "Hi, I'm PIXIE-BOT ✨ Jane Burton, creative stylist and your guide to perfect music moments. I shape K-KUT experiences, curate PIXIE's PIX playlist, and help you find the exact note that speaks. Say \"NEXT\" or tap → and let's create something beautiful.",
     firstVisitCue: "I'm PIXIE-BOT ✨ Say \"NEXT\" or tap → and I'll shape your perfect music moment — personal, curated, exactly right.",
   },
@@ -254,6 +260,7 @@ export default function GpmBot({
   const [isFirstVisit, setIsFirstVisit] = useState(false);
   const [moodAck, setMoodAck] = useState('');
   const recognitionRef = useRef<any>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
   const stepRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   // Detect first-time visitor and auto-expand with special greeting
@@ -304,6 +311,32 @@ export default function GpmBot({
     const t = setTimeout(() => setShowGreeting(false), 6000);
     return () => clearTimeout(t);
   }, [showGreeting]);
+
+  // Play greeting audio when greeting appears; fall back to SpeechSynthesis on error
+  useEffect(() => {
+    if (!showGreeting) return;
+    const src = profile.greetingAudio;
+    if (src) {
+      const audio = new Audio(src);
+      audioRef.current = audio;
+      audio.play().catch(() => {
+        // File not yet deployed — fall back to TTS
+        if (typeof window !== 'undefined' && window.speechSynthesis) {
+          const utt = new SpeechSynthesisUtterance(profile.greeting);
+          window.speechSynthesis.speak(utt);
+        }
+      });
+      return () => {
+        audio.pause();
+        audioRef.current = null;
+      };
+    } else {
+      if (typeof window !== 'undefined' && window.speechSynthesis) {
+        const utt = new SpeechSynthesisUtterance(profile.greeting);
+        window.speechSynthesis.speak(utt);
+      }
+    }
+  }, [showGreeting, profile.greetingAudio, profile.greeting]);
 
   // Scroll active step into centre of the step-list container
   useEffect(() => {
