@@ -8,6 +8,17 @@ function getStripe() {
 }
 
 export async function GET(req: NextRequest) {
+  const stripeKey = process.env.STRIPE_SECRET_KEY
+  if (!stripeKey) {
+    return NextResponse.json(
+      {
+        error: 'Session status unavailable: STRIPE_SECRET_KEY is not configured',
+        missingEnv: ['STRIPE_SECRET_KEY'],
+      },
+      { status: 503 }
+    )
+  }
+
   const sessionId = req.nextUrl.searchParams.get('session_id')
 
   if (!sessionId || typeof sessionId !== 'string' || sessionId.length > 200) {

@@ -9,10 +9,27 @@ function getStripe() {
 }
 
 export async function POST(req: NextRequest) {
+  const stripeKey = process.env.STRIPE_SECRET_KEY;
+  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+  if (!stripeKey || !webhookSecret) {
+    return NextResponse.json(
+      {
+        error: 'Webhook unavailable: Stripe environment is not configured',
+        missingEnv: [
+          ...(!stripeKey ? ['STRIPE_SECRET_KEY'] : []),
+          ...(!webhookSecret ? ['STRIPE_WEBHOOK_SECRET'] : []),
+        ],
+      },
+      { status: 503 }
+    );
+  }
+
   const stripe = getStripe();
-  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
   const body = await req.text();
-  const sig = req.headers.get('stripe-signature')!;
+  const sig = req.headers.get('stripe-signature');
+  if (!sig) {
+    return NextResponse.json({ error: 'Missing stripe-signature header' }, { status: 400 });
+  }
 
   let event: Stripe.Event;
 
@@ -59,8 +76,8 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     .eq('stripe_session_id', session.id);
 
   if (updateError) {
+    // Never block gift fulfillment on donation logging errors.
     console.error('Failed to update donation:', updateError);
-    return;
   }
 
   // Assign a random gift asset from the tier
@@ -95,6 +112,7 @@ async function handlePaymentFailed(intent: Stripe.PaymentIntent) {
     .eq('stripe_payment_intent', intent.id);
 
   if (error) {
+    // Logging failure should not fail webhook acknowledgement.
     console.error('Failed to update failed payment:', error);
   }
 }
