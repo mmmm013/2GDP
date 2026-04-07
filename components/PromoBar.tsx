@@ -8,7 +8,9 @@ const PROMOS = [
     id: 'founder',
     bg: 'bg-amber-500',
     text: 'text-black',
-    label: '⚡ FOUNDER SPECIAL — First 50 K-KUTs get permanent ELDER status for the price of JOEY. Limited.',
+    // NOTE: K-KUT language is product/inventory language; this bar is sponsor-focused.
+    // Keep it sponsor-centric (KUB) because /join is where sponsors join.
+    label: '⚡ FOUNDER SPECIAL — First 50 KUBs get permanent ELDER status for the price of JOEY. Limited.',
     cta: 'CLAIM IT →',
     href: '/join',
   },
@@ -32,7 +34,7 @@ const PROMOS = [
     id: 'kleigh',
     bg: 'bg-purple-900',
     text: 'text-purple-200',
-    label: '🐨 KLEIGH KUB — Alt rock from Down Under. KUBs are KLEIGH\'s koala crew. Stream free, join the pride.',
+    label: "🐨 KLEIGH KUB — Alt rock from Down Under. KUBs are KLEIGH's koala crew. Stream free, join the pride.",
     cta: 'BECOME A KUB →',
     href: 'https://2kleigh.com',
   },
