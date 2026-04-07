@@ -14,7 +14,7 @@
  * PIXIE:   Two tabs — HERB BLOG (rich-text) + PLAYLIST (drag-sort 2hr GPM FP)
  */
 
-import { useEffect, useState, useCallback, useRef } from 'react';
+import { useEffect, useState, useCallback, useRef , type ChangeEvent } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import {
   startAuthentication,
@@ -501,7 +501,7 @@ function UploadZone({
   const [label, setLabel] = useState('');
   const [pendingFile, setPendingFile] = useState<File | null>(null);
 
-  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+  function handleFileChange(e: ChangeEvent<HTMLInputElement>) {
     const f = e.target.files?.[0] ?? null;
     setPendingFile(f);
     if (f && !label) setLabel(f.name.replace(/\.[^.]+$/, ''));
