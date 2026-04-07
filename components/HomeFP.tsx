@@ -44,9 +44,11 @@ const TWO_HOURS_MS = 2 * 60 * 60 * 1000;
 // Excluded artists (case-insensitive match)
 const EXCLUDED_ARTISTS = ['sybc', 'wounded', 'willing'];
 
-// IMPORTANT: get-stream-url defaults to bucket "audio-stream".
-// If your audio is stored in a different bucket, set it here.
-const STREAM_BUCKET_OVERRIDE: string | undefined = undefined;
+// IMPORTANT:
+// Your Supabase project shows the "audio-stream" bucket is empty, and your audio files
+// are actually stored in the "tracks" bucket.
+// So we override the bucket when calling get-stream-url.
+const STREAM_BUCKET_OVERRIDE: string | undefined = 'tracks';
 
 // ---------------------------------------------------------------------------
 // HELPERS
