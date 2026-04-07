@@ -17,7 +17,7 @@
  * steps - optional custom journey steps (defaults to JOURNEY_PROTOCOL)
  * onStepChange - optional callback fired when activeStep changes
  */
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, type KeyboardEvent } from 'react';
 import { ChevronRight, ChevronDown, CheckCircle, Circle, Zap, X, Mic, MicOff } from 'lucide-react';
 import { safePlay } from '@/lib/audio/safePlay';
 import { AUDIO_UI_MESSAGES } from '@/lib/audio/messages';
@@ -300,7 +300,7 @@ export default function GpmBot({
     onStepChange?.(activeStep);
   }, [activeStep, onStepChange]);
 
-  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+  const handleKeyDown = useCallback((e: KeyboardEvent) => {
     if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
       setActiveStep((s) => Math.min(s + 1, steps.length - 1));
     } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
