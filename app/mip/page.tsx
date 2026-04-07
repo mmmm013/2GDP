@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect , type FormEvent } from 'react';
 import { Shield, Zap, Mic, Lock, Download, Play, Pause, FileText, ToggleLeft, ToggleRight, CheckCircle, Copy } from 'lucide-react';
 import { supabase } from '@/lib/supabaseClient';
 import BraveEaglePromo from '@/components/BraveEaglePromo';
@@ -18,7 +18,7 @@ export default function MipPage() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   // AUTH
-  const checkPass = (e: React.FormEvent) => {
+  const checkPass = (e: FormEvent) => {
     e.preventDefault();
     if (passcode.toLowerCase() === 'gpmpro26') setAccessGranted(true);
     else alert('Access Denied.');
