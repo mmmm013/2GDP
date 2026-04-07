@@ -44,6 +44,10 @@ const TWO_HOURS_MS = 2 * 60 * 60 * 1000;
 // Excluded artists (case-insensitive match)
 const EXCLUDED_ARTISTS = ['sybc', 'wounded', 'willing'];
 
+// IMPORTANT: get-stream-url defaults to bucket "audio-stream".
+// If your audio is stored in a different bucket, set it here.
+const STREAM_BUCKET_OVERRIDE: string | undefined = undefined;
+
 // ---------------------------------------------------------------------------
 // HELPERS
 // ---------------------------------------------------------------------------
@@ -89,6 +93,9 @@ async function resolveSignedStreamUrl(params: {
 }): Promise<string> {
   const { trackId, supabaseUrl, supabaseAnonKey } = params;
 
+  const body: Record<string, unknown> = { track_id: trackId };
+  if (STREAM_BUCKET_OVERRIDE) body.bucket = STREAM_BUCKET_OVERRIDE;
+
   const res = await fetch(`${supabaseUrl}/functions/v1/get-stream-url`, {
     method: 'POST',
     headers: {
@@ -96,7 +103,7 @@ async function resolveSignedStreamUrl(params: {
       apikey: supabaseAnonKey,
       Authorization: `Bearer ${supabaseAnonKey}`,
     },
-    body: JSON.stringify({ track_id: trackId }),
+    body: JSON.stringify(body),
   });
 
   const json = await res.json().catch(() => ({}));
