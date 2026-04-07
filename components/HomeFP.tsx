@@ -12,11 +12,10 @@
  *  • Amber brand — #C8A882 / #D4A017 / #2A1506 / #1a1207
  *  • Single audio source — dispatches stop-all-audio before playing
  *
- * STREAMING MODEL (Option A):
- *  • Track metadata is loaded from DB (tracks/gpm_tracks)
- *  • Actual playback URL is ALWAYS resolved via Supabase Edge Function:
- *      POST /functions/v1/get-stream-url
- *    so we are not dependent on raw external URLs (DISCO / redirects / CORS).
+ * STREAMING MODEL:
+ *  • Primary: resolves playback URL via Edge Function get-stream-url (signed URL)
+ *  • Fallback (when DB file_path / Edge signing isn’t ready): uses public Storage URL
+ *    from bucket "tracks" (you confirmed this bucket is public and has mp3s).
  */
 
 import { useState, useEffect, useRef, useCallback } from 'react';
@@ -31,9 +30,17 @@ interface FPTrack {
   id: number | string;
   title: string;
   artist: string;
-  /** Stream URL (signed) used for playback. */
+  /** Stream URL used for playback. */
   url: string;
 }
+
+type RawTrack = {
+  id: number | string;
+  title?: string | null;
+  artist?: string | null;
+  file_path?: string | null;
+  url?: string | null;
+};
 
 // ---------------------------------------------------------------------------
 // CONSTANTS
@@ -44,11 +51,8 @@ const TWO_HOURS_MS = 2 * 60 * 60 * 1000;
 // Excluded artists (case-insensitive match)
 const EXCLUDED_ARTISTS = ['sybc', 'wounded', 'willing'];
 
-// IMPORTANT:
-// Your Supabase project shows the "audio-stream" bucket is empty, and your audio files
-// are actually stored in the "tracks" bucket.
-// So we override the bucket when calling get-stream-url.
-const STREAM_BUCKET_OVERRIDE: string | undefined = 'tracks';
+// Your audio files are in Storage bucket "tracks"
+const STREAM_BUCKET = 'tracks';
 
 // ---------------------------------------------------------------------------
 // HELPERS
@@ -70,7 +74,7 @@ function formatTime(sec: number): string {
   return `${m}:${s.toString().padStart(2, '0')}`;
 }
 
-function isExcluded(track: { title?: string; artist?: string }): boolean {
+function isExcluded(track: { title?: string | null; artist?: string | null }): boolean {
   const titleUp = (track.title ?? '').toUpperCase();
   const artistLo = (track.artist ?? '').toLowerCase();
 
@@ -88,15 +92,23 @@ function isExcluded(track: { title?: string; artist?: string }): boolean {
   return false;
 }
 
+function toPublicStorageUrl(params: {
+  supabaseUrl: string;
+  bucket: string;
+  filePath: string;
+}): string {
+  const { supabaseUrl, bucket, filePath } = params;
+  const trimmed = filePath.replace(/^\//, '');
+  return `${supabaseUrl}/storage/v1/object/public/${bucket}/${encodeURI(trimmed)}`;
+}
+
 async function resolveSignedStreamUrl(params: {
   trackId: string | number;
   supabaseUrl: string;
   supabaseAnonKey: string;
+  bucket: string;
 }): Promise<string> {
-  const { trackId, supabaseUrl, supabaseAnonKey } = params;
-
-  const body: Record<string, unknown> = { track_id: trackId };
-  if (STREAM_BUCKET_OVERRIDE) body.bucket = STREAM_BUCKET_OVERRIDE;
+  const { trackId, supabaseUrl, supabaseAnonKey, bucket } = params;
 
   const res = await fetch(`${supabaseUrl}/functions/v1/get-stream-url`, {
     method: 'POST',
@@ -105,7 +117,7 @@ async function resolveSignedStreamUrl(params: {
       apikey: supabaseAnonKey,
       Authorization: `Bearer ${supabaseAnonKey}`,
     },
-    body: JSON.stringify(body),
+    body: JSON.stringify({ track_id: trackId, bucket }),
   });
 
   const json = await res.json().catch(() => ({}));
@@ -137,50 +149,42 @@ export default function HomeFP() {
   const playedAtRef = useRef<Map<string, number>>(new Map());
 
   // ---------------------------------------------------------------------------
-  // FETCH TRACKS + RESOLVE SIGNED URLS
+  // FETCH TRACKS + RESOLVE URLS
   // ---------------------------------------------------------------------------
 
   useEffect(() => {
     async function load() {
-      const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-      const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+      const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-      if (!url || !key) {
+      if (!supabaseUrl || !anonKey) {
         setIsLoading(false);
         setError('Stream unavailable');
         return;
       }
 
-      const sb = createClient(url, key);
+      const sb = createClient(supabaseUrl, anonKey);
 
       // Query a broad set — we'll filter client-side so we get enough tracks
-      // for a 2+ hour session.  Limit 200 to keep payload manageable.
+      // for a 2+ hour session. Limit 200 to keep payload manageable.
       const { data, error: dbErr } = await sb
         .from('tracks')
-        .select('id, title, artist')
+        .select('id, title, artist, file_path, url')
         .limit(200);
 
-      let raw: Array<{ id: string | number; title?: string; artist?: string }> = [];
+      let raw: RawTrack[] = [];
 
       if (!dbErr && data && data.length > 0) {
-        raw = (data as any[]).map((r) => ({
-          id: r.id,
-          title: r.title ?? 'Unknown',
-          artist: r.artist ?? 'G Putnam Music',
-        }));
+        raw = data as unknown as RawTrack[];
       } else {
         // Fallback: try gpm_tracks table (used by FPPixBar)
         const { data: alt } = await sb
           .from('gpm_tracks')
-          .select('id, title, artist')
+          .select('id, title, artist, file_path, url')
           .limit(200);
 
         if (alt && alt.length > 0) {
-          raw = (alt as any[]).map((r) => ({
-            id: r.id,
-            title: r.title ?? 'Unknown',
-            artist: r.artist ?? 'G Putnam Music',
-          }));
+          raw = alt as unknown as RawTrack[];
         }
       }
 
@@ -192,25 +196,48 @@ export default function HomeFP() {
         return;
       }
 
-      // Resolve signed URLs in parallel, but keep only those that succeed.
+      // Resolve URLs:
+      //  1) Try Edge signed URL (preferred)
+      //  2) Fallback to public Storage URL using file_path (bucket is public)
+      //  3) Fallback to DB url if it looks like a direct http(s) link
       const resolved = await Promise.all(
         filteredRaw.map(async (t) => {
+          const title = t.title ?? 'Unknown';
+          const artist = t.artist ?? 'G Putnam Music';
+
+          // 1) Signed URL
           try {
             const signed = await resolveSignedStreamUrl({
               trackId: t.id,
-              supabaseUrl: url,
-              supabaseAnonKey: key,
+              supabaseUrl,
+              supabaseAnonKey: anonKey,
+              bucket: STREAM_BUCKET,
             });
-            if (!signed) return null;
-            return {
-              id: t.id,
-              title: t.title ?? 'Unknown',
-              artist: t.artist ?? 'G Putnam Music',
-              url: signed,
-            } satisfies FPTrack;
+            if (signed) {
+              return { id: t.id, title, artist, url: signed } satisfies FPTrack;
+            }
           } catch {
-            return null;
+            // fall through
           }
+
+          // 2) Public storage URL from file_path
+          if (t.file_path) {
+            const pub = toPublicStorageUrl({
+              supabaseUrl,
+              bucket: STREAM_BUCKET,
+              filePath: t.file_path,
+            });
+            if (pub) {
+              return { id: t.id, title, artist, url: pub } satisfies FPTrack;
+            }
+          }
+
+          // 3) DB url fallback
+          if (t.url && /^https?:\/\//i.test(t.url)) {
+            return { id: t.id, title, artist, url: t.url } satisfies FPTrack;
+          }
+
+          return null;
         })
       );
 
@@ -453,9 +480,7 @@ export default function HomeFP() {
                 </span>
               </button>
             )}
-            {error && (
-              <p className="text-amber-400/70 text-xs mb-2">{error}</p>
-            )}
+            {error && <p className="text-amber-400/70 text-xs mb-2">{error}</p>}
             <p className="text-[10px] text-[#C8A882]/50 uppercase tracking-widest mb-1">
               {isPlaying ? 'Now Streaming' : 'Ready'}
             </p>
