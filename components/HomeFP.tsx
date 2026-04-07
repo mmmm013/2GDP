@@ -18,7 +18,7 @@
  *    from bucket "tracks" (you confirmed this bucket is public and has mp3s).
  */
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, type ChangeEvent } from 'react';
 import { Play, Pause, SkipBack, SkipForward, Radio } from 'lucide-react';
 import { createClient } from '@supabase/supabase-js';
 
@@ -391,7 +391,7 @@ export default function HomeFP() {
     setIsPlaying(true);
   }, [tracks.length]);
 
-  const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSeek = (e: ChangeEvent<HTMLInputElement>) => {
     const audio = audioRef.current;
     if (!audio) return;
     const t = parseFloat(e.target.value);
