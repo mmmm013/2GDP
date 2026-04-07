@@ -65,7 +65,7 @@ export default function JoinPage() {
         <div className="max-w-3xl mx-auto text-center">
           <p className="text-xs font-black uppercase tracking-[0.2em] mb-1 opacity-70">⚡ Limited Time — Founder Special</p>
           <p className="text-lg font-black leading-tight">
-            First {FOUNDER_TOTAL} K-KUTs get <span className="text-white">ELDER status at the JOEY price</span> — forever.
+            First {FOUNDER_TOTAL} <span className="text-white">Sponsors</span> get <span className="text-white">ELDER status at the JOEY price</span> — forever.
           </p>
           <div className="mt-2 flex items-center justify-center gap-3">
             <div className="h-2 bg-[#FFD54F]/20 rounded-full flex-1 max-w-xs overflow-hidden">
@@ -102,13 +102,13 @@ export default function JoinPage() {
           <Users size={48} className="text-[#FFD54F]" strokeWidth={2} />
         </div>
         <h1 className="text-5xl md:text-7xl font-black text-[#3E2723] mb-3 tracking-tight drop-shadow-sm leading-none">
-          Join the<br/>Pride.
+          Join the<br />Pride.
         </h1>
         <p className="text-lg font-bold text-[#3E2723] opacity-80 mb-2 uppercase tracking-widest">
           Partner with us to keep the music flowing.
         </p>
         <p className="text-sm font-semibold text-[#3E2723]/60 mb-8 max-w-md mx-auto">
-          We want volume. We value every single K-KUT. Pick your level — all tiers get real access, real benefits.
+          We want volume. We value every single Sponsor. Pick your level — all tiers get real access, real benefits.
         </p>
       </div>
 
@@ -123,14 +123,14 @@ export default function JoinPage() {
           <div className="bg-[#FFF8E1] border-2 border-[#3E2723] rounded-3xl p-8 shadow-[8px_8px_0px_0px_rgba(62,39,35,1)]">
             <h2 className="text-2xl font-black uppercase tracking-tight mb-6 flex items-center gap-2"><Compass size={24} /> The Course</h2>
             <div className="space-y-4 text-base font-bold text-[#3E2723]/80 leading-relaxed">
-              <p>K-KUTs are the engine of G Putnam Music. You aren&apos;t just a fan — you are a partner.</p>
+              <p>Sponsors are the engine of G Putnam Music. You aren&apos;t just a fan — you are a partner.</p>
               <p>Your contribution keeps the <strong>Singalongs</strong> free for pediatric wards and the <strong>Kleigh</strong> stream running for fans worldwide.</p>
               <p><span className="text-[#E65100]">100% of proceeds</span> fuel artist support &amp; platform development.</p>
               <p className="text-xs opacity-50 italic">We watch process. Money cares for itself when the process is right.</p>
             </div>
 
             <div className="mt-6 pt-6 border-t-2 border-[#3E2723]/10 space-y-3">
-              <h3 className="font-black text-sm uppercase">Every K-KUT Gets:</h3>
+              <h3 className="font-black text-sm uppercase">Every Sponsor Gets:</h3>
               <div className="flex items-center gap-3 font-bold text-sm"><Check size={18} className="text-[#E65100]" /> Access to URU Story Engine</div>
               <div className="flex items-center gap-3 font-bold text-sm"><Check size={18} className="text-[#E65100]" /> Unlimited Plays (No Limits)</div>
               <div className="flex items-center gap-3 font-bold text-sm"><Check size={18} className="text-[#E65100]" /> Verified &quot;Sponsor&quot; Rank</div>
@@ -140,7 +140,7 @@ export default function JoinPage() {
             {/* ONE-TIME GIFT SHORTCUT */}
             <div className="mt-6 pt-6 border-t-2 border-[#3E2723]/10">
               <p className="text-xs font-black uppercase tracking-widest opacity-60 mb-3">Not ready to subscribe?</p>
-              <Link href="/gift" className="block w-full text-center bg-[#E65100] text-white py-3 rounded-xl font-black text-sm uppercase tracking-wider hover:bg-[#BF360C] transition-colors shadow-md">
+              <Link href="/gift" className="block w-full text-center bg-[#E65100] text-white py-3 rounded-xl font-black text-sm uppercase tracking-wider hover:bg-[#BF360C] transition-colors shado[...]
                 ❤️ One-Time Heart-Tap Gift
               </Link>
             </div>
@@ -159,7 +159,8 @@ export default function JoinPage() {
               </div>
               <div className="text-right">
                 <div className="font-black text-2xl">$5</div>
-                <button onClick={() => handleJoin('joey')} disabled={loading === 'joey'} className="text-[10px] underline hover:text-white cursor-pointer disabled:opacity-50">{loading === 'joey' ? 'LOADING...' : 'JOIN'}</button>
+                <button onClick={() => handleJoin('joey')} disabled={loading === 'joey'} className="text-[10px] underline hover:text-white cursor-pointer disabled:opacity-50">{loading === 'joey' [...]
+                </button>
               </div>
             </div>
 
@@ -174,7 +175,8 @@ export default function JoinPage() {
               </div>
               <div className="text-right">
                 <div className="font-black text-2xl text-[#3E2723]">$10</div>
-                <button onClick={() => handleJoin('climber')} disabled={loading === 'climber'} className="text-[10px] text-[#3E2723] font-bold underline hover:text-[#E65100] cursor-pointer disabled:opacity-50">{loading === 'climber' ? 'LOADING...' : 'JOIN'}</button>
+                <button onClick={() => handleJoin('climber')} disabled={loading === 'climber'} className="text-[10px] text-[#3E2723] font-bold underline hover:text-[#E65100] cursor-pointer disabl[...]
+                </button>
               </div>
             </div>
 
@@ -189,7 +191,8 @@ export default function JoinPage() {
               </div>
               <div className="text-right">
                 <div className="font-black text-2xl text-[#3E2723]">$15</div>
-                <button onClick={() => handleJoin('alpha')} disabled={loading === 'alpha'} className="text-[10px] text-[#3E2723] font-bold underline hover:text-[#2E7D32] cursor-pointer disabled:opacity-50">{loading === 'alpha' ? 'LOADING...' : 'JOIN'}</button>
+                <button onClick={() => handleJoin('alpha')} disabled={loading === 'alpha'} className="text-[10px] text-[#3E2723] font-bold underline hover:text-[#2E7D32] cursor-pointer disabled:o[...]
+                </button>
               </div>
             </div>
 
@@ -205,7 +208,8 @@ export default function JoinPage() {
               </div>
               <div className="text-right">
                 <div className="font-black text-2xl text-[#3E2723]">$20</div>
-                <button onClick={() => handleJoin('elder')} disabled={loading === 'elder'} className="text-[10px] text-[#3E2723] font-bold underline hover:text-white cursor-pointer disabled:opacity-50">{loading === 'elder' ? 'LOADING...' : 'JOIN'}</button>
+                <button onClick={() => handleJoin('elder')} disabled={loading === 'elder'} className="text-[10px] text-[#3E2723] font-bold underline hover:text-white cursor-pointer disabled:opaci[...]
+                </button>
               </div>
             </div>
 
@@ -250,4 +254,3 @@ export default function JoinPage() {
     </main>
   );
 }
-
