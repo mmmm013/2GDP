@@ -1,5 +1,5 @@
 'use client';
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect, useCallback , type ChangeEvent } from 'react';
 import { Play, Pause, SkipBack, SkipForward, Volume2, VolumeX, Repeat } from 'lucide-react';
 import { gpmET } from '@/lib/gpm-et';
 
@@ -206,7 +206,7 @@ export default function HeroesFeaturedPlayer() {
     playStartRef.current = Date.now();
   }, [currentIndex, currentTrack]);
 
-  const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSeek = (e: ChangeEvent<HTMLInputElement>) => {
     const audio = audioRef.current;
     if (!audio) return;
     const newTime = parseFloat(e.target.value);
@@ -214,7 +214,7 @@ export default function HeroesFeaturedPlayer() {
     setCurrentTime(newTime);
   };
 
-  const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleVolumeChange = (e: ChangeEvent<HTMLInputElement>) => {
     const newVol = parseFloat(e.target.value);
     setVolume(newVol);
     if (newVol > 0 && isMuted) setIsMuted(false);
