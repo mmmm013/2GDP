@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState , type FormEvent } from 'react';
 import { createClient } from '@supabase/supabase-js';
 import { Mail, CheckCircle, Loader2 } from 'lucide-react';
 
@@ -21,7 +21,7 @@ export default function EmailCapture() {
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [errorMsg, setErrorMsg] = useState('');
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (!email || !email.includes('@')) {
       setErrorMsg('Please enter a valid email.');
