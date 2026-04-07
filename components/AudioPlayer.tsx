@@ -1,5 +1,5 @@
 'use client';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect , type ChangeEvent } from 'react';
 import { Play, Pause, AlertCircle, SkipBack, SkipForward, Volume2, VolumeX } from 'lucide-react';
 
 export default function AudioPlayer() {
@@ -159,7 +159,7 @@ export default function AudioPlayer() {
     }
   };
 
-  const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSeek = (e: ChangeEvent<HTMLInputElement>) => {
     const newTime = parseFloat(e.target.value);
     let clampedTime = newTime;
     if (clampedTime < boundaries.start) clampedTime = boundaries.start;
@@ -169,7 +169,7 @@ export default function AudioPlayer() {
     if (audioRef.current) audioRef.current.currentTime = clampedTime;
   };
 
-  const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleVolumeChange = (e: ChangeEvent<HTMLInputElement>) => {
     const newVolume = parseFloat(e.target.value);
     setVolume(newVolume);
     if (audioRef.current) audioRef.current.volume = newVolume;
