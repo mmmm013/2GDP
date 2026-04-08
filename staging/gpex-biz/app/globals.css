@@ -1,0 +1,13 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --gpex-gold: #D4AF37;
+  --gpex-dark: #0A0A0A;
+}
+
+body {
+  background: var(--gpex-dark);
+  color: #f0f0f0;
+}
