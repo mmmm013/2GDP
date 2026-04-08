@@ -7,7 +7,43 @@
  * - A K-KUT may contain ONE or MORE CONTIGUOUS sections in ORIGINAL SONG ORDER.
  * - Only 1 K-KUT per purchase — no rearrangement allowed.
  * - This order is the canonical reference; no deviation is permitted.
+ *
+ * SWSP (Sweet Spot) time rule:
+ * - ONLY SWSPs for IN-PIX and INO-PIX packages have a time constraint.
+ * - ALL such SWSPs must be at least SWSP_MINIMUM_MS milliseconds (13 seconds).
+ * - K-KUTs (section-based) have NO time constraint whatsoever.
  */
+
+// ---------------------------------------------------------------------------
+// SWSP minimum — applies exclusively to IN-PIX and INO-PIX package types
+// ---------------------------------------------------------------------------
+/** Minimum duration in milliseconds for a Sweet Spot in an IN-PIX or INO-PIX package. */
+export const SWSP_MINIMUM_MS = 13_000;
+
+/** pix_pck.pck_type values that require the SWSP_MINIMUM_MS duration floor. */
+export const SWSP_PACKAGE_TYPES = ['IN', 'INO'] as const;
+export type SwspPackageType = (typeof SWSP_PACKAGE_TYPES)[number];
+
+/**
+ * Returns true if the given pck_type requires the 13-second SWSP minimum.
+ * K-KUT section packages (LT / ST / EP) always return false.
+ */
+export function requiresSwspMinimum(pckType: string): pckType is SwspPackageType {
+  return (SWSP_PACKAGE_TYPES as readonly string[]).includes(pckType);
+}
+
+/**
+ * Validates a SWSP duration for IN-PIX and INO-PIX packages.
+ * Returns null on success, or an error string if the duration is too short.
+ * Pass duration in milliseconds.
+ */
+export function validateSwspDuration(durationMs: number | null | undefined): string | null {
+  if (durationMs == null) return null; // unknown duration — validated at ingest
+  if (durationMs < SWSP_MINIMUM_MS) {
+    return `Sweet Spot must be at least ${SWSP_MINIMUM_MS / 1000} seconds (${SWSP_MINIMUM_MS} ms). This asset is ${durationMs} ms.`;
+  }
+  return null;
+}
 
 // ---------------------------------------------------------------------------
 // Canonical section order — fixed, non-negotiable (matches ASCAP filing)

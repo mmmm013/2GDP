@@ -338,4 +338,69 @@ Applied by `supabase/migrations/20260405000001_pix_pck_lt_mkut_guard.sql`.  Cove
 
 **Report Generated:** 2026-03-28  
 **Updated:** 2026-04-05 — LT-PIX mini-KUT minimum rule added  
+**Updated:** 2026-04-08 — IN-PIX / INO-PIX package types + SWSP 13-second minimum added  
 **Next Review:** After environment variables configured and data uploaded
+
+---
+
+## IN-PIX and INO-PIX Package Types — SWSP 13-Second Minimum
+
+**Adopted:** 2026-04-08  
+
+### PIX Package Types (full set)
+
+| `pck_type` | Name | Description |
+|---|---|---|
+| `LT` | Long Track | Full-length track package; requires ≥40 active mini-KUTs |
+| `ST` | Short Track | Sub-3-minute track; no minimum enforced at DB level |
+| `EP` | EP Cut | EP-specific excerpt package |
+| `IN` | Inner-PIX | Instrumental / inner-song excerpt type |
+| `INO` | Intro-Only PIX | Intro-anchored excerpt type |
+
+### SWSP Rule
+
+**ONLY SWSPs (Sweet Spots) for IN-PIX and INO-PIX packages have a time constraint.**  
+K-KUTs (section-based) have **NO** time constraint.
+
+| Constraint | Applies to | Rule |
+|---|---|---|
+| Section-based excerpt | K-KUT (all pck_types) | Must use whole song sections in original order (ASCAP) |
+| 13-second minimum | IN-PIX (`IN`) and INO-PIX (`INO`) only | `duration_ms >= 13,000` |
+
+### Enforcement Layers
+
+**1. DB-level trigger — `trg_swsp_minimum_duration` on `public.k_kut_assets`**
+
+Fires `BEFORE INSERT OR UPDATE OF duration_ms, pix_pck_id`. For any asset whose owning package has `pck_type IN ('IN','INO')`, if `duration_ms` is non-null and less than 13,000 the operation is aborted with:
+
+```
+ERROR: SWSP minimum violated: asset in IN-PIX package (pix_pck <id>) has duration_ms=<n>; minimum is 13,000 ms (13 seconds).
+SQLSTATE: 23514  (check_violation)
+```
+
+`NULL` duration is permitted at insert time (duration may not be measured yet).
+
+**2. App-layer helpers — `lib/kkut-sections.ts`**
+
+```ts
+import { SWSP_MINIMUM_MS, requiresSwspMinimum, validateSwspDuration } from '@/lib/kkut-sections'
+
+// SWSP_MINIMUM_MS = 13000
+
+// Check whether a package type requires the floor
+requiresSwspMinimum('IN')   // → true
+requiresSwspMinimum('INO')  // → true
+requiresSwspMinimum('LT')   // → false (K-KUT — no time constraint)
+
+// Validate a measured duration
+validateSwspDuration(12000)  // → "Sweet Spot must be at least 13 seconds..."
+validateSwspDuration(13000)  // → null (pass)
+validateSwspDuration(null)   // → null (unknown — validated at ingest)
+```
+
+### Migration
+
+Applied by `supabase/migrations/20260408000002_inpix_inopix_swsp_minimum.sql`. Covers:
+- `ALTER TABLE pix_pck` — expand `pck_type` constraint to include `'IN'` and `'INO'`
+- Trigger function `public.enforce_swsp_minimum_duration()`
+- Trigger `trg_swsp_minimum_duration` on `public.k_kut_assets`
