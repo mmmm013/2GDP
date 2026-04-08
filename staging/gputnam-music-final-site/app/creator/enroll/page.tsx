@@ -15,7 +15,7 @@ const CREATORS = [
   { id: 'zg', brand: 'ZG', displayName: 'ZG', legalName: 'Zach Garrett', role: 'Lyrics · Vocal Demos', portalSlug: 'zg' },
 ];
 
-const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL ?? '';
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL ?? 'https://lbzpfqarraegkghxwbah.supabase.co';
 
 function EnrollForm() {
   const searchParams = useSearchParams();
