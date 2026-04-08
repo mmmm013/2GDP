@@ -4,7 +4,7 @@
 --
 -- Covers:
 --   A) public.pix_pck — canonical PIX package registry.
---      pck_type = 'LT' (Long Track), 'ST' (Short Track), 'EP' (EP cut).
+--      pck_type = 'LT' (LT-PIX — MetaGrab cue for KKr-MSC), 'ST', 'EP'.
 --      LT-type packages must always hold at least 40 active mini-KUT
 --      assets in k_kut_assets.
 --   B) FK on k_kut_assets.pix_pck_id → public.pix_pck(id).
@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS public.pix_pck (
   title       text        NOT NULL,
 
   -- Package type:
-  --   LT  Long Track  — standard full-length track package; requires ≥40 active mini-KUTs
+  --   LT  LT-PIX  — MetaGrab cue for KKr-MSC; MetaGrab harvests mini-KUTs; requires ≥40 active mini-KUTs
   --   ST  Short Track — sub-3-minute track; no minimum enforced at DB level
   --   EP  EP Cut      — EP-specific excerpt package; no minimum enforced at DB level
   pck_type    text        NOT NULL DEFAULT 'ST'

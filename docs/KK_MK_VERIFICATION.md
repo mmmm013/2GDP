@@ -284,7 +284,7 @@ grep -r "createClient" --include="*.tsx" app/
 
 | Term | Database representation |
 |------|------------------------|
-| **LT-PIX** | Row in `public.pix_pck` where `pck_type = 'LT'` (Long Track package) |
+| **LT-PIX** | Row in `public.pix_pck` where `pck_type = 'LT'` (MetaGrab cue — signals KKr-MSC to run MetaGrab on this PIX) |
 | **mini-KUT** | Row in `public.k_kut_assets` where `status = 'active'` and `pix_pck_id` matches the LT-PIX |
 
 ### Enforcement Layers
@@ -351,7 +351,7 @@ Applied by `supabase/migrations/20260405000001_pix_pck_lt_mkut_guard.sql`.  Cove
 
 | `pck_type` | Name | Description |
 |---|---|---|
-| `LT` | Long Track | Full-length track package; requires ≥40 active mini-KUTs |
+| `LT` | LT-PIX | MetaGrab cue — signals KKr-MSC to run MetaGrab on this PIX package; MetaGrab harvests mini-KUTs; requires ≥40 active mini-KUTs |
 | `ST` | Short Track | Sub-3-minute track; no minimum enforced at DB level |
 | `EP` | EP Cut | EP-specific excerpt package |
 | `IN` | Inner-PIX | Instrumental / inner-song excerpt type |
