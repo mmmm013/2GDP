@@ -29,7 +29,7 @@ const PROMO_LEADS = [
     emoji: '🎸',
     label: 'KLEIGH',
     sub: 'Alt Rock · The Vault',
-    href: '/kleigh',
+    href: 'https://www.2kleigh.com',
     color: '#C8A882',
   },
   {
@@ -68,7 +68,7 @@ export function BraveEagleBanner() {
             {' '}Artists:{' '}
             <a href="/scherer" onClick={(e) => e.stopPropagation()} className="text-[#D4A017] hover:underline font-semibold">Michael Scherer</a>
             {', '}
-            <a href="/kleigh" onClick={(e) => e.stopPropagation()} className="text-[#C8A882] hover:underline font-semibold">KLEIGH</a>
+            <a href="https://www.2kleigh.com" onClick={(e) => e.stopPropagation()} className="text-[#C8A882] hover:underline font-semibold">KLEIGH</a>
             {', Lloyd G Miller.'}
           </span>
         </button>
