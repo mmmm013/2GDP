@@ -140,7 +140,7 @@ export default function JoinPage() {
             {/* ONE-TIME GIFT SHORTCUT */}
             <div className="mt-6 pt-6 border-t-2 border-[#3E2723]/10">
               <p className="text-xs font-black uppercase tracking-widest opacity-60 mb-3">Not ready to subscribe?</p>
-              <Link href="/gift" className="block w-full text-center bg-[#E65100] text-white py-3 rounded-xl font-black text-sm uppercase tracking-wider hover:bg-[#BF360C] transition-colors shado[...]
+              <Link href="/gift" className="block w-full text-center bg-[#E65100] text-white py-3 rounded-xl font-black text-sm uppercase tracking-wider hover:bg-[#BF360C] transition-colors shadow-md">
                 ❤️ One-Time Heart-Tap Gift
               </Link>
             </div>
@@ -159,8 +159,7 @@ export default function JoinPage() {
               </div>
               <div className="text-right">
                 <div className="font-black text-2xl">$5</div>
-                <button onClick={() => handleJoin('joey')} disabled={loading === 'joey'} className="text-[10px] underline hover:text-white cursor-pointer disabled:opacity-50">{loading === 'joey' [...]
-                </button>
+                <button onClick={() => handleJoin('joey')} disabled={loading === 'joey'} className="text-[10px] underline hover:text-white cursor-pointer disabled:opacity-50">{loading === 'joey' ? 'LOADING...' : 'JOIN'}</button>
               </div>
             </div>
 
@@ -175,8 +174,7 @@ export default function JoinPage() {
               </div>
               <div className="text-right">
                 <div className="font-black text-2xl text-[#3E2723]">$10</div>
-                <button onClick={() => handleJoin('climber')} disabled={loading === 'climber'} className="text-[10px] text-[#3E2723] font-bold underline hover:text-[#E65100] cursor-pointer disabl[...]
-                </button>
+                <button onClick={() => handleJoin('climber')} disabled={loading === 'climber'} className="text-[10px] text-[#3E2723] font-bold underline hover:text-[#E65100] cursor-pointer disabled:opacity-50">{loading === 'climber' ? 'LOADING...' : 'JOIN'}</button>
               </div>
             </div>
 
@@ -191,8 +189,7 @@ export default function JoinPage() {
               </div>
               <div className="text-right">
                 <div className="font-black text-2xl text-[#3E2723]">$15</div>
-                <button onClick={() => handleJoin('alpha')} disabled={loading === 'alpha'} className="text-[10px] text-[#3E2723] font-bold underline hover:text-[#2E7D32] cursor-pointer disabled:o[...]
-                </button>
+                <button onClick={() => handleJoin('alpha')} disabled={loading === 'alpha'} className="text-[10px] text-[#3E2723] font-bold underline hover:text-[#2E7D32] cursor-pointer disabled:opacity-50">{loading === 'alpha' ? 'LOADING...' : 'JOIN'}</button>
               </div>
             </div>
 
@@ -208,8 +205,7 @@ export default function JoinPage() {
               </div>
               <div className="text-right">
                 <div className="font-black text-2xl text-[#3E2723]">$20</div>
-                <button onClick={() => handleJoin('elder')} disabled={loading === 'elder'} className="text-[10px] text-[#3E2723] font-bold underline hover:text-white cursor-pointer disabled:opaci[...]
-                </button>
+                <button onClick={() => handleJoin('elder')} disabled={loading === 'elder'} className="text-[10px] text-[#3E2723] font-bold underline hover:text-white cursor-pointer disabled:opacity-50">{loading === 'elder' ? 'LOADING...' : 'JOIN'}</button>
               </div>
             </div>
 

@@ -1,0 +1,15 @@
+# GPEx Business — Excel-A-rator
+# 4PE-BIZ Platform
+
+# Vercel
+.vercel
+
+# Next.js
+.next/
+out/
+node_modules/
+
+# Env
+.env
+.env.local
+.env.production
