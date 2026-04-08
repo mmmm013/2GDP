@@ -19,33 +19,27 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { createClient } from '@supabase/supabase-js';
 
 // ─── Supabase ────────────────────────────────────────────────────────────────
-const SUPABASE_URL = 'https://lbzpfqarraegkghxwbah.supabase.co';
+// Use canonical env vars — never hardcode project URLs.
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL ?? '';
 const SUPABASE_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? '';
-const supabase = SUPABASE_KEY ? createClient(SUPABASE_URL, SUPABASE_KEY) : null;
-
-const STORAGE_BASE = `${SUPABASE_URL}/storage/v1/object/public/tracks/`;
+const supabase = SUPABASE_URL && SUPABASE_KEY ? createClient(SUPABASE_URL, SUPABASE_KEY) : null;
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface Track {
   id: number | string;
   title: string;
   artist?: string;
-  url?: string;
   mood?: string;
   plays?: number;
 }
 
-// ─── Hero images ─────────────────────────────────────────────────────────────
-const HERO_IMAGES = [
-  { src: 'https://lbzpfqarraegkghxwbah.supabase.co/storage/v1/object/public/tracks/hero.jpg', alt: 'G Putnam Music' },
-  { src: 'https://lbzpfqarraegkghxwbah.supabase.co/storage/v1/object/public/tracks/IMG_7429.JPG', alt: 'G Putnam Music live' },
-];
-
-function resolveUrl(raw: string): string {
-  if (!raw) return '';
-  if (raw.startsWith('http')) return raw;
-  return STORAGE_BASE + (raw.split('/').pop()?.split('?')[0] ?? raw);
-}
+// ─── Hero images (public storage — no signing required for images) ────────────
+const HERO_IMAGES = SUPABASE_URL
+  ? [
+      { src: `${SUPABASE_URL}/storage/v1/object/public/tracks/hero.jpg`, alt: 'G Putnam Music' },
+      { src: `${SUPABASE_URL}/storage/v1/object/public/tracks/IMG_7429.JPG`, alt: 'G Putnam Music live' },
+    ]
+  : [{ src: '', alt: 'G Putnam Music' }];
 
 // ─────────────────────────────────────────────────────────────────────────────
 // ROW 1 — HEADER (STI top row, amber/gtmplt)
@@ -284,53 +278,121 @@ function McBot() {
 
 // ─────────────────────────────────────────────────────────────────────────────
 // ROW 2 (right) — HOME FEATURED PLAYLIST PLAYER
+// Resolves signed audio URLs via Supabase Edge Function `get-stream-url`.
+// Explicit states: Loading → Ready | Misconfigured | Empty | Playback Error
 // ─────────────────────────────────────────────────────────────────────────────
 function HomeFP() {
-  const [tracks, setTracks]   = useState<Track[]>([]);
-  const [idx, setIdx]         = useState(0);
-  const [playing, setPlaying] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const audioRef              = useRef<HTMLAudioElement | null>(null);
+  const [tracks, setTracks]           = useState<Track[]>([]);
+  const [idx, setIdx]                 = useState(0);
+  const [playing, setPlaying]         = useState(false);
+  const [loading, setLoading]         = useState(true);
+  const [resolving, setResolving]     = useState(false);
+  const [playbackError, setError]     = useState<string | null>(null);
+  const audioRef                      = useRef<HTMLAudioElement | null>(null);
 
+  // Misconfigured when either env var is absent
+  const misconfigured = !SUPABASE_URL || !SUPABASE_KEY;
+
+  // Load track metadata (no raw audio URLs — resolved on demand via get-stream-url)
   useEffect(() => {
-    if (!supabase) { setLoading(false); return; }
+    if (misconfigured || !supabase) { setLoading(false); return; }
     supabase
       .from('tracks')
-      .select('id, title, artist, url, mood')
-      .not('url', 'is', null)
+      .select('id, title, artist, mood')
       .limit(60)
       .then(({ data }) => {
         const filtered = (data ?? []).filter((t: any) => {
-          const title = (t.title ?? '').toLowerCase();
+          const title  = (t.title  ?? '').toLowerCase();
           const artist = (t.artist ?? '').toLowerCase();
           return !title.includes('instro') && !title.includes('instrumental') &&
-                 !artist.includes('sybc') && !artist.includes('wounded');
+                 !artist.includes('sybc')  && !artist.includes('wounded');
         });
-        const shuffled = [...filtered].sort(() => Math.random() - 0.5);
-        setTracks(shuffled);
+        setTracks([...filtered].sort(() => Math.random() - 0.5));
         setLoading(false);
       });
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Stop audio and clear error when user changes track
+  useEffect(() => {
+    setError(null);
+    setPlaying(false);
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.src = '';
+    }
+  }, [idx]);
 
   const current = tracks[idx];
 
-  useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio || !current?.url) return;
-    audio.src = resolveUrl(current.url);
-    if (playing) audio.play().catch(() => {});
-  }, [idx, current]);
+  // Resolve signed URL via get-stream-url, then play
+  const resolveAndPlay = useCallback(async () => {
+    if (!supabase || !current) return;
+    setResolving(true);
+    setError(null);
+    try {
+      const { data, error } = await supabase.functions.invoke('get-stream-url', {
+        body: { track_id: String(current.id) },
+      });
+      if (error || !data?.url) {
+        setError('Stream URL unavailable — check Supabase function config.');
+        return;
+      }
+      const audio = audioRef.current;
+      if (!audio) return;
+      audio.src = data.url as string;
+      await audio.play();
+      setPlaying(true);
+    } catch {
+      setError('Playback error — get-stream-url function unreachable.');
+    } finally {
+      setResolving(false);
+    }
+  }, [current]);
 
   const toggle = () => {
     const audio = audioRef.current;
     if (!audio) return;
-    if (playing) { audio.pause(); setPlaying(false); }
-    else { audio.play().then(() => setPlaying(true)).catch(() => {}); }
+    if (playing) {
+      audio.pause();
+      setPlaying(false);
+    } else if (!audio.src) {
+      resolveAndPlay();
+    } else {
+      audio.play()
+        .then(() => setPlaying(true))
+        .catch(() => setError('Playback blocked by browser. Tap play again.'));
+    }
   };
 
-  const skip = (dir: 1 | -1) => {
+  const skip = (dir: 1 | -1) =>
     setIdx(i => Math.max(0, Math.min(tracks.length - 1, i + dir)));
-  };
+
+  // ── State: Misconfigured ──────────────────────────────────────────────────
+  if (misconfigured) {
+    return (
+      <div className="flex flex-col h-full min-h-[280px] bg-[#110d06] p-6 justify-center items-center">
+        <div className="text-center max-w-xs">
+          <div className="text-3xl mb-3">⚠️</div>
+          <div className="text-[10px] uppercase tracking-[0.3em] text-[#D4A017] font-bold mb-2">
+            Stream Misconfigured
+          </div>
+          <p className="text-[#C8A882]/50 text-xs leading-relaxed">
+            <code className="text-[#D4A017]/80">NEXT_PUBLIC_SUPABASE_URL</code> and{' '}
+            <code className="text-[#D4A017]/80">NEXT_PUBLIC_SUPABASE_ANON_KEY</code> must be set
+            in Vercel Environment Variables to enable streaming.
+          </p>
+          <a
+            href="/api/healthcheck"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-4 inline-block text-[10px] text-[#D4A017]/60 underline underline-offset-2 hover:text-[#D4A017]"
+          >
+            Run healthcheck →
+          </a>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col h-full min-h-[280px] bg-[#110d06] p-6 justify-between">
@@ -339,9 +401,21 @@ function HomeFP() {
           <span className="w-1.5 h-1.5 rounded-full bg-[#D4A017] animate-pulse" />
           GPM Featured Stream
         </div>
-        {loading ? (
+
+        {/* State: Loading */}
+        {loading && (
           <div className="text-[#C8A882]/40 text-sm animate-pulse">Loading tracks…</div>
-        ) : current ? (
+        )}
+
+        {/* State: Empty catalog */}
+        {!loading && tracks.length === 0 && (
+          <div className="text-[#C8A882]/40 text-sm">
+            <span className="text-[#D4A017]">📂</span> No tracks in catalog yet.
+          </div>
+        )}
+
+        {/* State: Ready — show current track info */}
+        {!loading && current && (
           <>
             <div className="text-white font-bold text-lg leading-tight truncate">{current.title}</div>
             <div className="text-[#C8A882]/70 text-sm mt-1 truncate">{current.artist ?? 'G Putnam Music'}</div>
@@ -351,30 +425,45 @@ function HomeFP() {
               </div>
             )}
           </>
-        ) : (
-          <div className="text-[#C8A882]/40 text-sm">Stream unavailable — check ENV config.</div>
+        )}
+
+        {/* State: Playback error */}
+        {playbackError && (
+          <div className="mt-3 px-3 py-2 rounded-lg bg-red-900/30 border border-red-500/30 text-red-300 text-xs leading-relaxed">
+            ⚠️ {playbackError}
+          </div>
         )}
       </div>
 
       {/* Controls */}
       <div>
         <div className="flex items-center justify-center gap-4 mt-6">
-          <button onClick={() => skip(-1)} disabled={idx === 0}
-            className="p-3 rounded-full bg-[#2A1506] text-[#C8A882] hover:text-[#D4A017] hover:bg-[#3a2208] disabled:opacity-30 transition-all">
+          <button
+            onClick={() => skip(-1)}
+            disabled={idx === 0 || loading}
+            className="p-3 rounded-full bg-[#2A1506] text-[#C8A882] hover:text-[#D4A017] hover:bg-[#3a2208] disabled:opacity-30 transition-all"
+          >
             ⏮
           </button>
-          <button onClick={toggle}
-            className="w-14 h-14 rounded-full flex items-center justify-center text-xl transition-all shadow-lg"
-            style={{ background: '#D4A017', color: '#1a1207' }}>
-            {playing ? '⏸' : '▶'}
+          <button
+            onClick={toggle}
+            disabled={loading || resolving || tracks.length === 0}
+            aria-label={resolving ? 'Resolving stream…' : playing ? 'Pause' : 'Play'}
+            className="w-14 h-14 rounded-full flex items-center justify-center text-xl transition-all shadow-lg disabled:opacity-50"
+            style={{ background: '#D4A017', color: '#1a1207' }}
+          >
+            {resolving ? '⏳' : playing ? '⏸' : '▶'}
           </button>
-          <button onClick={() => skip(1)} disabled={idx === tracks.length - 1}
-            className="p-3 rounded-full bg-[#2A1506] text-[#C8A882] hover:text-[#D4A017] hover:bg-[#3a2208] disabled:opacity-30 transition-all">
+          <button
+            onClick={() => skip(1)}
+            disabled={idx === tracks.length - 1 || loading}
+            className="p-3 rounded-full bg-[#2A1506] text-[#C8A882] hover:text-[#D4A017] hover:bg-[#3a2208] disabled:opacity-30 transition-all"
+          >
             ⏭
           </button>
         </div>
         <div className="text-center text-[10px] text-[#C8A882]/30 mt-3 font-mono">
-          {idx + 1} / {tracks.length || '—'}
+          {tracks.length === 0 ? '— / —' : `${idx + 1} / ${tracks.length}`}
         </div>
         <audio ref={audioRef} onEnded={() => skip(1)} preload="none" />
       </div>
@@ -412,7 +501,15 @@ function T20Grid() {
         <div className="h-px flex-1 bg-[#5C3A1E]/30" />
       </div>
 
-      {loading ? (
+      {/* State: Misconfigured */}
+      {!SUPABASE_URL || !SUPABASE_KEY ? (
+        <div className="text-center text-[#C8A882]/30 text-sm py-8">
+          ⚠️ Supabase env vars missing — T20 data unavailable.{' '}
+          <a href="/api/healthcheck" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-[#D4A017]">
+            Run healthcheck
+          </a>
+        </div>
+      ) : loading ? (
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {Array.from({ length: 8 }).map((_, i) => (
             <div key={i} className="h-20 rounded-xl bg-[#2A1506]/40 animate-pulse" />

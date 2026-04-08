@@ -1,10 +1,11 @@
 /**
  * /herb-blog — PIXIE's PIX
- * Public page: herbal gardening & nature blog by PIXIE (Jane Burton)
+ * Public page: herbal gardening & nature blog by PIXIE (Herb Blogger)
  * + her curated GPM FP streaming playlist (2hr, her selections).
  *
  * Self-contained for staging/gputnam-music-final-site.
  * Server component: fetches published PIXIE assets from Supabase.
+ * Audio served via /api/stream-asset (signed URL — no raw storage paths exposed).
  */
 import { createClient } from '@supabase/supabase-js';
 import type { Metadata } from 'next';
@@ -13,16 +14,17 @@ import Link from 'next/link';
 export const metadata: Metadata = {
   title: "PIXIE's PIX | G Putnam Music",
   description:
-    "Herbal gardening, nature writing, and PIXIE's curated GPM FP streaming playlist — by Jane Burton.",
+    "Herbal gardening, nature writing, and PIXIE's curated GPM FP streaming playlist.",
 };
 
-const SUPABASE_URL = 'https://lbzpfqarraegkghxwbah.supabase.co';
+// Use canonical env var — no hardcoded project URLs.
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL ?? '';
 
 const CATEGORIES = ['All', 'Herb Lore', 'Garden Diary', 'Plant Medicine', 'Nature Notes', 'Seasonal'];
 
 function getSupabase() {
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? '';
-  if (!key) return null;
+  if (!SUPABASE_URL || !key) return null;
   return createClient(SUPABASE_URL, key);
 }
 
@@ -37,7 +39,6 @@ interface BlogPost {
 interface PlaylistAsset {
   id: string;
   label: string;
-  file_url: string;
   uploaded_at: string;
 }
 
@@ -59,7 +60,7 @@ async function fetchPublishedPlaylist(): Promise<PlaylistAsset | null> {
   if (!supabase) return null;
   const { data } = await supabase
     .from('creator_assets')
-    .select('id, label, file_url, uploaded_at')
+    .select('id, label, uploaded_at')
     .eq('brand', 'PIXIE')
     .eq('scope', 'GPM_FP_PLAYLIST')
     .eq('is_published', true)
@@ -88,7 +89,7 @@ export default async function HerbBlogPage() {
       <main className="min-h-screen bg-[#1a1207] text-white">
         {/* Hero */}
         <section className="bg-gradient-to-b from-[#2d3a1e] to-[#1a1207] py-16 px-4 text-center border-b border-white/10">
-          <p className="text-[#a8cc7f] text-xs uppercase tracking-[0.3em] mb-3">by Jane Burton · GPM Creator</p>
+          <p className="text-[#a8cc7f] text-xs uppercase tracking-[0.3em] mb-3">by PIXIE · GPM Creator</p>
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-3">
             🌿 PIXIE&apos;s PIX
           </h1>
@@ -99,9 +100,9 @@ export default async function HerbBlogPage() {
 
           {/* Personal bio */}
           <div className="inline-block bg-white/5 border border-white/10 rounded-2xl px-6 py-4 max-w-lg text-left">
-            <p className="text-[#a8cc7f] text-xs font-bold uppercase tracking-widest mb-1">About Jane</p>
+            <p className="text-[#a8cc7f] text-xs font-bold uppercase tracking-widest mb-1">About PIXIE</p>
             <p className="text-white/60 text-sm leading-relaxed">
-              Jane Burton — known to the GPMC family as PIXIE — tends herbs, follows seasons, and writes about the living world
+              PIXIE — the herb blogger of the GPMC family — tends herbs, follows seasons, and writes about the living world
               with the same precision she brings to music curation. Every post here is her own hand.
             </p>
           </div>
@@ -137,7 +138,7 @@ export default async function HerbBlogPage() {
                 </p>
                 <audio
                   controls
-                  src={playlist.file_url}
+                  src={`/api/stream-asset?id=${playlist.id}`}
                   className="w-full rounded-lg"
                   style={{ accentColor: '#a8cc7f' }}
                 />
