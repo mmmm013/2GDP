@@ -37,10 +37,10 @@ const syncBucket = async (bucketName) => {
             .upsert({
                 title: cleanTitle,
                 artist: 'G Putnam Music',
-                audio_url: publicData.publicUrl,
+                url: publicData.publicUrl,
                 season: null,
                 mood: 'ALL'
-            }, { onConflict: 'audio_url' });
+            }, { onConflict: 'url' });
 
         if (dbError) console.log(`   ❌ Failed: ${file.name}`);
         else process.stdout.write('.');

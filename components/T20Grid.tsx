@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { createClient } from '@supabase/supabase-js';
+import { resolveAudioUrl } from '@/lib/audio/resolveAudioUrl';
 
 /**
  * T20Grid — GPM Top 20 Streaming Activities
@@ -100,11 +101,8 @@ export default function T20Grid() {
       if (list.length > 0) {
         const track = list[Math.floor(Math.random() * list.length)];
         
-        // BIC: Resolve final playable URL
-        let finalUrl = track.url || '';
-        if (track.file_path && !/^https?:\/\//i.test(finalUrl)) {
-           finalUrl = `${SUPABASE_URL}/storage/v1/object/public/tracks/${track.file_path.replace(/^\//, '')}`;
-        }
+        // Resolve final playable URL via canonical resolver
+        const finalUrl = resolveAudioUrl(track.url || track.file_path || '');
 
         if (finalUrl) {
           window.dispatchEvent(new CustomEvent('stop-all-audio', { detail: { source: 't20' } }));

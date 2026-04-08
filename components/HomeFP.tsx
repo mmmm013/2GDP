@@ -19,6 +19,7 @@
 import { useState, useEffect, useRef, useCallback, type ChangeEvent } from 'react';
 import { Play, Pause, SkipBack, SkipForward, Radio } from 'lucide-react';
 import { createClient } from '@supabase/supabase-js';
+import { resolveAudioUrl } from '@/lib/audio/resolveAudioUrl';
 
 // ---------------------------------------------------------------------------
 // TYPES
@@ -159,10 +160,9 @@ export default function HomeFP() {
             if (signed) return { id: t.id, title, artist, url: signed };
           }
           
-          // 2) Fallback to DB url
-          if (t.url && /^https?:\/\//i.test(t.url)) {
-            return { id: t.id, title, artist, url: t.url };
-          }
+          // 2) Fallback: resolve via canonical resolver (handles relative paths too)
+          const resolved = resolveAudioUrl(t.url || t.file_path || '');
+          if (resolved) return { id: t.id, title, artist, url: resolved };
           
           return null;
         })

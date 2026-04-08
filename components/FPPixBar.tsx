@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { Play, Music } from 'lucide-react';
 import { createClient } from '@supabase/supabase-js';
+import { resolveAudioUrl } from '@/lib/audio/resolveAudioUrl';
 
 /**
  * FP PIX BAR - Featured Playlist Quick-Pick Buttons
@@ -79,12 +80,8 @@ export default function FPPixBar() {
         const randomIdx = Math.floor(Math.random() * finalTracks.length);
         const track = finalTracks[randomIdx];
         
-        // BIC: Resolve final playable URL
-        // If it's a relative storage path, prepend public bucket URL, else use as-is
-        let finalUrl = track.url || '';
-        if (track.file_path && !/^https?:\/\//i.test(finalUrl)) {
-           finalUrl = `${SUPABASE_URL}/storage/v1/object/public/tracks/${track.file_path.replace(/^\//, '')}`;
-        }
+        // Resolve final playable URL via canonical resolver
+        const finalUrl = resolveAudioUrl(track.url || track.file_path || '');
 
         if (finalUrl) {
           // SINGLE-SONG: Stop ALL other audio sources first
