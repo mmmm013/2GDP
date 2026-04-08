@@ -1,20 +1,17 @@
 'use client';
-
 import { useState, useEffect } from 'react';
 import { Play, Music } from 'lucide-react';
 import { createClient } from '@supabase/supabase-js';
 
 /**
  * FP PIX BAR - Featured Playlist Quick-Pick Buttons
- * DEPENDABILITY: Dispatches stop-all-audio before play-track
- * QUALITY: Supabase fallback queries, silent fail in production
- * SATISFACTION: Touch-friendly 44px targets, scale feedback
- * SINGLE-SONG: Ensures only ONE audio source plays at a time
+ * BIC (Best-In-Class) AUDIO PIPELINE:
+ * 1. Corrected column name to 'url' (not 'audio_url' or 'mp3_url')
+ * 2. Fallback logic: ensures playable src even if one field is missing
  */
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const SUPABASE_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
 const supabase = (SUPABASE_URL && SUPABASE_KEY)
   ? createClient(SUPABASE_URL, SUPABASE_KEY)
   : null;
@@ -40,6 +37,7 @@ export default function FPPixBar() {
           .select('id, display_name, icon, mood_tag, theme_color')
           .order('sort_order')
           .limit(5);
+
         if (configs && configs.length > 0) {
           setPicks(configs.filter((c: any) => c.display_name));
           setReady(true);
@@ -55,26 +53,24 @@ export default function FPPixBar() {
     if (!supabase) return;
     try {
       const moodTag = pick.mood_tag || pick.display_name;
+      // BIC UPDATE: Query 'url' and 'file_path' from gpm_tracks
       const { data: tracks } = await supabase
         .from('gpm_tracks')
-        .select('*')
-        .not('audio_url', 'is', null)
-        .neq('audio_url', 'EMPTY')
-        .neq('audio_url', '')
-        .not('audio_url', 'like', '%placeholder%')
+        .select('id, title, artist, url, file_path')
+        .not('url', 'is', null)
+        .neq('url', 'EMPTY')
+        .neq('url', '')
         .ilike('mood', `%${moodTag}%`)
         .limit(10);
 
       let finalTracks = tracks || [];
-
       if (finalTracks.length === 0) {
         const { data: fallback } = await supabase
           .from('gpm_tracks')
-          .select('*')
-          .not('audio_url', 'is', null)
-          .neq('audio_url', 'EMPTY')
-          .neq('audio_url', '')
-          .not('audio_url', 'like', '%placeholder%')
+          .select('id, title, artist, url, file_path')
+          .not('url', 'is', null)
+          .neq('url', 'EMPTY')
+          .neq('url', '')
           .limit(10);
         finalTracks = fallback || [];
       }
@@ -82,22 +78,31 @@ export default function FPPixBar() {
       if (finalTracks.length > 0) {
         const randomIdx = Math.floor(Math.random() * finalTracks.length);
         const track = finalTracks[randomIdx];
+        
+        // BIC: Resolve final playable URL
+        // If it's a relative storage path, prepend public bucket URL, else use as-is
+        let finalUrl = track.url || '';
+        if (track.file_path && !/^https?:\/\//i.test(finalUrl)) {
+           finalUrl = `${SUPABASE_URL}/storage/v1/object/public/tracks/${track.file_path.replace(/^\//, '')}`;
+        }
 
-        // SINGLE-SONG: Stop ALL other audio sources first
-        window.dispatchEvent(new CustomEvent('stop-all-audio', { detail: { source: 'pix' } }));
-
-        // Then tell GlobalPlayer to load and play this track
-        window.dispatchEvent(new CustomEvent('play-track', {
-          detail: {
-            url: track.audio_url || track.mp3_url,
-            title: track.title || 'Unknown Track',
-            vocalist: track.artist || 'G Putnam Music',
-            moodTheme: { primary: pick.theme_color || '#D4A017' }
-          }
-        }));
+        if (finalUrl) {
+          // SINGLE-SONG: Stop ALL other audio sources first
+          window.dispatchEvent(new CustomEvent('stop-all-audio', { detail: { source: 'pix' } }));
+          
+          // Then tell GlobalPlayer to load and play this track
+          window.dispatchEvent(new CustomEvent('play-track', {
+            detail: {
+              url: finalUrl,
+              title: track.title || 'Unknown Track',
+              vocalist: track.artist || 'G Putnam Music',
+              moodTheme: { primary: pick.theme_color || '#D4A017' }
+            }
+          }));
+        }
       }
-    } catch {
-      // Silent fail in production
+    } catch (err) {
+      console.error('FPPixBar error:', err);
     }
   };
 
@@ -109,8 +114,6 @@ export default function FPPixBar() {
         <Music className="w-3.5 h-3.5 text-[#D4A017]" />
         <span className="text-[10px] font-bold text-[#D4A017] tracking-wider">FP PIX</span>
       </div>
-
-      {/* MOBILE FIX: 44px min-h touch targets, active:scale-95 feedback */}
       <div className="flex items-center gap-2 overflow-x-auto">
         {picks.slice(0, 5).map((pick) => (
           <button
