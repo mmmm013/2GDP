@@ -329,7 +329,7 @@ Failing packages are listed first, sorted by `active_mkut_cnt` ascending.
 ### Migration
 
 Applied by `supabase/migrations/20260405000001_pix_pck_lt_mkut_guard.sql`.  Covers:
-- `CREATE TABLE public.pix_pck` (with `pck_type IN ('LT','ST','EP')`)
+- `CREATE TABLE public.pix_pck` (with `pck_type IN ('LT','EP')`)
 - FK `k_kut_assets.pix_pck_id → public.pix_pck(id) ON DELETE RESTRICT`
 - Trigger function `public.enforce_lt_pix_mkut_minimum()`
 - View `public.v_lt_pix_mkut_coverage`
@@ -352,7 +352,6 @@ Applied by `supabase/migrations/20260405000001_pix_pck_lt_mkut_guard.sql`.  Cove
 | `pck_type` | Name | Description |
 |---|---|---|
 | `LT` | LT-PIX | MetaGrab cue — signals KKr-MSC to run MetaGrab on this PIX package; MetaGrab harvests mini-KUTs; requires ≥40 active mini-KUTs |
-| `ST` | Short Track | Sub-3-minute track; no minimum enforced at DB level |
 | `EP` | EP Cut | EP-specific excerpt package |
 | `IN` | Inner-PIX | Instrumental / inner-song excerpt type |
 | `INO` | Intro-Only PIX | Intro-anchored excerpt type |

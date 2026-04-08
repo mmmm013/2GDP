@@ -16,7 +16,7 @@
 --   K-KUTs have NO time constraint — they are section-based only (ASCAP rule).
 --
 -- Changes:
---   A) Expand pix_pck.pck_type from ('LT','ST','EP') to also include 'IN', 'INO'
+--   A) Expand pix_pck.pck_type from ('LT','EP') to also include 'IN', 'INO'
 --   B) Add BEFORE INSERT OR UPDATE trigger on k_kut_assets that rejects any
 --      asset row whose owning pix_pck has pck_type IN ('IN','INO') and whose
 --      duration_ms is non-null and less than 13,000.
@@ -31,7 +31,7 @@ ALTER TABLE public.pix_pck
 
 ALTER TABLE public.pix_pck
   ADD CONSTRAINT pix_pck_pck_type_check
-    CHECK (pck_type IN ('LT', 'ST', 'EP', 'IN', 'INO'));
+    CHECK (pck_type IN ('LT', 'EP', 'IN', 'INO'));
 
 -- Update the default index to cover the new types (drop + recreate is idempotent)
 DROP INDEX IF EXISTS idx_pix_pck_type_active;
@@ -106,4 +106,4 @@ CREATE TRIGGER trg_swsp_minimum_duration
 --   DROP CONSTRAINT IF EXISTS pix_pck_pck_type_check;
 -- ALTER TABLE   public.pix_pck
 --   ADD CONSTRAINT pix_pck_pck_type_check
---     CHECK (pck_type IN ('LT', 'ST', 'EP'));
+--     CHECK (pck_type IN ('LT', 'EP'));
