@@ -1,11 +1,12 @@
 'use client'
 
 import { useSearchParams } from 'next/navigation'
-import { Suspense, useEffect, useState } from 'react'
+import { Suspense, useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import { supabase } from '@/lib/supabaseClient'
+import { resolveAudioUrl } from '@/lib/audio/resolveAudioUrl'
 
 interface Playlist {
   id: string
@@ -13,24 +14,51 @@ interface Playlist {
   description?: string
 }
 
+interface PlaylistTrack {
+  title: string
+  artist?: string
+  url?: string | null
+  file_path?: string | null
+}
+
 function GiftPlaylistsPageContent() {
   const searchParams = useSearchParams()
   const playlistId = searchParams.get('playlist') ?? ''
   const [playlist, setPlaylist] = useState<Playlist | null>(null)
   const [loading, setLoading] = useState(!!playlistId)
+  const [firstTrack, setFirstTrack] = useState<PlaylistTrack | null>(null)
+  const audioRef = useRef<HTMLAudioElement | null>(null)
+  const [playing, setPlaying] = useState(false)
 
   useEffect(() => {
     if (!playlistId) return
-    supabase
-      .from('playlists')
-      .select('id, name, description')
-      .eq('id', playlistId)
-      .single()
-      .then(({ data }) => {
-        setPlaylist(data ?? null)
-        setLoading(false)
-      })
+    Promise.all([
+      supabase.from('playlists').select('id, name, description').eq('id', playlistId).single(),
+      // Try to get first track via playlist_tracks join, fall back gracefully
+      supabase
+        .from('playlist_tracks')
+        .select('gpm_tracks(title, artist, url, file_path)')
+        .eq('playlist_id', playlistId)
+        .order('position', { ascending: true })
+        .limit(1),
+    ]).then(([{ data: plData }, { data: ptData }]) => {
+      setPlaylist(plData ?? null)
+      if (ptData && ptData.length > 0) {
+        const t = (ptData[0] as any)?.gpm_tracks
+        if (t) setFirstTrack(t)
+      }
+      setLoading(false)
+    })
   }, [playlistId])
+
+  const audioUrl = firstTrack ? resolveAudioUrl(firstTrack.url || firstTrack.file_path || '') : ''
+
+  const toggle = () => {
+    const audio = audioRef.current
+    if (!audio) return
+    if (playing) { audio.pause(); setPlaying(false) }
+    else { audio.play().then(() => setPlaying(true)).catch(() => {}) }
+  }
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-black via-gray-950 to-black text-white">
@@ -60,9 +88,30 @@ function GiftPlaylistsPageContent() {
               {playlist.description && (
                 <p className="text-white/50 text-sm mb-4">{playlist.description}</p>
               )}
-              <p className="text-white/40 text-sm">
-                The full curated tracklist from G Putnam Music will be available here once activated.
-              </p>
+              {audioUrl && firstTrack ? (
+                <div className="mt-4">
+                  <p className="text-white/40 text-xs uppercase tracking-widest mb-3">
+                    Now previewing: {firstTrack.title}{firstTrack.artist ? ` · ${firstTrack.artist}` : ''}
+                  </p>
+                  <button
+                    onClick={toggle}
+                    className="w-12 h-12 mx-auto rounded-full flex items-center justify-center text-xl shadow-lg transition-all active:scale-95"
+                    style={{ background: '#14b8a6', color: '#fff' }}
+                    aria-label={playing ? 'Pause' : 'Play playlist preview'}
+                  >
+                    {playing ? '⏸' : '▶'}
+                  </button>
+                  <p className="text-white/30 text-[10px] mt-2 uppercase tracking-widest">
+                    {playing ? 'Now Playing' : 'Tap to preview'}
+                  </p>
+                  <audio ref={audioRef} src={audioUrl} preload="metadata"
+                    onEnded={() => setPlaying(false)} />
+                </div>
+              ) : (
+                <p className="text-white/40 text-sm">
+                  The full curated tracklist from G Putnam Music will be available here once activated.
+                </p>
+              )}
             </>
           ) : (
             <>

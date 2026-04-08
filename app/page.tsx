@@ -18,6 +18,7 @@ import HomeFP from '@/components/HomeFP';
 import T20Grid from '@/components/T20Grid';
 import PromoBar from '@/components/PromoBar';
 import GpmBot from '@/components/GpmBot';
+import GlobalPlayer from '@/components/GlobalPlayer';
 
 // ---------------------------------------------------------------------------
 // Hero image rotation — shuffle-based, one image on screen at a time
@@ -117,6 +118,9 @@ export default function HomePage() {
 
       {/* ROW 3: TOP 20 Streaming Activities (BTI body row 2) */}
       <T20Grid />
+
+      {/* GlobalPlayer: receives play-track events from T20Grid + FPPixBar */}
+      <GlobalPlayer />
 
       {/* ROW 4: STO GPM Footer */}
       <Footer />

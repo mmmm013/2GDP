@@ -1,18 +1,108 @@
 'use client'
 
-import { Suspense, useEffect, useState } from 'react'
+import { Suspense, useEffect, useRef, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import { supabase } from '@/lib/supabaseClient'
+import { resolveAudioUrl } from '@/lib/audio/resolveAudioUrl'
 
 interface Track {
   id: string
   title: string
   artist: string
-  image?: string
-  duration?: number
+  url?: string | null
+  file_path?: string | null
+  image?: string | null
+  duration?: number | null
+}
+
+function KutPlayer({ audioUrl, title, artist }: { audioUrl: string; title: string; artist: string }) {
+  const audioRef = useRef<HTMLAudioElement | null>(null)
+  const [playing, setPlaying] = useState(false)
+  const [currentTime, setCurrentTime] = useState(0)
+  const [duration, setDuration] = useState(0)
+  const [error, setError] = useState('')
+
+  useEffect(() => {
+    const audio = audioRef.current
+    if (!audio) return
+    const onTime = () => setCurrentTime(audio.currentTime)
+    const onMeta = () => setDuration(audio.duration)
+    const onEnd  = () => { setPlaying(false); setCurrentTime(0) }
+    const onErr  = () => { setError('Audio unavailable — check back soon'); setPlaying(false) }
+    audio.addEventListener('timeupdate', onTime)
+    audio.addEventListener('loadedmetadata', onMeta)
+    audio.addEventListener('ended', onEnd)
+    audio.addEventListener('error', onErr)
+    return () => {
+      audio.removeEventListener('timeupdate', onTime)
+      audio.removeEventListener('loadedmetadata', onMeta)
+      audio.removeEventListener('ended', onEnd)
+      audio.removeEventListener('error', onErr)
+    }
+  }, [audioUrl])
+
+  const toggle = () => {
+    const audio = audioRef.current
+    if (!audio) return
+    if (playing) { audio.pause(); setPlaying(false) }
+    else { audio.play().then(() => setPlaying(true)).catch(() => setError('Tap play to start')) }
+  }
+
+  const fmt = (s: number) => {
+    if (!s || isNaN(s)) return '0:00'
+    return `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`
+  }
+
+  return (
+    <div className="mt-6 rounded-2xl border border-amber-500/30 bg-black/40 p-5">
+      <p className="text-[10px] uppercase tracking-[0.3em] text-amber-400/70 font-bold mb-1">
+        {playing ? '▶ NOW PLAYING' : 'K-KUT · SWEET SPOT'}
+      </p>
+      <p className="text-white font-bold text-lg truncate">{title}</p>
+      <p className="text-amber-400/80 text-sm mb-4 truncate">{artist}</p>
+
+      {error ? (
+        <p className="text-red-400/80 text-sm">{error}</p>
+      ) : (
+        <>
+          <div className="flex items-center gap-3 mb-3">
+            <button
+              onClick={toggle}
+              className="w-12 h-12 rounded-full flex items-center justify-center text-xl shadow-lg transition-all active:scale-95"
+              style={{ background: '#D4A017', color: '#1a1207' }}
+              aria-label={playing ? 'Pause' : 'Play K-KUT'}
+            >
+              {playing ? '⏸' : '▶'}
+            </button>
+            <div className="flex-1">
+              <input
+                type="range"
+                min={0}
+                max={duration || 0}
+                value={currentTime}
+                onChange={e => {
+                  const t = parseFloat(e.target.value)
+                  if (audioRef.current) audioRef.current.currentTime = t
+                  setCurrentTime(t)
+                }}
+                className="w-full h-1 rounded-full appearance-none cursor-pointer accent-amber-400"
+                aria-label="Seek"
+              />
+              <div className="flex justify-between text-[10px] text-white/30 mt-1">
+                <span>{fmt(currentTime)}</span>
+                <span>{fmt(duration)}</span>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
+
+      <audio ref={audioRef} src={audioUrl} preload="metadata" />
+    </div>
+  )
 }
 
 function GiftSongsContent() {
@@ -25,7 +115,7 @@ function GiftSongsContent() {
     if (!trackId) return
     supabase
       .from('gpm_tracks')
-      .select('id, title, artist, image, duration')
+      .select('id, title, artist, url, file_path, image, duration')
       .eq('id', trackId)
       .single()
       .then(({ data }) => {
@@ -33,6 +123,8 @@ function GiftSongsContent() {
         setLoading(false)
       })
   }, [trackId])
+
+  const audioUrl = track ? resolveAudioUrl(track.url || track.file_path || '') : ''
 
   return (
     <section className="pt-24 pb-16 px-4 max-w-2xl mx-auto">
@@ -57,23 +149,19 @@ function GiftSongsContent() {
               <div className="w-16 h-16 mx-auto rounded-full bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center text-3xl mb-5 shadow-lg shadow-amber-500/25">♪</div>
             )}
             <h2 className="text-2xl font-bold text-white mb-1">{track.title}</h2>
-            <p className="text-amber-400 font-medium mb-4">{track.artist}</p>
-            {track.duration && (
-              <p className="text-white/30 text-xs mb-4">
-                {Math.floor(track.duration / 60000)}:{String(Math.floor((track.duration % 60000) / 1000)).padStart(2, '0')}
-              </p>
+            <p className="text-amber-400 font-medium mb-2">{track.artist}</p>
+            {audioUrl ? (
+              <KutPlayer audioUrl={audioUrl} title={track.title} artist={track.artist} />
+            ) : (
+              <p className="text-white/40 text-sm mt-4">Audio coming soon — check back shortly.</p>
             )}
-            <p className="text-white/50 text-sm">Your K-KUT excerpt will play once the Sweet Spot is activated.</p>
           </>
         ) : (
           <>
             <div className="w-16 h-16 mx-auto rounded-full bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center text-3xl mb-5 shadow-lg shadow-amber-500/25">♪</div>
             <p className="text-white/60 text-sm mb-6">
-              Your K-KUT is loading its Sweet Spot. The excerpt will play here once the track is activated.
+              Track not found. The K-KUT link may have expired or the track is not yet available.
             </p>
-            <div className="h-1 w-full rounded-full bg-white/10 overflow-hidden">
-              <div className="h-full w-1/3 bg-gradient-to-r from-amber-400 to-orange-500 rounded-full animate-pulse" />
-            </div>
           </>
         )}
       </div>
