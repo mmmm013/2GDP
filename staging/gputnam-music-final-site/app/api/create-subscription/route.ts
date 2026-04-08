@@ -2,13 +2,13 @@ import { NextRequest, NextResponse } from 'next/server';
 
 // Ships tier pricing (cents/month)
 const TIER_AMOUNTS: Record<string, number> = {
-  canoe: 1313,
-  cruiser: 2323,
+  kanoe: 1313,
+  kruiser: 2323,
 };
 
 const TIER_LABELS: Record<string, string> = {
-  canoe: 'Canoe — Ship Sponsor',
-  cruiser: 'Cruiser — Senior Ship Sponsor',
+  kanoe: 'Kanoe — Ship Sponsor',
+  kruiser: 'Kruiser — Senior Ship Sponsor',
 };
 
 export async function POST(req: NextRequest) {
@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
 
     if (!tier || !TIER_AMOUNTS[tier]) {
       return NextResponse.json(
-        { error: 'Invalid tier. Must be: canoe or cruiser' },
+        { error: 'Invalid tier. Must be: kanoe or kruiser' },
         { status: 400 }
       );
     }

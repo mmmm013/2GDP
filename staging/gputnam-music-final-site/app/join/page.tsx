@@ -8,9 +8,9 @@ import { Suspense } from 'react';
 // ─── Tier config ──────────────────────────────────────────────────────────────
 const TIERS = [
   {
-    id: 'canoe',
+    id: 'kanoe',
     emoji: '🛶',
-    name: 'CANOE',
+    name: 'KANOE',
     subtitle: 'Ship Sponsor',
     price: '$13.13',
     description: 'Board the vessel. Your monthly sponsorship directly funds the GPM catalog, artist support, and keeps the stream flowing.',
@@ -26,9 +26,9 @@ const TIERS = [
     ring: 'hover:border-[#4da6ff]/80',
   },
   {
-    id: 'cruiser',
+    id: 'kruiser',
     emoji: '🚢',
-    name: 'CRUISER',
+    name: 'KRUISER',
     subtitle: 'Senior Ship Sponsor',
     price: '$23.23',
     description: 'Command the deck. Senior Ships sponsors receive elevated profit-share status and are named in Founder dispatches.',
@@ -87,7 +87,7 @@ function JoinInner() {
           <div className="text-7xl">⚓</div>
           <h1 className="text-3xl font-black text-[#4da6ff]">Welcome aboard, Ship!</h1>
           <p className="text-[#F5e6c8]/80 leading-relaxed">
-            You&apos;re now a {successTier === 'cruiser' ? 'Cruiser' : 'Canoe'} — a Ships Sponsor of G Putnam Music.
+            You&apos;re now a {successTier === 'kruiser' ? 'Kruiser' : 'Kanoe'} — a Ships Sponsor of G Putnam Music.
             Every dollar flows directly to Michael Scherer and the GPM artist family. Thank you.
           </p>
           <Link
@@ -195,7 +195,7 @@ function JoinInner() {
               className="w-full py-3.5 rounded-xl font-black text-sm uppercase tracking-wider transition-all disabled:opacity-50"
               style={{
                 backgroundColor: tier.accent,
-                color: tier.id === 'canoe' ? '#0a1e35' : '#0a1e35',
+                color: tier.id === 'kanoe' ? '#0a1e35' : '#0a1e35',
               }}
             >
               {loading === tier.id ? 'Loading…' : `Join as ${tier.name} →`}
