@@ -118,7 +118,7 @@ BEGIN
         required    = EXCLUDED.required;
 
   -- -------------------------------------------------------
-  -- BTIs (bound track items / content payloads)
+  -- BTIs (Branded Template Items)
   -- -------------------------------------------------------
   INSERT INTO app_private.btis (bti_key, domain_code, payload)
   VALUES
