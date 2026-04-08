@@ -104,7 +104,7 @@ function KUTRedirectContent() {
           return r.json()
         })
         .then((data: { destination: string; item_type: string }) => {
-          const labels: Record<string, string> = { STI: 'STI', BTI: 'BTI', FP: 'FP' }
+          const labels: Record<string, string> = { STI: 'STI', BTI: 'BTI', FP: 'Featured Playlist' }
           setResolvedTarget({ href: data.destination, label: labels[data.item_type] ?? 'KUPID' })
         })
         .catch(() => {

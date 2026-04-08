@@ -7,6 +7,7 @@
 | :--- | :--- | :--- |
 | **GPM** | **G Putnam Music** | The Brand / The Vocalist / The Enterprise. |
 | **GPMC** | **G Putnam Music Catalog** | The library of all audio/visual assets. |
+| **GPMD** | **G Putnam Music Destination** | Any public-facing consumer site powered by the GPM platform. FP (Featured Playlist) is standard to ALL GPMDs. |
 | **MIP** | **Most Important Person/Partner** | Co-Copyright Collaborators (Scherer, Nelson). Strategy focuses on *their* ease of use. |
 | **G** | **Gemini AI** | Designer / Operations / Directional Intelligence. |
 | **LP** | **Lisa Putnam** | Leadership (Context: Legacy Retrieval). |
@@ -35,7 +36,20 @@
 ---
 *Protocol Saved for Retrieval.*
 
-## IV. AUTOMATION AGENTS (BOTS)
+## IV. PLATFORM TEMPLATE SYSTEM (4PE / KKr / GPEx)
+| Acronym | Definition | Role/Context |
+| :--- | :--- | :--- |
+| **STI** | **Standard Template Item** | A template slot/container in the 4PE platform engine. STI-Slots hold space to be filled by BTIs. |
+| **BTI** | **Branded Template Item** | Content payload that fills an STI-Slot. Brand-specific customization layer. |
+| **4PE** | **4 Platform Engine** | The universal platform engine. 4PE-MSC = music prototype. 4PE-BIZ = general business platform. |
+| **KKr** | **K-KUT Router / KKr-MSC** | The MetaGrab + mini-KUT processing system bundled into all 4PE platforms. |
+| **GPEx** | **GPEx Business "Excel-A-rator"** | The renamed GPMCC. Houses 4PE-BIZ platform family for Central IL industries. |
+| **K-KUT** | **K-KUT** | Exact excerpt of whole song sections (not time-based). 1 per purchase. |
+| **mK** | **mini-KUT** | Text unit harvested by KKr-MSC metaGrab from LT-PIX. Types: verb/noun/adj/adv/pron/cmpnd/phrase/hook. |
+| **LT** | **MetaGrab trigger (LT-PIX)** | pck_type='LT' flags a PIX package for KKr-MSC MetaGrab. Result: ≥40 mini-KUTs. NOT "Long Track". |
+| **SWSP** | **Sweet Spot** | Time-based clip marker. IN-PIX + INO-PIX SWSPs must be ≥13 seconds. K-KUTs are section-based only (no time constraint). |
+
+## V. AUTOMATION AGENTS (BOTS)
 | Acronym | Definition | Role/Context |
 | :--- | :--- | :--- |
 | **MC BOT** | **Music Curator Bot** | Manages Audio & MIP Rotation. |

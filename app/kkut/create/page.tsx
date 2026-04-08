@@ -157,7 +157,7 @@ export default function KKKCreatorPage() {
         <GpmBot
           bot="GD-BOT"
           steps={[
-            { title: 'Select your track type', hint: 'Choose STI (Standard Template Item), BTI (Branded Template Item), or FP.', action: 'Pick Type' },
+            { title: 'Select your track type', hint: 'Choose STI (Standard Template Item), BTI (Branded Template Item), or FP (Featured Playlist).', action: 'Pick Type' },
             { title: 'Find your track', hint: 'Search or browse the catalog. Select the exact track you want to link.' },
             { title: 'Set your Sweet Spot', hint: 'Toggle K-KUT (full sweet-spot link) or mini-KUT (short clip). Enter your timestamp.' },
             { title: 'Generate your code', hint: 'Hit Generate — your 6-character K-KUT code is created instantly.', action: 'Generate' },
