@@ -310,7 +310,7 @@ function HomeFP() {
         setTracks([...filtered].sort(() => Math.random() - 0.5));
         setLoading(false);
       });
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []);
 
   // Stop audio and clear error when user changes track
   useEffect(() => {
@@ -342,7 +342,8 @@ function HomeFP() {
       audio.src = data.url as string;
       await audio.play();
       setPlaying(true);
-    } catch {
+    } catch (err) {
+      console.error('[HomeFP] playback error:', err);
       setError('Playback error — get-stream-url function unreachable.');
     } finally {
       setResolving(false);

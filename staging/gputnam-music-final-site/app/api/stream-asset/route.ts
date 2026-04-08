@@ -20,7 +20,7 @@ export async function GET(req: NextRequest) {
   const assetId = req.nextUrl.searchParams.get('id');
 
   if (!assetId) {
-    return NextResponse.json({ error: 'asset id is required' }, { status: 400 });
+    return NextResponse.json({ error: 'Asset ID is required' }, { status: 400 });
   }
 
   try {
@@ -33,11 +33,11 @@ export async function GET(req: NextRequest) {
       .single();
 
     if (error || !asset) {
-      return NextResponse.json({ error: 'asset not found or not published' }, { status: 404 });
+      return NextResponse.json({ error: 'Asset not found or not published' }, { status: 404 });
     }
 
     if (!asset.storage_path) {
-      return NextResponse.json({ error: 'asset has no storage path' }, { status: 422 });
+      return NextResponse.json({ error: 'Asset has no storage path' }, { status: 422 });
     }
 
     // Generate a short-lived signed URL (creator-assets bucket)
@@ -47,13 +47,13 @@ export async function GET(req: NextRequest) {
 
     if (signErr || !signed?.signedUrl) {
       console.error('[stream-asset] signing failed', signErr);
-      return NextResponse.json({ error: 'could not sign asset URL' }, { status: 502 });
+      return NextResponse.json({ error: 'Could not sign asset URL' }, { status: 502 });
     }
 
     // Redirect — browser follows to the signed URL
     return NextResponse.redirect(signed.signedUrl, { status: 302 });
   } catch (err) {
     console.error('[stream-asset] unexpected error', err);
-    return NextResponse.json({ error: 'internal server error' }, { status: 500 });
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
