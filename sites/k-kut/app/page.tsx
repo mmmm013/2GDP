@@ -158,8 +158,8 @@ export default function HomePage() {
               {
                 id: "K-kUpId",
                 icon: "⬡",
-                role: "The Delivery Vehicle",
-                desc: "The smart link that resolves your selection into a playable, shareable, giftable moment.",
+                role: "The Romance Invention",
+                desc: "Same exact-excerpt strategy as K-KUT, but every moment is curated for a level of connection: Interest, Date, Love, Sex, or Forever.",
               },
             ].map(({ id, icon, role, desc }) => (
               <div

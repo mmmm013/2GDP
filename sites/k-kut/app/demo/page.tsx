@@ -2,16 +2,16 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
-import NotifyForm from "@/components/NotifyForm";
+import GpmBox from "@/components/GpmBox";
 
 export const metadata: Metadata = {
   title: "Demo",
   description:
-    "See the full K-KUT journey: Browse a feeling, pick your path (K-KUT or mini-KUT), resolve the link, and deliver a K-kUpId.",
+    "See K-KUT in action. Browse a feeling, choose K-KUT or mini-KUT, and experience the GPM box opening.",
   alternates: { canonical: "https://k-kut.com/demo" },
   openGraph: {
     title: "Demo | K-KUT",
-    description: "See the full K-KUT journey — from feeling to K-kUpId delivery.",
+    description: "Browse a feeling. Pick the moment. Open the box.",
     url: "https://k-kut.com/demo",
   },
 };
@@ -40,8 +40,8 @@ const SCENARIOS = [
   },
   {
     id: "04",
-    title: "Send it as a gift.",
-    description: "Choose a moment, resolve the link, and gift a K-kUpId. They open it. They feel it. They share it.",
+    title: "Send the moment.",
+    description: "K-kUpId: Interest→Date→Love. The exact lyric for exactly where you are — and where you want to go.",
     feeling: "Romance",
     type: "K-kUpId",
   },
@@ -70,11 +70,11 @@ export default function DemoPage() {
               See it in motion
             </p>
             <h1 className="text-4xl sm:text-5xl font-bold text-[var(--text)] mb-4 leading-tight">
-              A feeling → a moment → a K&#8209;kUpId.
+              Browse. Pick. Open the box.
             </h1>
             <p className="text-base text-[var(--text-muted)] leading-relaxed">
-              Browse. Choose your path. Resolve the link. Deliver the moment.
-              The full K&#8209;KUT journey in four steps.
+              Three inventions. One experience. From the feeling to the moment
+              — delivered through the GPM box.
             </p>
           </div>
         </section>
@@ -101,13 +101,13 @@ export default function DemoPage() {
               },
               {
                 step: "03",
-                title: "Resolve the link",
-                body: "Your selection resolves into a K-kUpId — a smart, cryptographically signed experience link.",
+                title: "Open the box",
+                body: "The GPM box opens — three panels fall: left, center, right. Three letters reveal the moment. GPM. KUT. LUV.",
               },
               {
                 step: "04",
-                title: "Deliver it",
-                body: "Share or gift your K-kUpId. The recipient opens it, hears it, feels it — and can share it further.",
+                title: "Feel it",
+                body: "Audio plays. The moment lands. Share it, gift it, or keep it. One exact excerpt. One exact feeling.",
               },
             ].map(({ step, title, body }) => (
               <div key={step} className="flex flex-col gap-3">

@@ -40,12 +40,12 @@ const INVENTIONS = [
   {
     id: "K-kUpId",
     icon: "⬡",
-    tagline: "The Delivery Vehicle",
-    headline: "The Experience Link",
-    body: "K-kUpId is the smart link that resolves intent into a playable moment. The final step in the user journey — after browsing and selecting a K-KUT or mini-K, K-kUpId delivers a precise, high-fidelity experience to the recipient. It can be shared or gifted, creating a viral path back to the platform. Every K-kUpId is cryptographically signed.",
-    role: "Romance · Interested · Gifted",
-    action: "Share / Gift",
-    velocity: "Growth + Connection",
+    tagline: "The Romance Invention",
+    headline: "Levels of Love",
+    body: "K-kUpId is an exact-excerpt audio invention — same strategy as K-KUT — but every moment is selected for a specific level of romantic or emotional closeness: Interest, Date, Love, Sex, or Forever. Where K-KUT expresses any feeling, K-kUpId is devoted entirely to connection.",
+    role: "Interest · Date · Love · Sex · Forever",
+    action: "Hold My Heart",
+    velocity: "Depth + Intimacy",
   },
 ];
 
@@ -200,52 +200,52 @@ export default function InventionPage() {
             K-kUpId
           </p>
           <h2 className="text-2xl sm:text-3xl font-semibold text-center text-[var(--text)] mb-4">
-            The Delivery Vehicle.
+            The Romance Invention.
           </h2>
           <p className="text-center text-sm text-[var(--text-muted)] mb-12 max-w-xl mx-auto">
-            The smart link that acts as Cupid between your catalog and the
-            person who needs to feel it.
+            K&#8209;kUpId uses the same exact-excerpt audio strategy as K&#8209;KUT
+            — but every moment is selected for a specific level of connection.
+            Five levels. One intention: closeness.
           </p>
 
-          {/* Journey steps */}
-          <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-14">
+          {/* 5 Levels of Love */}
+          <div className="grid grid-cols-1 sm:grid-cols-5 gap-3 mb-14">
             {[
-              { step: "01", label: "Browse", desc: "Explore by feeling, gesture, or artist" },
-              { step: "02", label: "Select Path", desc: "Choose a K-KUT section or mini-KUT text" },
-              { step: "03", label: "Resolve Link", desc: "The K-kUpId smart link is generated" },
-              { step: "04", label: "Delivered", desc: "Recipient opens, plays, and feels it" },
-            ].map(({ step, label, desc }) => (
+              { level: "01", label: "Interest", desc: "The spark. The opener. The moment that says 'I see you.'" },
+              { level: "02", label: "Date", desc: "Anticipation. A shared vibe before the night begins." },
+              { level: "03", label: "Love", desc: "Deep feeling. The lyric that says what words can't." },
+              { level: "04", label: "Sex", desc: "Charged. Certain. The exact beat that says everything." },
+              { level: "05", label: "Forever", desc: "The forever song. The moment that seals it." },
+            ].map(({ level, label, desc }) => (
               <div
-                key={step}
-                className="relative border border-[var(--border)] bg-[var(--surface)] rounded-sm p-4 hover:border-[var(--border-bright)] transition-colors"
+                key={level}
+                className="border border-[var(--border)] bg-[var(--surface)] rounded-sm p-4 hover:border-[var(--accent)] transition-colors text-center"
               >
-                <span className="block text-2xl font-bold text-[var(--border-bright)] mb-2">
-                  {step}
-                </span>
-                <p className="text-sm font-semibold text-[var(--accent)] mb-1">{label}</p>
+                <span className="block text-xs text-[var(--text-muted)] mb-1">{level}</span>
+                <p className="text-sm font-bold text-[var(--accent)] mb-2">{label}</p>
                 <p className="text-xs text-[var(--text-muted)] leading-relaxed">{desc}</p>
               </div>
             ))}
           </div>
 
-          {/* K-kUpId features */}
+          {/* K-kUpId vs K-KUT comparison */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl mx-auto">
             {[
               {
-                title: "Romance · Interested · Gifted",
-                body: "K-kUpId is designed for intimate, intentional moments — a crush, a connection, an acknowledgment. The feeling theme is romantic and personal.",
+                title: "Same strategy as K-KUT",
+                body: "Exact excerpts from professional, registered tracks — music + vocals — selected with precision. ASCAP-compliant section-based extraction.",
               },
               {
-                title: "Share or Gift — Viral by Design",
-                body: "Every K-kUpId can be shared or gifted, creating an organic loop back to the GPM platform. Expression spreads.",
+                title: "Feeling-first: Romance only",
+                body: "Where K-KUT covers all emotions, K-kUpId's entire catalog is curated for the romantic spectrum — from first glance to forever.",
               },
               {
-                title: "Cryptographically Signed",
-                body: "Every K-kUpId is signed by Lone Admin credentials. Every share is traceable. You get paid for every play.",
+                title: "Level-matched discovery",
+                body: "Browse by level, not just mood. The right excerpt for exactly where you are in the connection — and exactly where you want to go.",
               },
               {
-                title: "Precision Delivery",
-                body: "The K-kUpId resolves exactly the moment selected — no buffering, no ambiguity. High-fidelity, every time.",
+                title: "Gift-ready by design",
+                body: "K-kUpId moments are built to be sent — a gift, a signal, an invitation. Every excerpt is chosen because it says what you mean better than you can.",
               },
             ].map(({ title, body }) => (
               <div
