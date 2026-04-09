@@ -1,15 +1,27 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
+import Link from "next/link";
+import { playKKutSection } from "@/lib/kkut-audio";
 
 /* ═══════════════════════════════════════════════════════════
    K-KUT BOT — SMS / DM chat simulation
    Shows a scripted conversation where a K-KUT section is sent
    ═══════════════════════════════════════════════════════════ */
 
+// 4 BOT voice intro lines — BOTs draw one before dropping a K-KUT card
+const BOT_VOICE_INTROS = [
+  "Here's the moment.",
+  "Drop this. No caption needed.",
+  "Three letters. One feeling.",
+  "This one says it.",
+] as const;
+
 type ChatLine = {
   from: "sender" | "bot" | "system";
   text?: string;
+  /** BOT vocal intro line shown just before a K-KUT card drops */
+  voice?: string;
   card?: {
     title: string;
     tag: string;
@@ -25,6 +37,7 @@ const KKUT_SCRIPTS: ChatLine[][] = [
     { from: "bot",    text: "…",                                          delay: 900 },
     {
       from: "bot",
+      voice: BOT_VOICE_INTROS[0],
       card: { title: "LOVE RENEWS", tag: "K-KUT · Chorus", section: "Ch1", color: "255,105,180" },
       delay: 600,
     },
@@ -38,6 +51,7 @@ const KKUT_SCRIPTS: ChatLine[][] = [
     { from: "bot",    text: "...",                                                 delay: 1000 },
     {
       from: "bot",
+      voice: BOT_VOICE_INTROS[2],
       card: { title: "STARTS WITH ME", tag: "K-KUT · Verse 2", section: "V2", color: "0,229,255" },
       delay: 700,
     },
@@ -49,6 +63,7 @@ const KKUT_SCRIPTS: ChatLine[][] = [
     { from: "bot",    text: "stop talking. send this.",                     delay: 900 },
     {
       from: "bot",
+      voice: BOT_VOICE_INTROS[1],
       card: { title: "STILL HERE", tag: "K-KUT · Bridge", section: "BR", color: "180,200,255" },
       delay: 600,
     },
@@ -188,6 +203,86 @@ function useAutoScript<T>(
 }
 
 /* ═══════════════════════════════════════════════════════════
+   K-KUT card with play button + animated waveform
+   ═══════════════════════════════════════════════════════════ */
+
+const CARD_BARS = [3, 5, 8, 12, 9, 14, 7];
+
+function KKutCardPlayer({ card }: { card: NonNullable<ChatLine["card"]> }) {
+  const [playing, setPlaying] = useState(false);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  function handlePlay() {
+    if (playing) return;
+    const ms = playKKutSection(card.section);
+    if (ms > 0) {
+      setPlaying(true);
+      if (timerRef.current) clearTimeout(timerRef.current);
+      timerRef.current = setTimeout(() => setPlaying(false), ms);
+    }
+  }
+
+  useEffect(() => () => { if (timerRef.current) clearTimeout(timerRef.current); }, []);
+
+  const rgba = (a: number) => `rgba(${card.color},${a})`;
+
+  return (
+    <div className="flex justify-start anim-bubble-in">
+      <div
+        className="rounded-sm p-3 max-w-[240px] border"
+        style={{
+          borderColor: rgba(0.6),
+          background: rgba(0.08),
+          boxShadow: `0 0 16px ${rgba(0.2)}`,
+        }}
+      >
+        <p
+          className="text-[9px] uppercase tracking-widest mb-1 font-semibold"
+          style={{ color: `rgb(${card.color})` }}
+        >
+          {card.tag}
+        </p>
+        <p className="text-sm font-bold text-[var(--text)]">{card.title}</p>
+        <p className="text-[10px] text-[var(--text-muted)] mt-0.5">
+          Section: {card.section} · K-KUT
+        </p>
+
+        {/* Waveform + play button */}
+        <div className="mt-2.5 flex items-center gap-2">
+          <div className="flex flex-1 items-end gap-[3px] h-5" aria-hidden>
+            {CARD_BARS.map((h, i) => (
+              <span
+                key={i}
+                className="flex-1 rounded-sm"
+                style={{
+                  height: playing ? `${h * 2.5}px` : "3px",
+                  background: `rgb(${card.color})`,
+                  opacity: playing ? 0.8 : 0.35,
+                  transition: `height ${0.13 + (i % 3) * 0.06}s ease-in-out ${(i % 4) * 0.04}s`,
+                }}
+              />
+            ))}
+          </div>
+          <button
+            onClick={handlePlay}
+            aria-label={playing ? "Playing K-KUT" : "Play K-KUT"}
+            className="shrink-0 text-[9px] uppercase tracking-widest px-2.5 py-1 rounded-sm border transition-all"
+            style={{
+              borderColor: rgba(0.5),
+              color: `rgb(${card.color})`,
+              background: playing ? rgba(0.2) : rgba(0.05),
+              cursor: playing ? "default" : "pointer",
+            }}
+          >
+            {playing ? "●" : "▶"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════
    K-KUT BOT sub-component
    ═══════════════════════════════════════════════════════════ */
 
@@ -227,32 +322,18 @@ function KKutBot() {
         )}
         {lines.map((line, i) => {
           if (line.card) {
-            const c = line.card;
             return (
-              <div key={i} className="flex justify-start anim-bubble-in">
-                <div
-                  className="rounded-sm p-3 max-w-[220px] border"
-                  style={{
-                    borderColor: `rgba(${c.color},0.6)`,
-                    background: `rgba(${c.color},0.08)`,
-                    boxShadow: `0 0 16px rgba(${c.color},0.2)`,
-                  }}
-                >
-                  <p
-                    className="text-[9px] uppercase tracking-widest mb-1 font-semibold"
-                    style={{ color: `rgb(${c.color})` }}
-                  >
-                    {c.tag}
-                  </p>
-                  <p className="text-sm font-bold text-[var(--text)]">{c.title}</p>
-                  <p className="text-[10px] text-[var(--text-muted)] mt-1">
-                    Section: {c.section} · K-KUT
-                  </p>
-                  <div
-                    className="mt-2 h-1 rounded-full"
-                    style={{ background: `rgba(${c.color},0.5)`, width: "70%" }}
-                  />
-                </div>
+              <div key={i} className="space-y-1.5">
+                {/* BOT voice intro — one of 4 vocal intro lines */}
+                {line.voice && (
+                  <div className="flex justify-start anim-bubble-in">
+                    <div className="px-3 py-1.5 rounded-sm text-[10px] italic text-[var(--text-muted)] bg-[var(--surface-2)] border border-[var(--border)] flex items-center gap-1.5">
+                      <span className="text-[var(--accent)] not-italic">🔊</span>
+                      {line.voice}
+                    </div>
+                  </div>
+                )}
+                <KKutCardPlayer card={line.card} />
               </div>
             );
           }
@@ -284,6 +365,21 @@ function KKutBot() {
         })}
         <div ref={bottomRef} />
       </div>
+
+      {/* Post-demo sale CTA — appears after K-KUT BOT script completes */}
+      {done && (
+        <div className="flex flex-col items-center gap-2 px-4 pb-4 pt-1 animate-fade-in">
+          <p className="text-xs text-[var(--text-muted)] text-center">
+            That&rsquo;s a K&#8209;KUT. Ready to send one?
+          </p>
+          <Link
+            href="/pricing"
+            className="px-6 py-2.5 bg-[var(--accent)] text-[var(--bg)] text-[10px] font-bold uppercase tracking-widest rounded-sm hover:opacity-90 transition-opacity"
+          >
+            Get K&#8209;KUT Access →
+          </Link>
+        </div>
+      )}
 
       {/* Controls */}
       <div className="flex items-center justify-between gap-3 px-4 py-3 border-t border-[var(--border)]">
