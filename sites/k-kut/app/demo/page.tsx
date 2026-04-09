@@ -3,6 +3,7 @@ import Link from "next/link";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 import DeliveryStage from "@/components/DeliveryStage";
+import BotDemo from "@/components/BotDemo";
 
 export const metadata: Metadata = {
   title: "Demo",
