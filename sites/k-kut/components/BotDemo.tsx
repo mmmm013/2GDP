@@ -179,6 +179,8 @@ function useAutoScript<T>(
       timerRef.current.push(t);
     });
     return () => timerRef.current.forEach(clearTimeout);
+    // items/delays are rebuilt on every render (new array references) so including
+    // them would cause an infinite re-run loop. running is the only stable gate we need.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [running]);
 

@@ -148,6 +148,24 @@ export default function DemoPage() {
           </div>
         </section>
 
+        {/* ─── BOT Demos ────────────────────────── */}
+        <section className="border-t border-[var(--border)] bg-[var(--surface)]">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 py-20">
+            <p className="text-[10px] uppercase tracking-[0.3em] text-[var(--accent)] mb-4 text-center">
+              Live BOT Demos
+            </p>
+            <h2 className="text-2xl font-semibold text-center text-[var(--text)] mb-3">
+              Three inventions. Three BOTs. Watch them run.
+            </h2>
+            <p className="text-center text-sm text-[var(--text-muted)] mb-10 max-w-xl mx-auto">
+              Scripted, auto-playing demonstrations — one per invention. K-KUT BOT
+              sends an exact section. mini-KUT BOT fires 12 micro-assets from one
+              master track. K-kUpId BOT walks all 5 romance levels.
+            </p>
+            <BotDemo />
+          </div>
+        </section>
+
         {/* ─── Delivery Stage ───────────────────── */}
         <section className="max-w-5xl mx-auto px-4 sm:px-6 py-24">
           <p className="text-[10px] uppercase tracking-[0.3em] text-[var(--accent)] mb-4 text-center">
