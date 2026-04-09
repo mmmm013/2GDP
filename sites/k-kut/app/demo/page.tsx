@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
-import GpmBox from "@/components/GpmBox";
+import DeliveryStage from "@/components/DeliveryStage";
 
 export const metadata: Metadata = {
   title: "Demo",
@@ -70,11 +70,12 @@ export default function DemoPage() {
               See it in motion
             </p>
             <h1 className="text-4xl sm:text-5xl font-bold text-[var(--text)] mb-4 leading-tight">
-              Browse. Pick. Open the box.
+              Pick your messenger.<br />Open the box.
             </h1>
             <p className="text-base text-[var(--text-muted)] leading-relaxed">
-              Three inventions. One experience. From the feeling to the moment
-              — delivered through the GPM box.
+              Devil. Cupid. Angel. Spy. Twelve messengers, each with a unique
+              entrance. Three letters fall open. You choose the channel.
+              Every delivery is unrepeatable.
             </p>
           </div>
         </section>
@@ -101,13 +102,13 @@ export default function DemoPage() {
               },
               {
                 step: "03",
-                title: "Open the box",
-                body: "The GPM box opens — three panels fall: left, center, right. Three letters reveal the moment. GPM. KUT. LUV.",
+                title: "Pick your messenger",
+                body: "Devil. Cupid. Angel. Nurse. Romeo. Puppy. Cat. Ghost. Each messenger carries the moment with a unique entrance and glow.",
               },
               {
                 step: "04",
-                title: "Feel it",
-                body: "Audio plays. The moment lands. Share it, gift it, or keep it. One exact excerpt. One exact feeling.",
+                title: "Choose the channel",
+                body: "SMS, DM, Social, or Email. Three letter panels fall open — left, center, right. A new delivery every time.",
               },
             ].map(({ step, title, body }) => (
               <div key={step} className="flex flex-col gap-3">
@@ -146,32 +147,20 @@ export default function DemoPage() {
           </div>
         </section>
 
-        {/* ─── Demo Placeholder ─────────────────── */}
+        {/* ─── Delivery Stage ───────────────────── */}
         <section className="max-w-5xl mx-auto px-4 sm:px-6 py-24">
           <p className="text-[10px] uppercase tracking-[0.3em] text-[var(--accent)] mb-4 text-center">
-            Step 2: Select Your Path
+            Step 3: The Delivery
           </p>
-          <h2 className="text-2xl font-semibold text-center text-[var(--text)] mb-4">
-            K-KUT or mini-KUT?
+          <h2 className="text-2xl font-semibold text-center text-[var(--text)] mb-3">
+            Pick your messenger. Open the box.
           </h2>
           <p className="text-center text-sm text-[var(--text-muted)] mb-10 max-w-xl mx-auto">
-            A K&#8209;KUT is a whole song section — structural, deep, musical.
-            A mini&#8209;KUT is a text phrase, word, or hook — fast, punchy,
-            social-ready.
+            Twelve messengers. Fifteen codes. Four channels. Every delivery is
+            different — same electric feeling. Choose who carries your moment,
+            then pick how it lands: SMS, DM, Social, or Email.
           </p>
-          <div className="border border-[var(--accent)] bg-[var(--surface)] rounded-sm p-10 text-center max-w-lg mx-auto accent-glow">
-            <div className="mb-6">
-              <span className="block text-5xl text-[var(--accent)] mb-3">▶</span>
-              <p className="text-xs uppercase tracking-widest text-[var(--text-muted)]">
-                Demo Audio — Coming Soon
-              </p>
-            </div>
-            <p className="text-sm text-[var(--text-muted)] leading-relaxed mb-6">
-              Interactive audio demo is being prepared. Join the notify list to
-              be first when it goes live.
-            </p>
-            <NotifyForm />
-          </div>
+          <DeliveryStage />
         </section>
 
         {/* ─── 4 Demo Scenarios ─────────────────── */}
