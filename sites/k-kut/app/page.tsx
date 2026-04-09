@@ -128,6 +128,63 @@ export default function HomePage() {
           </div>
         </section>
 
+        {/* ─── The Invention Family ─────────────── */}
+        <section className="max-w-5xl mx-auto px-4 sm:px-6 py-24">
+          <p className="text-[10px] uppercase tracking-[0.3em] text-[var(--accent)] mb-4 text-center">
+            The Invention Family
+          </p>
+          <h2 className="text-2xl sm:text-3xl font-semibold text-center text-[var(--text)] mb-4">
+            Three inventions. One complete system.
+          </h2>
+          <p className="text-center text-sm text-[var(--text-muted)] mb-12 max-w-xl mx-auto">
+            K&#8209;KUT is the core — but the full expression system includes
+            mini&#8209;KUT and K&#8209;kUpId. Together they cover every layer
+            from catalog to delivery.
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+            {[
+              {
+                id: "K-KUT",
+                icon: "◆",
+                role: "The Section",
+                desc: "Exact-excerpt audio from whole song sections. The structural moment that says it for you.",
+              },
+              {
+                id: "mini-KUT",
+                icon: "◈",
+                role: "The Micro-Asset",
+                desc: "Text-based sub-sectional extractions — words, phrases, hooks. High-velocity. Quick Tap ready.",
+              },
+              {
+                id: "K-kUpId",
+                icon: "⬡",
+                role: "The Delivery Vehicle",
+                desc: "The smart link that resolves your selection into a playable, shareable, giftable moment.",
+              },
+            ].map(({ id, icon, role, desc }) => (
+              <div
+                key={id}
+                className="border border-[var(--border)] bg-[var(--surface)] rounded-sm p-6 hover:border-[var(--border-bright)] transition-colors"
+              >
+                <span className="block text-2xl text-[var(--accent)] mb-3">{icon}</span>
+                <p className="text-base font-bold text-[var(--text)]">{id}</p>
+                <p className="text-[10px] uppercase tracking-widest text-[var(--accent)] mt-0.5 mb-3">
+                  {role}
+                </p>
+                <p className="text-sm text-[var(--text-muted)] leading-relaxed">{desc}</p>
+              </div>
+            ))}
+          </div>
+          <div className="mt-8 text-center">
+            <Link
+              href="/invention"
+              className="text-xs uppercase tracking-widest text-[var(--accent)] border-b border-[var(--accent)] pb-0.5 hover:opacity-80 transition-opacity"
+            >
+              Explore all three inventions →
+            </Link>
+          </div>
+        </section>
+
         {/* ─── Make Moments ─────────────────────── */}
         <section className="max-w-5xl mx-auto px-4 sm:px-6 py-24">
           <p className="text-[10px] uppercase tracking-[0.3em] text-[var(--accent)] mb-4 text-center">

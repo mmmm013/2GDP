@@ -7,11 +7,11 @@ import NotifyForm from "@/components/NotifyForm";
 export const metadata: Metadata = {
   title: "Demo",
   description:
-    "See K-KUT in action. Choose a feeling, pick the moment, send it anywhere.",
+    "See the full K-KUT journey: Browse a feeling, pick your path (K-KUT or mini-KUT), resolve the link, and deliver a K-kUpId.",
   alternates: { canonical: "https://k-kut.com/demo" },
   openGraph: {
     title: "Demo | K-KUT",
-    description: "See K-KUT in action. Choose a feeling, pick the moment, send it anywhere.",
+    description: "See the full K-KUT journey — from feeling to K-kUpId delivery.",
     url: "https://k-kut.com/demo",
   },
 };
@@ -22,18 +22,28 @@ const SCENARIOS = [
     title: "Make it right.",
     description: "An apology that actually lands — not a wall of text. The exact lyric that says \"I mean it.\"",
     feeling: "Apology",
+    type: "K-KUT",
   },
   {
     id: "02",
     title: "Light them up.",
     description: "Hype your friend before the big moment. The exact beat drop that says \"you've got this.\"",
     feeling: "Hype",
+    type: "mini-KUT",
   },
   {
     id: "03",
     title: "Say it without saying it.",
     description: "A crush. An inside feeling. The perfect lyric moment that says everything without the risk.",
     feeling: "Heart",
+    type: "K-KUT",
+  },
+  {
+    id: "04",
+    title: "Send it as a gift.",
+    description: "Choose a moment, resolve the link, and gift a K-kUpId. They open it. They feel it. They share it.",
+    feeling: "Romance",
+    type: "K-kUpId",
   },
 ];
 
@@ -60,11 +70,11 @@ export default function DemoPage() {
               See it in motion
             </p>
             <h1 className="text-4xl sm:text-5xl font-bold text-[var(--text)] mb-4 leading-tight">
-              A feeling → a moment → a send.
+              A feeling → a moment → a K&#8209;kUpId.
             </h1>
             <p className="text-base text-[var(--text-muted)] leading-relaxed">
-              K&#8209;KUT is built for three steps. No friction. No guessing.
-              Just the right moment.
+              Browse. Choose your path. Resolve the link. Deliver the moment.
+              The full K&#8209;KUT journey in four steps.
             </p>
           </div>
         </section>
@@ -75,31 +85,36 @@ export default function DemoPage() {
             The Flow
           </p>
           <h2 className="text-2xl sm:text-3xl font-semibold text-center text-[var(--text)] mb-12">
-            Three steps. Zero overthinking.
+            Four steps. One delivered feeling.
           </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-4 gap-6">
             {[
               {
                 step: "01",
-                title: "Choose a feeling",
-                body: "Tap a feeling tile — Hype, Heart, Calm, Funny. The library surfaces moments that match.",
+                title: "Browse a feeling",
+                body: "Tap a feeling tile — Hype, Heart, Romance, Apology. The library surfaces moments that match.",
               },
               {
                 step: "02",
-                title: "Tap the moment",
-                body: "Browse exact excerpts. Each one labeled for what it means, not just what it says.",
+                title: "Select your path",
+                body: "Choose a K-KUT (whole section) or a mini-KUT (text phrase). Pick the one that fits the moment.",
               },
               {
                 step: "03",
-                title: "Send it",
-                body: "Share as a clean link. In a text, a post, a DM. The recipient hears exactly what you meant.",
+                title: "Resolve the link",
+                body: "Your selection resolves into a K-kUpId — a smart, cryptographically signed experience link.",
+              },
+              {
+                step: "04",
+                title: "Deliver it",
+                body: "Share or gift your K-kUpId. The recipient opens it, hears it, feels it — and can share it further.",
               },
             ].map(({ step, title, body }) => (
               <div key={step} className="flex flex-col gap-3">
                 <span className="text-4xl font-bold text-[var(--border-bright)]">
                   {step}
                 </span>
-                <h3 className="text-lg font-semibold text-[var(--text)]">{title}</h3>
+                <h3 className="text-base font-semibold text-[var(--text)]">{title}</h3>
                 <p className="text-sm text-[var(--text-muted)] leading-relaxed">{body}</p>
               </div>
             ))}
@@ -110,7 +125,7 @@ export default function DemoPage() {
         <section className="border-t border-[var(--border)] bg-[var(--surface)]">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 py-20">
             <p className="text-[10px] uppercase tracking-[0.3em] text-[var(--accent)] mb-4 text-center">
-              Step 1: Choose a Feeling
+              Step 1: Browse a Feeling
             </p>
             <h2 className="text-2xl font-semibold text-center text-[var(--text)] mb-10">
               What do you need to say?
@@ -134,11 +149,16 @@ export default function DemoPage() {
         {/* ─── Demo Placeholder ─────────────────── */}
         <section className="max-w-5xl mx-auto px-4 sm:px-6 py-24">
           <p className="text-[10px] uppercase tracking-[0.3em] text-[var(--accent)] mb-4 text-center">
-            Step 2: Pick the Moment
+            Step 2: Select Your Path
           </p>
-          <h2 className="text-2xl font-semibold text-center text-[var(--text)] mb-10">
-            The excerpt that says it all.
+          <h2 className="text-2xl font-semibold text-center text-[var(--text)] mb-4">
+            K-KUT or mini-KUT?
           </h2>
+          <p className="text-center text-sm text-[var(--text-muted)] mb-10 max-w-xl mx-auto">
+            A K&#8209;KUT is a whole song section — structural, deep, musical.
+            A mini&#8209;KUT is a text phrase, word, or hook — fast, punchy,
+            social-ready.
+          </p>
           <div className="border border-[var(--accent)] bg-[var(--surface)] rounded-sm p-10 text-center max-w-lg mx-auto accent-glow">
             <div className="mb-6">
               <span className="block text-5xl text-[var(--accent)] mb-3">▶</span>
@@ -154,25 +174,30 @@ export default function DemoPage() {
           </div>
         </section>
 
-        {/* ─── 3 Demo Scenarios ─────────────────── */}
+        {/* ─── 4 Demo Scenarios ─────────────────── */}
         <section className="border-t border-[var(--border)] bg-[var(--surface)]">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 py-20">
             <p className="text-[10px] uppercase tracking-[0.3em] text-[var(--accent)] mb-4 text-center">
               Demo Scenarios
             </p>
             <h2 className="text-2xl font-semibold text-center text-[var(--text)] mb-12">
-              Real moments. Exact sound.
+              Real moments. Exact delivery.
             </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-              {SCENARIOS.map(({ id, title, description, feeling }) => (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {SCENARIOS.map(({ id, title, description, feeling, type }) => (
                 <div
                   key={id}
-                  className="border border-[var(--border)] bg-[var(--bg)] rounded-sm p-6 hover:border-[var(--border-bright)] transition-colors"
+                  className="border border-[var(--border)] bg-[var(--bg)] rounded-sm p-6 hover:border-[var(--border-bright)] transition-colors flex flex-col gap-3"
                 >
-                  <p className="text-[10px] uppercase tracking-widest text-[var(--accent)] mb-3">
-                    {feeling}
-                  </p>
-                  <h3 className="text-base font-semibold text-[var(--text)] mb-2">
+                  <div className="flex items-center justify-between">
+                    <p className="text-[10px] uppercase tracking-widest text-[var(--accent)]">
+                      {feeling}
+                    </p>
+                    <span className="text-[10px] uppercase tracking-widest text-[var(--text-muted)] border border-[var(--border)] px-1.5 py-0.5 rounded-sm">
+                      {type}
+                    </span>
+                  </div>
+                  <h3 className="text-base font-semibold text-[var(--text)]">
                     {title}
                   </h3>
                   <p className="text-sm text-[var(--text-muted)] leading-relaxed">

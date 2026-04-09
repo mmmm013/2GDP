@@ -4,41 +4,56 @@ import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 
 export const metadata: Metadata = {
-  title: "The Invention",
+  title: "The Inventions",
   description:
-    "K-KUT is a new messaging layer — emotion delivered through an exact moment of music. Discover the invention behind Send a Feeling.",
+    "Three inventions. One new language. K-KUT, mini-KUT, and K-kUpId — the complete GPM audio expression system.",
   alternates: { canonical: "https://k-kut.com/invention" },
   openGraph: {
-    title: "The Invention | K-KUT",
+    title: "The Inventions | K-KUT",
     description:
-      "K-KUT is a new messaging layer — emotion delivered through an exact moment of music.",
+      "Three inventions. One new language. K-KUT, mini-KUT, and K-kUpId.",
     url: "https://k-kut.com/invention",
   },
 };
 
-const PILLARS = [
+const INVENTIONS = [
   {
+    id: "K-KUT",
     icon: "◆",
-    title: "Send a Feeling",
-    body: "Not a reaction. A signal. K-KUT lets you say something without saying anything — just the exact moment that speaks.",
+    tagline: "The Section",
+    headline: "Exact-Excerpt Audio",
+    body: "A K-KUT is a structural excerpt from a professional, registered track — music + vocals — taken from a whole song section (Verse, Chorus, Bridge, etc.). It is the exact moment that says it for you. Not a preview. Not a clip. A precise selection with meaning.",
+    role: "The Core Expression",
+    action: "Double Tap",
+    velocity: "Depth + Precision",
   },
   {
+    id: "mini-KUT",
     icon: "◈",
-    title: "Make Moments",
-    body: "A memory you can send. Every K-KUT is a moment anchored in sound — precise, portable, and personal.",
+    tagline: "The Micro-Asset",
+    headline: "High-Velocity Text",
+    body: "A mini-KUT (mK) is a sub-sectional text extraction — a single word, a phrase, an exclamation, or a hook pulled from within a song section. Where a K-KUT is the Verse, the mini-K is the \"8-bar hook\" or the \"one line\" within it. Designed for social media, alerts, and instant messaging.",
+    role: "The Unit of Velocity",
+    action: "Quick Tap",
+    velocity: "Speed + Impact",
   },
   {
-    icon: "⬢",
-    title: "Exact-Excerpt Audio",
-    body: "The right line. The right beat. The right second. Selected from professional, registered tracks — music + vocals.",
+    id: "K-kUpId",
+    icon: "⬡",
+    tagline: "The Delivery Vehicle",
+    headline: "The Experience Link",
+    body: "K-kUpId is the smart link that resolves intent into a playable moment. The final step in the user journey — after browsing and selecting a K-KUT or mini-K, K-kUpId delivers a precise, high-fidelity experience to the recipient. It can be shared or gifted, creating a viral path back to the platform. Every K-kUpId is cryptographically signed.",
+    role: "Romance · Interested · Gifted",
+    action: "Share / Gift",
+    velocity: "Growth + Connection",
   },
 ];
 
 const ACTIONS = [
-  { gesture: "Quick Tap", level: "mK Single", price: "$1.99" },
-  { gesture: "Double Tap", level: "K-KUT Duo", price: "$4.99" },
-  { gesture: "Long Press", level: "PIX Stream", price: "$9.99" },
-  { gesture: "Hold My Heart", level: "Sovereign Pass", price: "$24.99" },
+  { gesture: "Quick Tap", level: "mK Single", invention: "mini-KUT", price: "$1.99" },
+  { gesture: "Double Tap", level: "K-KUT Duo", invention: "K-KUT", price: "$4.99" },
+  { gesture: "Long Press", level: "PIX Stream", invention: "K-KUT + mini-K", price: "$9.99" },
+  { gesture: "Hold My Heart", level: "Sovereign Pass", invention: "All Access", price: "$24.99" },
 ];
 
 export default function InventionPage() {
@@ -56,41 +71,189 @@ export default function InventionPage() {
           </div>
           <div className="relative z-10 max-w-3xl mx-auto">
             <p className="text-[10px] uppercase tracking-[0.3em] text-[var(--accent)] mb-4">
-              K-KUT
+              G Putnam Music
             </p>
             <h1 className="text-4xl sm:text-6xl font-bold text-[var(--text)] mb-6 leading-tight">
-              The Invention
+              Three Inventions.
+              <br />
+              <span className="text-[var(--accent)]">One New Language.</span>
             </h1>
-            <p className="text-lg sm:text-xl text-[var(--text-muted)] max-w-xl mx-auto leading-relaxed">
-              K&#8209;KUT is a new messaging layer: emotion, delivered through
-              an exact moment of music.
+            <p className="text-lg sm:text-xl text-[var(--text-muted)] max-w-2xl mx-auto leading-relaxed">
+              K&#8209;KUT, mini&#8209;KUT, and K&#8209;kUpId together form a
+              complete audio expression system — from catalog to the moment it
+              reaches someone who needs to feel it.
             </p>
           </div>
         </section>
 
-        {/* ─── 3 Pillars ────────────────────────── */}
+        {/* ─── 3 Inventions ─────────────────────── */}
         <section className="max-w-5xl mx-auto px-4 sm:px-6 py-24">
           <p className="text-[10px] uppercase tracking-[0.3em] text-[var(--accent)] mb-4 text-center">
-            Core Idea
+            The Invention Family
           </p>
-          <h2 className="text-2xl sm:text-3xl font-semibold text-center text-[var(--text)] mb-12">
-            Three pillars. One new language.
+          <h2 className="text-2xl sm:text-3xl font-semibold text-center text-[var(--text)] mb-4">
+            Each one does a distinct job.
           </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
-            {PILLARS.map(({ icon, title, body }) => (
+          <p className="text-center text-sm text-[var(--text-muted)] mb-16 max-w-xl mx-auto">
+            Together they cover every layer of the audio expression stack —
+            from structural section to micro-text to final delivery.
+          </p>
+
+          <div className="space-y-8">
+            {INVENTIONS.map(({ id, icon, tagline, headline, body, role, action, velocity }) => (
+              <div
+                key={id}
+                className="border border-[var(--border)] bg-[var(--surface)] rounded-sm p-6 md:p-8 hover:border-[var(--border-bright)] transition-colors"
+              >
+                <div className="flex flex-col md:flex-row md:items-start gap-6">
+                  {/* Left: icon + id */}
+                  <div className="flex-shrink-0 flex flex-col items-start gap-2 min-w-[140px]">
+                    <span className="text-3xl text-[var(--accent)]">{icon}</span>
+                    <p className="text-xl font-bold text-[var(--text)]">{id}</p>
+                    <p className="text-[10px] uppercase tracking-widest text-[var(--accent)]">
+                      {tagline}
+                    </p>
+                  </div>
+
+                  {/* Right: content */}
+                  <div className="flex-1">
+                    <h3 className="text-lg font-semibold text-[var(--text)] mb-3">
+                      {headline}
+                    </h3>
+                    <p className="text-sm text-[var(--text-muted)] leading-relaxed mb-5">
+                      {body}
+                    </p>
+                    <div className="flex flex-wrap gap-4 text-xs text-[var(--text-muted)]">
+                      <span className="flex items-center gap-1.5">
+                        <span className="text-[var(--accent)]">◆</span>
+                        <strong className="text-[var(--text)]">Role:</strong> {role}
+                      </span>
+                      <span className="flex items-center gap-1.5">
+                        <span className="text-[var(--accent)]">◈</span>
+                        <strong className="text-[var(--text)]">Action:</strong> {action}
+                      </span>
+                      <span className="flex items-center gap-1.5">
+                        <span className="text-[var(--accent)]">⬢</span>
+                        <strong className="text-[var(--text)]">Value:</strong> {velocity}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* ─── The mini-KUT Deep Dive ───────────── */}
+        <section className="border-t border-[var(--border)] bg-[var(--surface)]">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 py-20">
+            <p className="text-[10px] uppercase tracking-[0.3em] text-[var(--accent)] mb-4 text-center">
+              mini-KUT
+            </p>
+            <h2 className="text-2xl sm:text-3xl font-semibold text-center text-[var(--text)] mb-4">
+              The Unit of Velocity.
+            </h2>
+            <p className="text-center text-sm text-[var(--text-muted)] mb-12 max-w-xl mx-auto">
+              If a K-KUT is the Verse, the mini-KUT is the 8-bar hook within
+              it — unconstrained by duration, bounded only by the content
+              itself.
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-3xl mx-auto">
+              {[
+                {
+                  label: "Types",
+                  items: ["Words", "Exclamations", "Compound phrases (≤4 words)", "Lyric hooks (≤2 lines)"],
+                },
+                {
+                  label: "Use Cases",
+                  items: ["Social media captions", "Message alerts", "Quick Tap sends", "Micro-sync placements"],
+                },
+                {
+                  label: "Scale",
+                  items: ["12 mini-KUTs per Master Track", "8/12/20 extraction rule", "Zero catalog waste", "Maximum speed to market"],
+                },
+              ].map(({ label, items }) => (
+                <div
+                  key={label}
+                  className="border border-[var(--border)] rounded-sm p-5"
+                >
+                  <p className="text-[10px] uppercase tracking-widest text-[var(--accent)] mb-3">
+                    {label}
+                  </p>
+                  <ul className="space-y-1.5">
+                    {items.map((item) => (
+                      <li key={item} className="flex gap-2 text-sm text-[var(--text-muted)]">
+                        <span className="text-[var(--accent)] mt-0.5">—</span>
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ─── The K-kUpId Deep Dive ────────────── */}
+        <section className="max-w-5xl mx-auto px-4 sm:px-6 py-24">
+          <p className="text-[10px] uppercase tracking-[0.3em] text-[var(--accent)] mb-4 text-center">
+            K-kUpId
+          </p>
+          <h2 className="text-2xl sm:text-3xl font-semibold text-center text-[var(--text)] mb-4">
+            The Delivery Vehicle.
+          </h2>
+          <p className="text-center text-sm text-[var(--text-muted)] mb-12 max-w-xl mx-auto">
+            The smart link that acts as Cupid between your catalog and the
+            person who needs to feel it.
+          </p>
+
+          {/* Journey steps */}
+          <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-14">
+            {[
+              { step: "01", label: "Browse", desc: "Explore by feeling, gesture, or artist" },
+              { step: "02", label: "Select Path", desc: "Choose a K-KUT section or mini-KUT text" },
+              { step: "03", label: "Resolve Link", desc: "The K-kUpId smart link is generated" },
+              { step: "04", label: "Delivered", desc: "Recipient opens, plays, and feels it" },
+            ].map(({ step, label, desc }) => (
+              <div
+                key={step}
+                className="relative border border-[var(--border)] bg-[var(--surface)] rounded-sm p-4 hover:border-[var(--border-bright)] transition-colors"
+              >
+                <span className="block text-2xl font-bold text-[var(--border-bright)] mb-2">
+                  {step}
+                </span>
+                <p className="text-sm font-semibold text-[var(--accent)] mb-1">{label}</p>
+                <p className="text-xs text-[var(--text-muted)] leading-relaxed">{desc}</p>
+              </div>
+            ))}
+          </div>
+
+          {/* K-kUpId features */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl mx-auto">
+            {[
+              {
+                title: "Romance · Interested · Gifted",
+                body: "K-kUpId is designed for intimate, intentional moments — a crush, a connection, an acknowledgment. The feeling theme is romantic and personal.",
+              },
+              {
+                title: "Share or Gift — Viral by Design",
+                body: "Every K-kUpId can be shared or gifted, creating an organic loop back to the GPM platform. Expression spreads.",
+              },
+              {
+                title: "Cryptographically Signed",
+                body: "Every K-kUpId is signed by Lone Admin credentials. Every share is traceable. You get paid for every play.",
+              },
+              {
+                title: "Precision Delivery",
+                body: "The K-kUpId resolves exactly the moment selected — no buffering, no ambiguity. High-fidelity, every time.",
+              },
+            ].map(({ title, body }) => (
               <div
                 key={title}
-                className="border border-[var(--border)] bg-[var(--surface)] rounded-sm p-6 hover:border-[var(--border-bright)] transition-colors"
+                className="border border-[var(--border)] bg-[var(--surface)] rounded-sm p-5 hover:border-[var(--border-bright)] transition-colors"
               >
-                <span className="block text-3xl text-[var(--accent)] mb-4">
-                  {icon}
-                </span>
-                <h3 className="text-base font-semibold text-[var(--text)] mb-2">
-                  {title}
-                </h3>
-                <p className="text-sm text-[var(--text-muted)] leading-relaxed">
-                  {body}
-                </p>
+                <h4 className="text-sm font-semibold text-[var(--text)] mb-2">{title}</h4>
+                <p className="text-sm text-[var(--text-muted)] leading-relaxed">{body}</p>
               </div>
             ))}
           </div>
@@ -100,17 +263,18 @@ export default function InventionPage() {
         <section className="border-t border-[var(--border)] bg-[var(--surface)]">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 py-20">
             <p className="text-[10px] uppercase tracking-[0.3em] text-[var(--accent)] mb-4 text-center">
-              What makes it new
+              Why nothing else compares
             </p>
             <h2 className="text-2xl sm:text-3xl font-semibold text-center text-[var(--text)] mb-12">
-              Everything else falls short.
+              Every other format leaves something out.
             </h2>
-            <div className="max-w-2xl mx-auto space-y-4">
+            <div className="max-w-2xl mx-auto space-y-3">
               {[
-                { label: "Emojis", verdict: "simplify" },
-                { label: "GIFs", verdict: "imitate" },
-                { label: "Full songs", verdict: "too long" },
-                { label: "K-KUT", verdict: "the exact moment that says it for you.", accent: true },
+                { label: "Emojis", verdict: "simplify — no sound, no soul" },
+                { label: "GIFs", verdict: "imitate — no original, no rights" },
+                { label: "Full songs", verdict: "too long — loses the moment" },
+                { label: "Song previews", verdict: "random — not feeling-first" },
+                { label: "K-KUT + mini-K + K-kUpId", verdict: "exact · personal · delivered", accent: true },
               ].map(({ label, verdict, accent }) => (
                 <div
                   key={label}
@@ -127,7 +291,9 @@ export default function InventionPage() {
                   >
                     {label}
                   </span>
-                  <span className="text-sm text-[var(--text-muted)]">{verdict}</span>
+                  <span className="text-sm text-[var(--text-muted)] text-right max-w-[50%]">
+                    {verdict}
+                  </span>
                 </div>
               ))}
             </div>
@@ -143,11 +309,11 @@ export default function InventionPage() {
             A new interaction language.
           </h2>
           <p className="text-center text-sm text-[var(--text-muted)] mb-12 max-w-xl mx-auto">
-            K&#8209;KUT is organized around physical gestures. Every Action is
-            a level of access — and a way of being present.
+            Each Action maps to a gesture, a plan tier, and an invention.
+            Physical expression meets audio expression.
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {ACTIONS.map(({ gesture, level, price }) => (
+            {ACTIONS.map(({ gesture, level, invention, price }) => (
               <div
                 key={level}
                 className="flex items-center justify-between border border-[var(--border)] bg-[var(--surface)] rounded-sm px-5 py-4 hover:border-[var(--border-bright)] transition-colors"
@@ -157,6 +323,7 @@ export default function InventionPage() {
                     {gesture}
                   </p>
                   <p className="text-sm font-semibold text-[var(--text)]">{level}</p>
+                  <p className="text-xs text-[var(--text-muted)] mt-0.5">{invention}</p>
                 </div>
                 <span className="text-sm text-[var(--text-muted)]">{price} / mo</span>
               </div>
@@ -182,8 +349,9 @@ export default function InventionPage() {
             </h2>
             <p className="text-sm text-[var(--text-muted)] leading-relaxed max-w-xl mx-auto">
               The goal is simple: a new format that respects creators and feels
-              effortless for users. K&#8209;KUT is designed to operate within
-              the framework of professional music licensing — not around it.
+              effortless for users. K&#8209;KUT, mini&#8209;KUT, and
+              K&#8209;kUpId are designed to operate within the framework of
+              professional music licensing — not around it.
             </p>
           </div>
         </section>
