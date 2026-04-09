@@ -37,8 +37,21 @@ const OCCASIONS: Occasion[] = [
     },
   },
   {
+    id: "birthday",
+    label: "Best Birthday",
+    emoji: "🎂",
+    kkut: {
+      track: "VICTORY RUN",
+      section: "Ch1",
+      label: "K-KUT · Chorus",
+      color: "255,200,50",
+      note: "The only gift that plays itself",
+      productType: "K-KUT",
+    },
+  },
+  {
     id: "anniversary",
-    label: "Anniversary",
+    label: "Awesome Anniversary",
     emoji: "💍",
     kkut: {
       track: "LOVE RENEWS",

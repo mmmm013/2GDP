@@ -4,6 +4,7 @@ import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 import BotDemo from "@/components/BotDemo";
 import OccasionHero from "@/components/OccasionHero";
+import ArtistPromo from "@/components/ArtistPromo";
 
 export const metadata: Metadata = {
   title: "Demo",
@@ -48,6 +49,9 @@ export default function DemoPage() {
         <section className="border-b border-[var(--border)]">
           <OccasionHero />
         </section>
+
+        {/* ─── Artist Promo: Michael Scherer ────── */}
+        <ArtistPromo />
 
         {/* ─── BOT Demos ────────────────────────── */}
         <section className="border-t border-[var(--border)]">
