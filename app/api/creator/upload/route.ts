@@ -9,6 +9,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { verify } from 'jsonwebtoken';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
 import { getCreatorBySlug, SCOPE_ACCEPT, type CreatorScope } from '@/config/creators';
+import { hasGpmeAdminBypass, blockedCustomizationResponse } from '@/lib/policy/gpmeCustomizationPolicy';
 
 const SESSION_SECRET = process.env.CREATOR_SESSION_SECRET ?? 'change-me-in-production';
 const STORAGE_BUCKET = 'creator-assets';
@@ -30,6 +31,10 @@ function getSession(req: NextRequest): SessionPayload | null {
 }
 
 export async function POST(req: NextRequest) {
+  if (!hasGpmeAdminBypass(req)) {
+    return NextResponse.json(blockedCustomizationResponse(), { status: 403 });
+  }
+
   const session = getSession(req);
   if (!session) {
     return NextResponse.json({ error: 'Unauthorized — biometric login required' }, { status: 401 });

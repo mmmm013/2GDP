@@ -16,6 +16,8 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Play, Pause, SkipBack, SkipForward, Radio } from 'lucide-react';
 import { createClient } from '@supabase/supabase-js';
+import { safePlay } from '@/lib/audio/safePlay';
+import { AUDIO_UI_MESSAGES } from '@/lib/audio/messages';
 
 // ---------------------------------------------------------------------------
 // TYPES
@@ -178,14 +180,13 @@ export default function HomeFP() {
       // Attempt autoplay — browser may block it
       const audio = audioRef.current;
       if (audio) {
-        audio.play()
-          .then(() => {
+        safePlay(audio, 'HomeFP-autoplay', { track: tracks[queueIndex]?.title, url: tracks[queueIndex]?.url }).then((result) => {
+          if (!result.ok) {
+            setAutoplayBlocked(true);
+            return;
+          }
             setIsPlaying(true);
             setAutoplayBlocked(false);
-          })
-          .catch(() => {
-            // Browser blocked autoplay — show play button
-            setAutoplayBlocked(true);
           });
       }
     }
@@ -260,11 +261,16 @@ export default function HomeFP() {
     const audio = audioRef.current;
     if (!audio) return;
     if (isPlaying) {
-      audio.play().catch(() => setIsPlaying(false));
+      safePlay(audio, 'HomeFP-toggle', { track: tracks[queueIndex]?.title, url: tracks[queueIndex]?.url }).then((result) => {
+        if (!result.ok) {
+          setIsPlaying(false);
+          setError(AUDIO_UI_MESSAGES.playbackBlocked);
+        }
+      });
     } else {
       audio.pause();
     }
-  }, [isPlaying, queueIndex]);
+  }, [isPlaying, queueIndex, tracks]);
 
   // Stop other site players when this one starts
   useEffect(() => {

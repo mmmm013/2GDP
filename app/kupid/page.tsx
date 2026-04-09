@@ -6,6 +6,7 @@ import GlobalPlayer from '@/components/GlobalPlayer';
 import Link from 'next/link';
 import { KUPID_TIERS } from '@/lib/kupid-protocol';
 import GpmBot, { type JourneyStep } from '@/components/GpmBot';
+import KFamilyVisualStrip from '@/components/KFamilyVisualStrip';
 
 export default function KupidPage() {
   const [showInfo, setShowInfo] = useState(false);
@@ -52,16 +53,31 @@ export default function KupidPage() {
 
       {/* Hero Section */}
       <section className="pt-20 pb-6 px-4 text-center">
-        <span className="inline-block px-4 py-1 rounded-full text-xs font-bold tracking-widest uppercase bg-amber-500/20 text-amber-400 border border-amber-500/30 mb-4">
+        <span className="k-family-kicker inline-block px-4 py-1 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30 mb-4">
           Patented Invention
         </span>
-        <h1 className="text-5xl md:text-7xl font-bold mb-2 text-[#C8A882]">K-KUTs</h1>
-        <p className="text-xl md:text-2xl bg-gradient-to-r from-amber-400 to-orange-500 bg-clip-text text-transparent font-semibold">
+        <h1 className="k-family-title mb-2 text-[#C8A882]">K-KUTs</h1>
+        <p className="k-family-subtitle bg-gradient-to-r from-amber-400 to-orange-500 bg-clip-text text-transparent">
           Own the Sweet Spot
         </p>
         <p className="mt-4 text-white/60 max-w-lg mx-auto">
           Every track has a moment that moves you. K-KUTs capture that Sweet Spot &mdash; a curated highlight delivered as a clean, shareable digital experience.
         </p>
+
+        <KFamilyVisualStrip
+          containerClassName="max-w-4xl border-amber-500/30 bg-black/40 shadow-amber-500/15"
+          primaryImageSrc="/k-hero-alternate.JPG"
+          primaryImageAlt="K-kUpId hero visual"
+          primaryBadge="K-KUPID HUB"
+          primaryCopy="Tiered launch visuals for KK + mK + creator paths"
+          primarySizes="(max-width: 768px) 100vw, 60vw"
+          secondaryImageSrc="/gpm_qr_code.jpg"
+          secondaryImageAlt="K-kUpId QR visual"
+          secondarySizes="(max-width: 768px) 100vw, 40vw"
+          secondaryPaneClassName="bg-black/70"
+          gridStyle={{ gridTemplateColumns: 'minmax(0, 1.6fr) minmax(0, 1fr)' }}
+          overlayClassName="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent"
+        />
       </section>
 
       {/* Pricing Grid */}

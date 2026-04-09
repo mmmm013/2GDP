@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { useParams } from 'next/navigation'
+import Image from 'next/image'
 
 // mKUT prefab container — receives a canonical mKUT ID in the form:
 //   mkut-{type}-{itemId}-{timestamp}  (e.g. mkut-sti-abc123-1712000000)
@@ -239,8 +240,23 @@ export default function MKutPlayer() {
       )}
 
       <div className="mkut-capsule max-w-sm w-full">
+        <div className="relative h-32 rounded-2xl overflow-hidden border border-[#4a8060]/35 shadow-sm">
+          <Image
+            src="/hero-Music is Feeling.jpg"
+            alt="mini-KUT visual hero"
+            fill
+            sizes="(max-width: 640px) 100vw, 420px"
+            className="object-cover"
+            priority
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#0f1b22]/50 via-transparent to-[#123f2f]/45" />
+          <div className="absolute bottom-2 left-3">
+            <p className="kk-visual-badge text-[#d9f2e7]">MINI-KUT VISUAL</p>
+          </div>
+        </div>
+
         {/* Header badge */}
-        <div className="flex items-center justify-between mb-5">
+        <div className="flex items-center justify-between mb-5 mt-4">
           <span className="badge-mkut">mKUT</span>
           <span className="badge-structure">{structureLabel(mkut.structure_tag)}</span>
         </div>
@@ -256,7 +272,7 @@ export default function MKutPlayer() {
 
         {/* Track info */}
         <div className="track-info mt-4">
-          <h1 className="track-title">{mkut.title}</h1>
+          <h1 className="track-title k-family-capsule-title">{mkut.title}</h1>
           <p className="track-artist">{mkut.artist}</p>
           {durationSec && (
             <p className="track-duration">{durationSec}s excerpt</p>
@@ -439,11 +455,7 @@ const capsuleStyles = `
   /* Track info */
   .track-info { position: relative; z-index: 1; }
   .track-title {
-    font-size: 1.35rem;
-    font-weight: 900;
     color: #1a3a28;
-    letter-spacing: -0.01em;
-    line-height: 1.2;
   }
   .track-artist {
     margin-top: 3px;

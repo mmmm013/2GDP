@@ -3,12 +3,14 @@
 import { useState, useRef } from 'react';
 import { Play, Pause, Heart, Star, BookOpen, Sun, Moon, Music } from 'lucide-react';
 import { supabase } from '@/lib/supabaseClient';
+import { resolveAudioUrl } from '@/lib/audio/resolveAudioUrl';
 
 export default function Singalongs() {
   const [activeMood, setActiveMood] = useState<string | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTrack, setCurrentTrack] = useState<any>(null);
   const [loading, setLoading] = useState(false);
+   const [audioError, setAudioError] = useState('');
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   // THE LOGIC: Fetch from SHARED CATALOG, but Filter for THIS BRAND
@@ -22,6 +24,7 @@ export default function Singalongs() {
 
     setLoading(true);
     setActiveMood(moodTag);
+   setAudioError('');
     
       // FETCH FROM MASTER GPM VAULT
       const { data: supaData, error } = await supabase
@@ -83,11 +86,15 @@ export default function Singalongs() {
       {/* SHARED AUDIO ENGINE */}
       <audio 
         ref={audioRef} 
-        src={currentTrack?.public_url || currentTrack?.url} 
+            src={resolveAudioUrl(currentTrack?.public_url || currentTrack?.url || '') || undefined} 
         autoPlay 
         onPlay={() => setIsPlaying(true)}
         onPause={() => setIsPlaying(false)}
         onEnded={() => setIsPlaying(false)} // Future: Auto-play next
+            onError={() => {
+               setIsPlaying(false);
+               setAudioError('Track unavailable right now. Please try another vibe.');
+            }}
       />
 
       {/* TOP NAV: GPM AUTHORITY */}
@@ -124,6 +131,11 @@ export default function Singalongs() {
                     <div className="text-xl font-black">{cleanTitle(currentTrack?.name || currentTrack?.title)}</div>
                 </div>
             </div>
+                  {audioError && (
+                     <div className="mb-8 text-sm font-bold text-red-700 bg-red-100 border border-red-200 rounded-xl px-4 py-2 inline-block">
+                        {audioError}
+                     </div>
+                  )}
          </div>
 
          {/* THE "SQUISHY" BUTTON GRID */}

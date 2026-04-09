@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Play, Pause, Heart, Plus, Lock, Clock, Mic } from 'lucide-react';
 import { createClient } from '@supabase/supabase-js';
+import { resolveAudioUrl } from '@/lib/audio/resolveAudioUrl';
 
 // GPM CONFIG
 const SUPABASE_URL = 'https://eajxgrbxvkhfmmfiotpm.supabase.co';
@@ -29,6 +30,7 @@ export default function Hero() {
   const [playCounts, setPlayCounts] = useState<{[key:string]: number}>({});
   const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [audioError, setAudioError] = useState('');
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   // 1. GLOBAL 3:33 CLOCK
@@ -80,6 +82,7 @@ export default function Hero() {
       setPlayCounts(prev => ({...prev, [track.id]: currentCount + 1}));
     }
 
+    setAudioError('');
     setCurrentTrackIndex(index);
     setIsPlaying(true);
   };
@@ -91,8 +94,16 @@ export default function Hero() {
 
   const togglePlay = () => {
     if (audioRef.current) {
-      isPlaying ? audioRef.current.pause() : audioRef.current.play();
-      setIsPlaying(!isPlaying);
+      if (isPlaying) {
+        audioRef.current.pause();
+        setIsPlaying(false);
+      } else {
+        setAudioError('');
+        audioRef.current.play().then(() => setIsPlaying(true)).catch(() => {
+          setIsPlaying(false);
+          setAudioError('Playback blocked or unavailable. Tap play again.');
+        });
+      }
     }
   };
 
@@ -141,6 +152,11 @@ export default function Hero() {
         )}
 
         <div className="space-y-2">
+           {audioError && (
+             <div className="text-xs font-bold text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
+               {audioError}
+             </div>
+           )}
            {playlist.map((track, idx) => (
               <div key={track.id || idx} className={`flex items-center justify-between p-3 rounded-xl transition ${idx === currentTrackIndex ? 'bg-[#3E2723] text-[#FFD54F]' : 'hover:bg-[#FFF8E1] text-[#3E2723]'}`}>
                  <div className="flex items-center gap-4 flex-1 cursor-pointer" onClick={() => handlePlay(idx)}>
@@ -161,7 +177,16 @@ export default function Hero() {
       </div>
 
       {activeTrack && (
-        <audio ref={audioRef} src={activeTrack.public_url || activeTrack.url} onEnded={() => setCurrentTrackIndex((prev) => (prev + 1) % playlist.length)} autoPlay={isPlaying} />
+        <audio
+          ref={audioRef}
+          src={resolveAudioUrl(activeTrack.public_url || activeTrack.url || '') || undefined}
+          onEnded={() => setCurrentTrackIndex((prev) => (prev + 1) % playlist.length)}
+          onError={() => {
+            setIsPlaying(false);
+            setAudioError('Track unavailable right now. Try another selection.');
+          }}
+          autoPlay={isPlaying}
+        />
       )}
 
     </section>

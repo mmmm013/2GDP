@@ -30,6 +30,12 @@ export function resolveAudioUrl(input: string): string {
     return input; // preserve original query/hash if present
   }
 
+  // Rule 1.5 – root-relative public assets should remain local
+  // (e.g. /audio/*.m4a, /pix/*.mp3, /assets/*.mp3)
+  if (bare.startsWith('/')) {
+    return input;
+  }
+
   // Rule 2 – already a Supabase storage public URL (relative form)
   if (bare.includes('/storage/v1/object/public/')) {
     return input;

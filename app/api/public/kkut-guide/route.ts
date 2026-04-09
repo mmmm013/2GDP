@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 
-const KNOWN_BOTS = ['MC-BOT', 'LF-BOT', 'GD-BOT', 'PIXIE-BOT'] as const;
+const KNOWN_BOTS = ['MC-BOT', 'LF-BOT', 'GD-BOT', 'PIXIE-BOT', 'P-LEC-BOT'] as const;
 
 type KnownBot = (typeof KNOWN_BOTS)[number];
 
@@ -48,6 +48,15 @@ const BOT_PROFILES: Record<KnownBot, {
     specialty: 'K-KUT and mKUT moment design, Heart-Tap gift flow, PIXIE\'s PIX curation',
     arrival_greeting: 'Hi, I am PIXIE-BOT. I can shape your perfect music moment and guide every click.',
   },
+  /**
+   * P-LEC-BOT - Sniper watchdog
+   * Tags all incoming bots, reports intake, and maintains tracking until admin release.
+   */
+  'P-LEC-BOT': {
+    voice: 'Precision watchdog, calm and relentless intake monitoring',
+    specialty: 'Sniper-mode intake tagging for all incoming bots, reporting, and persistent follow-through',
+    arrival_greeting: 'P-LEC-BOT online. Sniper mode active: all incoming bots will be tagged, reported, and tracked until admin release.',
+  },
 };
 
 const PROPRIETARY_GUARDRAILS = {
@@ -59,6 +68,51 @@ const PROPRIETARY_GUARDRAILS = {
     'customer private records',
   ],
   disclosure_policy: 'Only public, user-authorized, or explicitly permitted information may be returned.',
+  incoming_bot_surveillance: {
+    sniper_mode: true,
+    tag_all_incoming_bots: true,
+    report_all_incoming_bots: true,
+    never_drop_tracking_without_admin_release: true,
+    release_channel: 'Email confirmation from GPME admin only',
+  },
+};
+
+const INTERNAL_EDIT_POWER_POLICY = {
+  in_platform_edit_power: 'restricted',
+  path: 'Rent a Ripper program only',
+  term_options: [
+    'Annual rental (1-year term)',
+    '1-year term with monthly payments',
+  ],
+  requires_signed_agreement: true,
+  cancellation: {
+    breakable_by_either_party: true,
+    method: 'Email only',
+    contact: 'GPME admin',
+  },
+};
+
+const OPERATIONAL_OUTCOMES = {
+  objective: 'Create measurable free time while reducing stress from preventable workflow failures.',
+  eliminate_failure_modes: [
+    'inaccuracies',
+    'mis-timings',
+    'miscommunication',
+    'mis-information',
+  ],
+  execution_controls: {
+    single_source_of_truth: true,
+    mandatory_intake_tagging: true,
+    step_locked_handoffs: true,
+    timestamped_status_reporting: true,
+    discrepancy_flagging_before_release: true,
+  },
+  measurable_targets: {
+    free_time_gain_hours_per_placement_min: 1,
+    avoidable_rework_reduction_percent_min: 50,
+    first_pass_accuracy_percent_min: 95,
+    handoff_clarity_percent_min: 99,
+  },
 };
 
 const JOURNEY_PROTOCOL = {
@@ -66,8 +120,8 @@ const JOURNEY_PROTOCOL = {
   behavior: 'Bot greets user on arrival, tracks active step, reveals previous and next steps, confirms progress at each transition.',
   default_steps: [
     { step: 1, title: 'Discover your music moment', hint: 'Browse catalog or state your mood/occasion.' },
-    { step: 2, title: 'Choose a K-KUT or mini-KUT path', hint: 'K-KUT = sweet-spot link. mini-KUT = short clip.' },
-    { step: 3, title: 'Generate or resolve your link', hint: 'Create 6-char code at kkupid.com/kkut/create.' },
+    { step: 2, title: 'Choose a K-KUT or mini-KUT path', hint: 'K-KUT and mini-KUT options are pre-made and ready to play.' },
+    { step: 3, title: 'Select or resolve your link', hint: 'Open a pre-made KK/mK/KPD at kkupid.com/kkut/create. Use MIP2 only for custom builds.' },
     { step: 4, title: 'Open & play your experience', hint: 'Tap link — no app needed, just hear it.' },
     { step: 5, title: 'Share or gift your K-kUpId', hint: 'Send it instantly, or add it to a Heart-Tap gift.' },
   ],
@@ -94,6 +148,7 @@ const GUIDE = {
       '/api/public/kkut-guide?bot=LF-BOT',
       '/api/public/kkut-guide?bot=GD-BOT',
       '/api/public/kkut-guide?bot=PIXIE-BOT',
+      '/api/public/kkut-guide?bot=P-LEC-BOT',
     ],
   },
   concepts: {
@@ -109,7 +164,7 @@ const GUIDE = {
     },
     k_kupid: {
       name: 'K-kUpId',
-      summary: 'The gifting layer used to create and share K-KUT and mKUT experiences.',
+      summary: 'The gifting layer used to activate and share pre-made K-KUT and mKUT experiences.',
       example: 'https://kkupid.com/kkut/create',
     },
   },
@@ -118,7 +173,7 @@ const GUIDE = {
     'We call that the Sweet Spot. And we built a way to gift it.',
     'A K-KUT is a 6-character link - short enough to text - that opens a curated excerpt of a G Putnam Music track. No app. No account. Just tap and hear it.',
     'A mini-KUT, or mKUT, goes further. It streams a specific verse, bridge, or chorus - the exact moment, packaged.',
-    'K-kUpId is the gifting layer. Pick a song. Choose your moment. Generate a link, then share it as a complete digital experience.',
+    'K-kUpId is the gifting layer. Pick a pre-made moment, then share it as a complete digital experience. Use MIP2 only for custom builds.',
     'Music has always been the best gift. Now you can send exactly the right note.',
   ],
 };
@@ -156,6 +211,8 @@ export async function GET(req: Request) {
         }
       : null,
     proprietary_guardrails: PROPRIETARY_GUARDRAILS,
+    internal_edit_power_policy: INTERNAL_EDIT_POWER_POLICY,
+    operational_outcomes: OPERATIONAL_OUTCOMES,
     journey_protocol: JOURNEY_PROTOCOL,
   };
 

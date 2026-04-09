@@ -1,16 +1,19 @@
 'use client';
 import React, { useState, useRef, useEffect } from 'react';
+import { resolveAudioUrl } from '@/lib/audio/resolveAudioUrl';
 
 export default function MusicSystem({ tracks = [] }: { tracks?: any[] }) {
   const [currentTrack, setCurrentTrack] = useState<any | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [boundaries, setBoundaries] = useState({ start: 0, end: null as number | null });
+  const [error, setError] = useState('');
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const playTrack = (track: any) => {
     setCurrentTrack(track);
     setIsPlaying(true);
+    setError('');
     
     // Set boundaries for excerpts
     const startMs = track.start_ms ?? 0;
@@ -18,9 +21,18 @@ export default function MusicSystem({ tracks = [] }: { tracks?: any[] }) {
     setBoundaries({ start: startMs / 1000, end: endMs ? endMs / 1000 : null });
 
     if (audioRef.current) {
-      audioRef.current.src = track.audio_url;
+      const resolved = resolveAudioUrl(track.audio_url || track.url || track.public_url || '');
+      if (!resolved) {
+        setIsPlaying(false);
+        setError('No playable source found for this K-KUT.');
+        return;
+      }
+      audioRef.current.src = resolved;
       audioRef.current.currentTime = startMs / 1000;
-      audioRef.current.play();
+      audioRef.current.play().catch(() => {
+        setIsPlaying(false);
+        setError('Playback unavailable for this K-KUT.');
+      });
     }
   };
 
@@ -49,10 +61,14 @@ export default function MusicSystem({ tracks = [] }: { tracks?: any[] }) {
     if (!audioRef.current || !currentTrack) return;
     if (isPlaying) {
       audioRef.current.pause();
+      setIsPlaying(false);
     } else {
-      audioRef.current.play();
+      setError('');
+      audioRef.current.play().then(() => setIsPlaying(true)).catch(() => {
+        setIsPlaying(false);
+        setError('Playback blocked or unavailable.');
+      });
     }
-    setIsPlaying(!isPlaying);
   };
 
   const handleShare = async () => {
@@ -69,6 +85,11 @@ export default function MusicSystem({ tracks = [] }: { tracks?: any[] }) {
       <h2 className="text-xl font-bold text-[#C8A882] mb-4 uppercase tracking-tighter">GPM FLAGSHIP - K-KUT SYSTEM</h2>
       
       <div className="mb-6 p-4 bg-zinc-900 rounded border border-zinc-700">
+        {error && (
+          <div className="mb-3 rounded border border-red-500/40 bg-red-950/30 px-3 py-2 text-xs text-red-200 font-semibold">
+            {error}
+          </div>
+        )}
         <div className="flex justify-between items-center mb-4">
           <div>
             <h3 className="text-lg font-semibold uppercase truncate max-w-md">

@@ -6,6 +6,7 @@ import { Share2, Copy, Check, Music, Radio, Heart, Sparkles, Zap } from 'lucide-
 import Header from '@/components/Header';
 import { supabase } from '@/lib/supabaseClient';
 import GpmBot from '@/components/GpmBot';
+import KFamilyVisualStrip from '@/components/KFamilyVisualStrip';
 
 interface CatalogItem {
   id: string;
@@ -81,7 +82,7 @@ export default function KKKCreatorPage() {
       setShortCode(code);
       setMkutId('');
       setGeneratedKUT(`kkupid.com/k/${code}`);
-      // Fire-and-forget: persist code → destination mapping
+      // Fire-and-forget: persist code -> destination mapping
       fetch('/api/k/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -131,19 +132,32 @@ export default function KKKCreatorPage() {
         <div className="text-center mb-12">
           <div className="inline-flex items-center gap-2 bg-gradient-to-r from-[#8B4513]/20 to-[#C8A882]/20 border border-[#8B4513]/40 px-6 py-3 rounded-full mb-6 shadow-lg shadow-[#8B4513]/10">
             <Zap size={18} className="text-[#8B4513] animate-pulse" />
-            <span className="text-sm font-black text-[#8B4513] tracking-[0.3em] uppercase">KKK</span>
+            <span className="k-family-kicker text-[#8B4513]">KKK</span>
             <Sparkles size={18} className="text-[#8B4513] animate-pulse" />
           </div>
           
-          <h1 className="text-5xl md:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-[#A0522D] via-[#8B4513] to-[#CD853F] mb-4 tracking-tight">
+          <h1 className="k-family-title text-transparent bg-clip-text bg-gradient-to-r from-[#A0522D] via-[#8B4513] to-[#CD853F] mb-4">
             K-KUT-Kreator
           </h1>
-          <p className="text-lg text-[#F5E6D3]/80 max-w-2xl mx-auto mb-2">
+          <p className="k-family-subtitle text-[#F5E6D3]/80 max-w-2xl mx-auto mb-2">
             Create sleek, shareable K-KUTs with <span className="text-[#8B4513] font-bold">6-character codes</span>
           </p>
           <p className="text-sm text-[#F5E6D3]/50">
             Short links. Big impact. Easy to share.
           </p>
+
+          <KFamilyVisualStrip
+            containerClassName="max-w-3xl border-[#8B4513]/40 bg-[#2a1f0f]/60 shadow-[#8B4513]/20"
+            primaryImageSrc="/k-hero.jpg"
+            primaryImageAlt="K-KUT visual hero"
+            primaryBadge="K-KUT VISUAL"
+            primaryCopy="Signature open look for short-code handoffs"
+            primarySizes="(max-width: 768px) 100vw, 66vw"
+            secondaryImageSrc="/gpm_qr_code.jpg"
+            secondaryImageAlt="K-KUT QR visual reference"
+            secondarySizes="(max-width: 768px) 100vw, 33vw"
+            gridStyle={{ gridTemplateColumns: 'minmax(0, 2fr) minmax(0, 1fr)' }}
+          />
         </div>
 
         {/* Mode Toggle — K-KUT vs mKUT */}
@@ -334,6 +348,7 @@ export default function KKKCreatorPage() {
                 ? 'Share this mKUT link. Recipients open a prefab mini-player pre-loaded with your content.'
                 : 'Share this short link anywhere. Recipients will be directed to your selected content on kkupid.com.'}
             </p>
+
           </div>
         )}
 

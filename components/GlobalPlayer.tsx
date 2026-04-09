@@ -4,6 +4,8 @@ import { useState, useEffect, useRef } from 'react';
 import { Pause, Play, AlertCircle, Radio, Volume2, VolumeX } from 'lucide-react';
 import { gpmET } from '@/lib/gpm-et';
 import { resolveAudioUrl } from '@/lib/audio/resolveAudioUrl';
+import { safePlay } from '@/lib/audio/safePlay';
+import { AUDIO_UI_MESSAGES } from '@/lib/audio/messages';
 
 /**
  * GLOBAL PLAYER - BIC MC BOT Streaming Player
@@ -127,8 +129,13 @@ export default function GlobalPlayer() {
         // SINGLE-SONG: Stop all other audio before we play
         window.dispatchEvent(new CustomEvent('stop-all-audio', { detail: { source: 'global' } }));
         audio.volume = isMuted ? 0 : volume;
-        audio.play()
-          .then(() => {
+        safePlay(audio, 'GlobalPlayer', { track: track.title, url: resolvedUrl })
+          .then((result) => {
+            if (!result.ok) {
+              setError(AUDIO_UI_MESSAGES.playbackBlocked);
+              setIsPlaying(false);
+              return;
+            }
             setIsPlaying(true);
             // GPM ET: track play start
             playStartRef.current = Date.now();
@@ -136,16 +143,6 @@ export default function GlobalPlayer() {
               title: track.title,
               vocalist: track.vocalist,
               source: 'GlobalPlayer',
-            });
-          })
-          .catch(() => {
-            setError('Playback failed - tap play to try again');
-            setIsPlaying(false);
-            gpmET.error({
-              title: track.title,
-              vocalist: track.vocalist,
-              source: 'GlobalPlayer',
-              errorMsg: 'Playback failed',
             });
           });
       }
@@ -162,7 +159,7 @@ export default function GlobalPlayer() {
           case 1: errMsg = 'Playback cancelled'; break;
           case 2: errMsg = 'Network error - check connection'; break;
           case 3: errMsg = 'Audio decode error'; break;
-          case 4: errMsg = 'Track unavailable'; break;
+          case 4: errMsg = AUDIO_UI_MESSAGES.trackUnavailable; break;
           default: errMsg = 'Playback error';
         }
         setError(errMsg);
@@ -215,9 +212,11 @@ export default function GlobalPlayer() {
 
     if (isPlaying) {
       audio.volume = isMuted ? 0 : volume;
-      audio.play().catch(() => {
-        setError('Tap play to start streaming');
-        setIsPlaying(false);
+      safePlay(audio, 'GlobalPlayer', { track: track.title, url: track.url }).then((result) => {
+        if (!result.ok) {
+          setError(AUDIO_UI_MESSAGES.playbackBlocked);
+          setIsPlaying(false);
+        }
       });
     } else {
       audio.pause();

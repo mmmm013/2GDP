@@ -2,6 +2,9 @@
 
 import { useRef, useEffect, useState, useCallback } from 'react';
 import { usePlayer } from '@/components/PlayerContext';
+import { resolveAudioUrl } from '@/lib/audio/resolveAudioUrl';
+import { safePlay } from '@/lib/audio/safePlay';
+import { AUDIO_UI_MESSAGES } from '@/lib/audio/messages';
 
 declare global {
   interface Window {
@@ -19,7 +22,8 @@ export default function PersistentPlayer() {
   const [volume, setVolume] = useState(0.8);
   const [isMuted, setIsMuted] = useState(false);
   const [isListening, setIsListening] = useState(false);
-  const [botStatus, setBotStatus] = useState<string>(''); 
+  const [botStatus, setBotStatus] = useState<string>('');
+  const [playbackStatus, setPlaybackStatus] = useState<string>('');
 
   const handleVoiceCommand = useCallback((command: string) => {
     setBotStatus(`Cmd: "${command}"`);
@@ -104,14 +108,19 @@ export default function PersistentPlayer() {
     const audio = audioRef.current;
     if (!audio) return;
     if (isPlaying) {
-      const playPromise = audio.play();
-      if (playPromise !== undefined) {
-        playPromise.catch((error) => console.log("Auto-play prevented:", error));
-      }
+      safePlay(audio, 'PersistentPlayer', {
+        track: currentTrack?.title,
+        url: currentTrack?.url,
+      }).then((result) => {
+        if (!result.ok) {
+          setPlaybackStatus(AUDIO_UI_MESSAGES.playbackBlocked);
+          setTimeout(() => setPlaybackStatus(''), 2500);
+        }
+      });
     } else {
       audio.pause();
     }
-  }, [isPlaying, currentTrack]); 
+  }, [isPlaying, currentTrack]);
 
   useEffect(() => {
     if (audioRef.current) audioRef.current.volume = isMuted ? 0 : volume;
@@ -122,6 +131,11 @@ export default function PersistentPlayer() {
       {isListening && (
         <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-amber-500/90 text-black text-[10px] font-bold px-2 py-0.5 rounded-full shadow-lg z-50 animate-pulse">
           {botStatus}
+        </div>
+      )}
+      {playbackStatus && (
+        <div className="absolute -top-4 right-4 bg-red-500/90 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-lg z-50">
+          {playbackStatus}
         </div>
       )}
       <div className="flex flex-col flex-1 min-w-0">
@@ -158,7 +172,7 @@ export default function PersistentPlayer() {
         <button onClick={() => setIsMuted(!isMuted)} className="text-gray-400 hover:text-white">{isMuted || volume === 0 ? "🔇" : "🔊"}</button>
         <input type="range" min="0" max="1" step="0.01" value={isMuted ? 0 : volume} onChange={(e) => { setVolume(parseFloat(e.target.value)); setIsMuted(false); }} className="w-24 h-1 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-amber-500" />
       </div>
-      <audio ref={audioRef} src={currentTrack?.url || undefined} preload="metadata" crossOrigin="anonymous" onEnded={nextTrack} />
+      <audio ref={audioRef} src={currentTrack?.url ? (resolveAudioUrl(currentTrack.url) || undefined) : undefined} preload="metadata" crossOrigin="anonymous" onEnded={nextTrack} />
     </div>
   );
 }

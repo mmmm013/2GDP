@@ -195,6 +195,13 @@ function classifyBot(ua: string): { blocked: boolean; botClass: BotClass } {
   return { blocked: false, botClass: 'unknown' };
 }
 
+function hasValidHealthcheckBypass(req: NextRequest): boolean {
+  const configured = process.env.PROXY_HEALTHCHECK_TOKEN;
+  if (!configured) return false;
+  const provided = req.headers.get('x-gpm-healthcheck-token');
+  return Boolean(provided && provided === configured);
+}
+
 // ---------------------------------------------------------------------------
 // PROXY ENTRY POINT
 // ---------------------------------------------------------------------------
@@ -244,7 +251,7 @@ export function proxy(req: NextRequest) {
     country,
   };
 
-  if (blocked) {
+  if (blocked && !hasValidHealthcheckBypass(req)) {
     emitSecurityLog({ ...baseLog, event: 'bot_blocked' });
     return new NextResponse(
       JSON.stringify({ error: 'Access denied' }),
@@ -260,6 +267,9 @@ export function proxy(req: NextRequest) {
   }
 
   const response = NextResponse.next();
+  if (blocked) {
+    response.headers.set('X-Bot-Class', 'blocked-bypass');
+  }
   for (const [key, value] of Object.entries(securityHeaders())) {
     response.headers.set(key, value);
   }

@@ -58,6 +58,7 @@ export default function HeroesFeaturedPlayer() {
   const [isMuted, setIsMuted] = useState(false);
   const [repeat, setRepeat] = useState(false);
   const [autoPlayTriggered, setAutoPlayTriggered] = useState(false);
+  const [audioError, setAudioError] = useState('');
   const playStartRef = useRef<number>(0);
 
   const currentTrack = HEROES_PIX[currentIndex];
@@ -119,14 +120,20 @@ export default function HeroesFeaturedPlayer() {
       }
       if (repeat) {
         audio.currentTime = 0;
-        audio.play();
-        playStartRef.current = Date.now();
+        audio.play().then(() => {
+          playStartRef.current = Date.now();
+          setAudioError('');
+        }).catch(() => {
+          setIsPlaying(false);
+          setAudioError('Replay blocked or unavailable. Tap play to continue.');
+        });
       } else {
         const nextIdx = (currentIndex + 1) % HEROES_PIX.length;
         setCurrentIndex(nextIdx);
       }
     };
     const handleError = () => {
+      setAudioError('Track unavailable. Skipping to next.');
       gpmET.error({
         title: currentTrack.title,
         vocalist: currentTrack.vocalist,
@@ -234,6 +241,7 @@ export default function HeroesFeaturedPlayer() {
             <span className="text-neutral-400 font-normal"> - </span>
             <span className="text-[#C8A882]">{currentTrack.vocalist}</span>
           </p>
+          {audioError && <p className="text-xs text-red-300 mt-1">{audioError}</p>}
         </div>
       )}
 

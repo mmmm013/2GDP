@@ -6,7 +6,14 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "audio:validate": "node scripts/validate-audio-assets.mjs",
+    "audio:smoke:local": "node scripts/audio-smoke.mjs http://localhost:3000",
+    "audio:smoke:prod": "node scripts/audio-smoke.mjs https://www.gputnammusic.com",
+    "audio:verify": "npm run audio:validate && npm run audio:smoke:prod",
+    "audio:e2e:install": "playwright install chromium",
+    "audio:e2e:local": "playwright test tests/audio.e2e.spec.ts",
+    "audio:e2e:prod": "PLAYWRIGHT_BASE_URL=https://www.gputnammusic.com playwright test tests/audio.e2e.spec.ts"
   },
   "dependencies": {
     "@simplewebauthn/browser": "^13.3.0",
@@ -25,6 +32,7 @@
     "tailwind-merge": "^3.5.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.59.1",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",

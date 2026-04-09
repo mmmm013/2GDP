@@ -1,6 +1,7 @@
 'use client';
 import { useState, useRef, useEffect } from 'react';
 import { Play, Pause, AlertCircle, SkipBack, SkipForward, Volume2, VolumeX } from 'lucide-react';
+import { resolveAudioUrl } from '@/lib/audio/resolveAudioUrl';
 
 export default function AudioPlayer() {
   const [isPlaying, setIsPlaying] = useState(false);
@@ -58,8 +59,16 @@ export default function AudioPlayer() {
       end: endMs ? endMs / 1000 : null 
     });
 
+    const source = trackData?.public_url || trackData?.url || trackData?.audio_url || '';
+    if (!source) {
+      setError('No playable source found for this track.');
+      setIsBuffering(false);
+      setIsPlaying(false);
+      return;
+    }
+
     if (audioRef.current) {
-      audioRef.current.src = trackData.url;
+      audioRef.current.src = resolveAudioUrl(source);
       audioRef.current.load();
       
       // Set initial position to start boundary
@@ -119,14 +128,22 @@ export default function AudioPlayer() {
       }
     };
 
+    const handleError = () => {
+      setError('Track unavailable right now.');
+      setIsBuffering(false);
+      setIsPlaying(false);
+    };
+
     audio.addEventListener('loadedmetadata', handleLoadedMetadata);
     audio.addEventListener('timeupdate', handleTimeUpdate);
     audio.addEventListener('ended', handleEnded);
+    audio.addEventListener('error', handleError);
 
     return () => {
       audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
       audio.removeEventListener('timeupdate', handleTimeUpdate);
       audio.removeEventListener('ended', handleEnded);
+      audio.removeEventListener('error', handleError);
     };
   }, [currentIndex, queue, boundaries]);
 
@@ -136,7 +153,10 @@ export default function AudioPlayer() {
       audioRef.current.pause();
       setIsPlaying(false);
     } else {
-      audioRef.current.play().then(() => setIsPlaying(true)).catch(console.error);
+      audioRef.current.play().then(() => setIsPlaying(true)).catch(() => {
+        setIsPlaying(false);
+        setError('Playback blocked or unavailable.');
+      });
     }
   };
 

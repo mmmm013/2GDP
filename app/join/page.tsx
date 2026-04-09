@@ -140,7 +140,7 @@ export default function JoinPage() {
             {/* ONE-TIME GIFT SHORTCUT */}
             <div className="mt-6 pt-6 border-t-2 border-[#3E2723]/10">
               <p className="text-xs font-black uppercase tracking-widest opacity-60 mb-3">Not ready to subscribe?</p>
-              <Link href="/gift" className="block w-full text-center bg-[#E65100] text-white py-3 rounded-xl font-black text-sm uppercase tracking-wider hover:bg-[#BF360C] transition-colors shadow-md">
+              <Link href="/gift" className="block w-full text-center bg-[#E65100] text-white py-3 rounded-xl font-black uppercase tracking-wider hover:bg-amber-400 transition-colors shadow-lg">
                 ❤️ One-Time Heart-Tap Gift
               </Link>
             </div>

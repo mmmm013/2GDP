@@ -5,16 +5,21 @@ import { Play, Pause, Mic } from 'lucide-react';
 
 export default function ManagerIntro() {
   const [isPlaying, setIsPlaying] = useState(false);
+  const [error, setError] = useState('');
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const togglePlay = () => {
     if (!audioRef.current) return;
     if (isPlaying) {
       audioRef.current.pause();
+      setIsPlaying(false);
     } else {
-      audioRef.current.play();
+      setError('');
+      audioRef.current.play().then(() => setIsPlaying(true)).catch(() => {
+        setIsPlaying(false);
+        setError('Playback unavailable right now.');
+      });
     }
-    setIsPlaying(!isPlaying);
   };
 
   return (
@@ -50,6 +55,7 @@ export default function ManagerIntro() {
           <p className="text-xs text-white/40 mt-1 font-mono">
             Greg Putnam • 0:40 • The Untapped Story
           </p>
+          {error && <p className="text-xs text-red-300 mt-1">{error}</p>}
         </div>
 
         {/* Animation */}

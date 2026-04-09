@@ -102,3 +102,53 @@ button,
     text-wrap: balance;
   }
 }
+
+@layer components {
+  .k-family-kicker {
+    @apply uppercase font-black text-[10px] md:text-xs;
+    letter-spacing: 0.28em;
+  }
+
+  .k-family-title {
+    @apply font-black leading-[0.95] tracking-tight text-4xl md:text-6xl lg:text-7xl;
+  }
+
+  .k-family-subtitle {
+    @apply font-semibold text-base md:text-lg;
+    letter-spacing: 0.01em;
+  }
+
+  .k-family-capsule-title {
+    @apply font-black leading-tight text-[1.3rem] md:text-[1.45rem];
+    letter-spacing: -0.01em;
+  }
+
+  .kk-visual-shell {
+    @apply mt-8 mx-auto rounded-2xl border backdrop-blur p-3 shadow-2xl;
+  }
+
+  .kk-visual-grid {
+    @apply grid gap-3;
+    grid-template-columns: minmax(0, 1.8fr) minmax(0, 1fr);
+  }
+
+  .kk-visual-pane {
+    @apply relative overflow-hidden rounded-xl;
+    min-height: 11rem;
+  }
+
+  .kk-visual-badge {
+    @apply text-[10px] uppercase font-black;
+    letter-spacing: 0.28em;
+  }
+
+  .kk-visual-copy {
+    @apply text-xs font-semibold;
+  }
+
+  @media (max-width: 768px) {
+    .kk-visual-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+}

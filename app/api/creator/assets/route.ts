@@ -7,6 +7,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verify } from 'jsonwebtoken';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
+import { hasGpmeAdminBypass, blockedCustomizationResponse } from '@/lib/policy/gpmeCustomizationPolicy';
 
 const SESSION_SECRET = process.env.CREATOR_SESSION_SECRET ?? 'change-me-in-production';
 const STORAGE_BUCKET = 'creator-assets';
@@ -56,6 +57,10 @@ export async function GET(req: NextRequest) {
 }
 
 export async function DELETE(req: NextRequest) {
+  if (!hasGpmeAdminBypass(req)) {
+    return NextResponse.json(blockedCustomizationResponse(), { status: 403 });
+  }
+
   const session = getSession(req);
   if (!session) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -97,6 +102,10 @@ export async function DELETE(req: NextRequest) {
 }
 
 export async function PATCH(req: NextRequest) {
+  if (!hasGpmeAdminBypass(req)) {
+    return NextResponse.json(blockedCustomizationResponse(), { status: 403 });
+  }
+
   const session = getSession(req);
   if (!session) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
