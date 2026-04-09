@@ -39,7 +39,7 @@ Deno.serve(async (req: Request) => {
       for (const variant of VARIANT_PRIORITY) {
         const { data } = await supabaseAdmin
           .from('k_kut_assets')
-          .select('id, pix_pck_id, structure_tag, storage_bucket, storage_path, mime_type, duration_ms, variant, status')
+          .select('id, pix_pck_id, structure_tag, storage_bucket, storage_path, mime_type, duration_ms, variant, status, is_free')
           .eq('id', body.k_kut_id)
           .eq('variant', variant)
           .eq('status', 'active')
@@ -52,7 +52,7 @@ Deno.serve(async (req: Request) => {
       for (const variant of VARIANT_PRIORITY) {
         const { data } = await supabaseAdmin
           .from('k_kut_assets')
-          .select('id, pix_pck_id, structure_tag, storage_bucket, storage_path, mime_type, duration_ms, variant, status')
+          .select('id, pix_pck_id, structure_tag, storage_bucket, storage_path, mime_type, duration_ms, variant, status, is_free')
           .eq('pix_pck_id', body.pix_pck_id)
           .eq('structure_tag', body.tag)
           .eq('variant', variant)
@@ -87,6 +87,8 @@ Deno.serve(async (req: Request) => {
       structure_tag: asset.structure_tag,
       duration_ms: asset.duration_ms ?? null,
       mime_type: asset.mime_type ?? null,
+      // is_free: true means Failure=FREE — QC failed, served at no charge for ALL users
+      is_free: (asset as Record<string, unknown>).is_free ?? false,
       // title/artist are not stored on k_kut_assets; the player has defaults.
       // Populated here when a richer join becomes available (4PE ingestion).
       title: null,

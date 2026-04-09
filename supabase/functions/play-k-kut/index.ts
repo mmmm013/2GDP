@@ -35,7 +35,7 @@ Deno.serve(async (req: Request) => {
     if (body.k_kut_id) {
       const { data, error } = await supabaseAdmin
         .from('k_kut_assets')
-        .select('id, pix_pck_id, structure_tag, storage_bucket, storage_path, mime_type, duration_ms, status')
+        .select('id, pix_pck_id, structure_tag, storage_bucket, storage_path, mime_type, duration_ms, status, is_free')
         .eq('id', body.k_kut_id)
         .eq('variant', VARIANT)
         .eq('status', 'active')
@@ -46,7 +46,7 @@ Deno.serve(async (req: Request) => {
       // Lookup by pix_pck_id + structure_tag
       const { data, error } = await supabaseAdmin
         .from('k_kut_assets')
-        .select('id, pix_pck_id, structure_tag, storage_bucket, storage_path, mime_type, duration_ms, status')
+        .select('id, pix_pck_id, structure_tag, storage_bucket, storage_path, mime_type, duration_ms, status, is_free')
         .eq('pix_pck_id', body.pix_pck_id)
         .eq('structure_tag', body.tag)
         .eq('variant', VARIANT)
@@ -78,6 +78,8 @@ Deno.serve(async (req: Request) => {
     return ok({
       signed_url: signed.signedUrl,
       expires_in: SIGNED_URL_EXPIRY,
+      // is_free: true means Failure=FREE — QC failed, served at no charge
+      is_free: (asset as Record<string, unknown>).is_free ?? false,
       meta: {
         id: asset.id,
         variant: VARIANT,
