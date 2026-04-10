@@ -10,7 +10,7 @@
  * Bookends: index 0 = START pill, index 6 = END/Thanks pill
  */
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import {
   FEELING_CLUSTERS,
   suggestFeelings,
@@ -115,6 +115,42 @@ function validateContiguous(secs: Section[]): Section[] {
   }
   if (cur.length > best.length) best = cur;
   return best.map((i) => SECTIONS[i]);
+}
+
+/* ─── Click-to-play sample hook ──────────────────────────────────────── */
+
+/**
+ * Manages a single audio instance for optional sample playback.
+ * Audio ONLY plays when the user explicitly calls `toggle()`.
+ * No autoplay, no play-on-mount, no play-on-selection.
+ */
+function useSamplePlayer() {
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [playingId, setPlayingId] = useState<string | null>(null);
+
+  const toggle = useCallback((id: string, src: string) => {
+    if (audioRef.current && !audioRef.current.paused) {
+      audioRef.current.pause();
+      audioRef.current = null;
+      if (playingId === id) { setPlayingId(null); return; }
+    }
+    const a = new Audio(src);
+    a.onended = () => setPlayingId(null);
+    a.onerror = () => setPlayingId(null);
+    a.play().catch(() => setPlayingId(null));
+    audioRef.current = a;
+    setPlayingId(id);
+  }, [playingId]);
+
+  const stop = useCallback(() => {
+    audioRef.current?.pause();
+    audioRef.current = null;
+    setPlayingId(null);
+  }, []);
+
+  useEffect(() => () => { audioRef.current?.pause(); }, []);
+
+  return { playingId, toggle, stop };
 }
 
 /* ─── Step Row Card ───────────────────────────────────────────────────── */
@@ -307,6 +343,7 @@ function Step2Pix({
     p.feelings.includes(feeling.id)
   );
   const display = matches.length ? matches : PIX_CATALOG.slice(0, 3);
+  const { playingId, toggle } = useSamplePlayer();
 
   return (
     <div className="flex flex-col gap-3">
@@ -320,11 +357,11 @@ function Step2Pix({
       <div className="flex flex-col gap-2">
         {display.map((p) => {
           const isChosen = selected?.id === p.id;
+          const isPlaying = playingId === p.id;
           return (
-            <button
+            <div
               key={p.id}
-              onClick={() => onConfirm(p)}
-              className="w-full text-left rounded-sm border p-3 transition-all"
+              className="w-full rounded-sm border p-3 transition-all"
               style={
                 isChosen
                   ? {
@@ -334,11 +371,34 @@ function Step2Pix({
                   : undefined
               }
             >
-              <p className="text-sm font-semibold text-[var(--text)]">{p.title}</p>
-              <p className="text-xs text-[var(--text-muted)] mt-0.5">
-                {p.artist} · {p.genre} · {p.tempo} tempo · {p.gender}
-              </p>
-            </button>
+              <div className="flex items-start justify-between gap-2">
+                <button
+                  onClick={() => onConfirm(p)}
+                  className="flex-1 text-left"
+                >
+                  <p className="text-sm font-semibold text-[var(--text)]">{p.title}</p>
+                  <p className="text-xs text-[var(--text-muted)] mt-0.5">
+                    {p.artist} · {p.genre} · {p.tempo} tempo · {p.gender}
+                  </p>
+                </button>
+                {/* Sample button — click-to-play only, never auto-plays */}
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    toggle(p.id, `/samples/${p.id}.mp3`);
+                  }}
+                  title={isPlaying ? "Stop sample" : "Play sample"}
+                  className="shrink-0 flex items-center gap-1 px-2 py-1 rounded-sm text-xs border transition-all"
+                  style={
+                    isPlaying
+                      ? { borderColor: `rgb(${feeling.color})`, color: `rgb(${feeling.color})` }
+                      : undefined
+                  }
+                >
+                  {isPlaying ? "■ Stop" : "▶ Sample"}
+                </button>
+              </div>
+            </div>
           );
         })}
       </div>
@@ -358,8 +418,13 @@ function Step3Kut({
   onConfirm: (secs: Section[]) => void;
 }) {
   const [localSel, setLocalSel] = useState<Section[]>(selected);
+  const { playingId, toggle: toggleSample, stop: stopSample } = useSamplePlayer();
+  const previewId = `preview-${pix.id}`;
+  const isPreviewPlaying = playingId === previewId;
 
   function toggle(sec: Section) {
+    // Stop any sample playing when user changes selection
+    stopSample();
     setLocalSel((prev) => toggleSection(prev, sec));
   }
 
@@ -407,9 +472,24 @@ function Step3Kut({
         })}
       </div>
       {localSel.length > 0 && (
-        <p className="text-xs text-[var(--text-muted)]">
-          Selected: {localSel.join(" → ")}
-        </p>
+        <div className="flex items-center justify-between gap-2">
+          <p className="text-xs text-[var(--text-muted)]">
+            Selected: {localSel.join(" → ")}
+          </p>
+          {/* Sample preview — click-to-play only, never auto-plays */}
+          <button
+            onClick={() => toggleSample(previewId, `/samples/${pix.id}-${localSel.join("-")}.mp3`)}
+            title={isPreviewPlaying ? "Stop preview" : "Preview this K-KUT (optional)"}
+            className="shrink-0 flex items-center gap-1 px-2 py-1 rounded-sm text-xs border transition-all"
+            style={
+              isPreviewPlaying
+                ? { borderColor: "var(--accent)", color: "var(--accent)" }
+                : undefined
+            }
+          >
+            {isPreviewPlaying ? "■ Stop" : "▶ Preview K-KUT"}
+          </button>
+        </div>
       )}
       <button
         onClick={() => onConfirm(localSel)}
