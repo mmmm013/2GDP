@@ -67,6 +67,19 @@ Any public GPMD (G Putnam Music Destination) lives in a separate site repository
 
 GPMDs **must link only to `gputnam-music-final-site`**, never to 2GDP or GPMC internal routes.
 
+### Staging deployments in this repo
+
+Standalone Next.js apps that deploy independently via Vercel (each with its own `vercel.json` and `Root Directory` setting):
+
+| Path | Site | Notes |
+|---|---|---|
+| `staging/gputnam-music-final-site/` | gputnammusic.com | Primary GPM consumer destination |
+| `staging/2kleigh-site/` | 2kleigh.com | KLEIGH artist destination |
+| `staging/gpex-biz/` | GPEx Business | Excel-A-rator platform |
+| `staging/k-kut/` | K-KUT | K-KUT invention family GPMD |
+
+> Each staging app sets **Root Directory** to its own subfolder in Vercel project settings.
+
 GPMD responsibilities:
 
 - Landing pages
