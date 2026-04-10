@@ -25,7 +25,7 @@ serve(async (req) => {
 
     // Fetch track metadata
     const { data: track, error: trackError } = await supabase
-      .from('tracks')
+      .from('gpm_tracks')
       .select('id, title, file_path, is_public')
       .eq('id', trackId)
       .single()

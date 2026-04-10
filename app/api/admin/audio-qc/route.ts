@@ -104,6 +104,55 @@ export async function POST(request: Request) {
     const supabase = getServiceClient()
     const tableName = item_type === 'k_kut_asset' ? 'k_kut_assets' : 'pix_pck'
 
+    // GAP-1: For a QC pass on k_kut_asset, verify the storage file actually exists
+    // before committing the status change. A missing file would create a ghost-pass
+    // (QC='pass' but audio 404s at play time).
+    if (result === 'pass' && item_type === 'k_kut_asset') {
+      const { data: asset, error: fetchErr } = await supabase
+        .from('k_kut_assets')
+        .select('storage_bucket, storage_path')
+        .eq('id', item_id)
+        .single()
+
+      if (fetchErr || !asset) {
+        return NextResponse.json(
+          { error: 'k_kut_assets row not found', item_id },
+          { status: 404 }
+        )
+      }
+
+      if (!asset.storage_bucket || !asset.storage_path) {
+        return NextResponse.json(
+          { error: 'storage_bucket or storage_path is null — cannot pass QC without a file', item_id },
+          { status: 422 }
+        )
+      }
+
+      // Use storage.list() to confirm the file exists at the expected path.
+      // storage_path may be 'folder/file.mp3' — split to (prefix, filename).
+      const lastSlash = asset.storage_path.lastIndexOf('/')
+      const folder = lastSlash >= 0 ? asset.storage_path.slice(0, lastSlash) : ''
+      const filename = lastSlash >= 0 ? asset.storage_path.slice(lastSlash + 1) : asset.storage_path
+
+      const { data: fileList, error: listErr } = await supabase.storage
+        .from(asset.storage_bucket)
+        .list(folder, { search: filename, limit: 1 })
+
+      const fileExists = !listErr && Array.isArray(fileList) && fileList.some((f) => f.name === filename)
+
+      if (!fileExists) {
+        console.error(`[audio-qc] Storage file not found: ${asset.storage_bucket}/${asset.storage_path}`, listErr)
+        return NextResponse.json(
+          {
+            error: 'Storage file not found — upload the audio file before marking QC pass',
+            storage_bucket: asset.storage_bucket,
+            storage_path: asset.storage_path,
+          },
+          { status: 422 }
+        )
+      }
+    }
+
     const { data, error } = await supabase
       .from(tableName)
       .update({ audio_qc_status: result })

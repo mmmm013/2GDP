@@ -127,6 +127,8 @@ function validateContiguous(secs: Section[]): Section[] {
 function useSamplePlayer() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [playingId, setPlayingId] = useState<string | null>(null);
+  // GAP-7: Track IDs where sample file is unavailable so we can show "coming soon"
+  const [unavailableIds, setUnavailableIds] = useState<Set<string>>(new Set());
 
   const toggle = useCallback((id: string, src: string) => {
     if (audioRef.current && !audioRef.current.paused) {
@@ -136,7 +138,11 @@ function useSamplePlayer() {
     }
     const a = new Audio(src);
     a.onended = () => setPlayingId(null);
-    a.onerror = () => setPlayingId(null);
+    // GAP-7: On onerror, mark the sample as unavailable rather than silently resetting
+    a.onerror = () => {
+      setPlayingId(null);
+      setUnavailableIds((prev) => new Set(prev).add(id));
+    };
     a.play().catch(() => setPlayingId(null));
     audioRef.current = a;
     setPlayingId(id);
@@ -150,7 +156,7 @@ function useSamplePlayer() {
 
   useEffect(() => () => { audioRef.current?.pause(); }, []);
 
-  return { playingId, toggle, stop };
+  return { playingId, toggle, stop, unavailableIds };
 }
 
 /* ─── Step Row Card ───────────────────────────────────────────────────── */
@@ -343,7 +349,7 @@ function Step2Pix({
     p.feelings.includes(feeling.id)
   );
   const display = matches.length ? matches : PIX_CATALOG.slice(0, 3);
-  const { playingId, toggle } = useSamplePlayer();
+  const { playingId, toggle, unavailableIds } = useSamplePlayer();
 
   return (
     <div className="flex flex-col gap-3">
@@ -358,6 +364,7 @@ function Step2Pix({
         {display.map((p) => {
           const isChosen = selected?.id === p.id;
           const isPlaying = playingId === p.id;
+          const sampleUnavailable = unavailableIds.has(p.id);
           return (
             <div
               key={p.id}
@@ -385,17 +392,18 @@ function Step2Pix({
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
-                    toggle(p.id, `/samples/${p.id}.mp3`);
+                    if (!sampleUnavailable) toggle(p.id, `/samples/${p.id}.mp3`);
                   }}
-                  title={isPlaying ? "Stop sample" : "Play sample"}
-                  className="shrink-0 flex items-center gap-1 px-2 py-1 rounded-sm text-xs border transition-all"
+                  title={sampleUnavailable ? "Sample coming soon" : isPlaying ? "Stop sample" : "Play sample"}
+                  disabled={sampleUnavailable}
+                  className="shrink-0 flex items-center gap-1 px-2 py-1 rounded-sm text-xs border transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                   style={
                     isPlaying
                       ? { borderColor: `rgb(${feeling.color})`, color: `rgb(${feeling.color})` }
                       : undefined
                   }
                 >
-                  {isPlaying ? "■ Stop" : "▶ Sample"}
+                  {sampleUnavailable ? "🔇 Soon" : isPlaying ? "■ Stop" : "▶ Sample"}
                 </button>
               </div>
             </div>
@@ -418,9 +426,10 @@ function Step3Kut({
   onConfirm: (secs: Section[]) => void;
 }) {
   const [localSel, setLocalSel] = useState<Section[]>(selected);
-  const { playingId, toggle: toggleSample, stop: stopSample } = useSamplePlayer();
+  const { playingId, toggle: toggleSample, stop: stopSample, unavailableIds } = useSamplePlayer();
   const previewId = `preview-${pix.id}`;
   const isPreviewPlaying = playingId === previewId;
+  const previewUnavailable = unavailableIds.has(previewId);
 
   function toggle(sec: Section) {
     // Stop any sample playing when user changes selection
@@ -478,16 +487,17 @@ function Step3Kut({
           </p>
           {/* Sample preview — click-to-play only, never auto-plays */}
           <button
-            onClick={() => toggleSample(previewId, `/samples/${pix.id}-${localSel.join("-")}.mp3`)}
-            title={isPreviewPlaying ? "Stop preview" : "Preview this K-KUT (optional)"}
-            className="shrink-0 flex items-center gap-1 px-2 py-1 rounded-sm text-xs border transition-all"
+            onClick={() => { if (!previewUnavailable) toggleSample(previewId, `/samples/${pix.id}-${localSel.join("-")}.mp3`); }}
+            title={previewUnavailable ? "Sample coming soon" : isPreviewPlaying ? "Stop preview" : "Preview this K-KUT (optional)"}
+            disabled={previewUnavailable}
+            className="shrink-0 flex items-center gap-1 px-2 py-1 rounded-sm text-xs border transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             style={
               isPreviewPlaying
                 ? { borderColor: "var(--accent)", color: "var(--accent)" }
                 : undefined
             }
           >
-            {isPreviewPlaying ? "■ Stop" : "▶ Preview K-KUT"}
+            {previewUnavailable ? "🔇 Soon" : isPreviewPlaying ? "■ Stop" : "▶ Preview K-KUT"}
           </button>
         </div>
       )}
