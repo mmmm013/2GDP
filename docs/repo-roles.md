@@ -10,7 +10,7 @@
 
 | Layer | Repo / Platform | Domain | Music? |
 |---|---|---|---|
-| **2GDP / The Vektor** | `mmmm013/2GDP` | 4PE engine, KKr, Business Konsulting, Admin Platform (4PE per-industry) | ❌ NEVER |
+| **2GDP / The Vektor** | `mmmm013/2GDP` · domain: **2gdp.com** · display: **The Vektor** | 4PE engine (universal process), KKr per-industry, Business Konsulting, Admin Platform | ❌ NEVER |
 | **GPMC-BIZ-MSC** (this repo) | `mmmm013/GPMC` | All KUTs + Derivatives + PIX + Jewelry + Inventions | ✅ Only |
 | **GPMDs** | `gputnam-music-final-site` + mirrors | Consumer-facing music destinations | ✅ Only |
 

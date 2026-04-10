@@ -49,10 +49,11 @@
 | **LT** | **MetaGrab trigger (LT-PIX)** | pck_type='LT' flags a PIX package for KKr-MSC MetaGrab. Result: ≥40 mini-KUTs. NOT "Long Track". |
 | **SWSP** | **Sweet Spot** | Time-based clip marker. IN-PIX + INO-PIX SWSPs must be ≥13 seconds. K-KUTs are section-based only (no time constraint). |
 
-## IV-B. GPEx BUSINESS (NON-MUSIC)
+## IV-B. GPEx / THE VEKTOR (NON-MUSIC)
 | Acronym | Definition | Role/Context |
 | :--- | :--- | :--- |
-| **GPEx** | **GPEx Business "Excel-A-rator"** | Standalone business acceleration platform. Houses 4PE-BIZ for Central IL industries. **Has NOTHING to do with music.** |
+| **GPEx** | **GPEx Business "Excel-A-rator"** | Parent company / umbrella entity. Houses 4PE-BIZ for Central IL industries. **Has NOTHING to do with music.** GPEx = The Vektor (parent company association only). |
+| **2GDP** | **G Putnam Music Platform (engine)** | The Vektor's platform engine. Domain: **2gdp.com**. Company display name: **The Vektor**. Houses 4PE universal process, KKr, Business Konsulting, Admin Platform. NOT music. |
 
 ## V. AUTOMATION AGENTS (BOTS)
 | Acronym | Definition | Role/Context |
