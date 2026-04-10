@@ -45,6 +45,7 @@
 | **KKr** | **K-KUT Router / KKr-MSC** | The MetaGrab + mini-KUT processing system bundled into all 4PE platforms. |
 | **GPEx** | **GPEx Business "Excel-A-rator"** | The renamed GPMCC. Houses 4PE-BIZ platform family for Central IL industries. |
 | **K-KUT** | **K-KUT** | Exact excerpt of whole song sections (not time-based). 1 per purchase. |
+| **KPD** | **K-kUpId** | K-KUT variant for singular, romantic repertoire. Same exact-excerpt audio as K-KUT but curated for 5 romance levels (Interest→Date→Love→Sex→Forever) with exhilarating, lively packaging. KPD = K-kUpId. |
 | **mK** | **mini-KUT** | Text unit harvested by KKr-MSC metaGrab from LT-PIX. Types: verb/noun/adj/adv/pron/cmpnd/phrase/hook. |
 | **LT** | **MetaGrab trigger (LT-PIX)** | pck_type='LT' flags a PIX package for KKr-MSC MetaGrab. Result: ≥40 mini-KUTs. NOT "Long Track". |
 | **SWSP** | **Sweet Spot** | Time-based clip marker. IN-PIX + INO-PIX SWSPs must be ≥13 seconds. K-KUTs are section-based only (no time constraint). |
