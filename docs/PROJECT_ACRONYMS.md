@@ -52,8 +52,9 @@
 ## IV-B. GPEx / THE VEKTOR (NON-MUSIC)
 | Acronym | Definition | Role/Context |
 | :--- | :--- | :--- |
-| **GPEx** | **GPEx Business "Excel-A-rator"** | Parent company / umbrella entity. Houses 4PE-BIZ for Central IL industries. **Has NOTHING to do with music.** GPEx = The Vektor (parent company association only). |
-| **2GDP** | **G Putnam Music Platform (engine)** | The Vektor's platform engine. Domain: **2gdp.com**. Company display name: **The Vektor**. Houses 4PE universal process, KKr, Business Konsulting, Admin Platform. NOT music. |
+| **GPEx** | **GPEx Business "Excel-A-rator"** | **Parent Company. Only association: GPEx = The Vektor.** Owns and drafts GENERIC versions of 4PE. Houses 4PE-BIZ for Central IL industries. Has NOTHING to do with music. |
+| **2GDP** | **G Putnam Music Platform (engine)** | The Vektor's platform engine. Domain: **2gdp.com**. Company display name: **The Vektor**. Houses 4PE universal process, KKr per industry, Business Konsulting, Admin Platform. NOT music. |
+| **4PE** | **4 Platform Engine** | A **ubiquitous process** created in GPEx (The Vektor). Generic model uses KKr per industry; adaptable to any industry of focus. Absolute components: STI (slot), STI-Slot (houses BTIs), BTI (branded payload). These three never change across deployments. |
 
 ## V. AUTOMATION AGENTS (BOTS)
 | Acronym | Definition | Role/Context |
