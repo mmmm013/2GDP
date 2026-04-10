@@ -1,24 +1,25 @@
-// Edge Function: play-m-kut
-// Returns a signed URL for mKUT (mini-KUT) playback.
-// mKUT accepts a pix_pck_id + structure tag and resolves the best available
-// K-KUT or K-kut asset for that excerpt. Both variants are attempted so that
-// the mini-player always finds audio when the asset exists.
-// Endpoint: POST /functions/v1/play-m-kut
-// Body: { k_kut_id?: string, pix_pck_id?: string, tag?: 'Verse'|'BR'|'Ch' }
-// Auth: none required (public prefab player)
-// Returns: { signed_url, expires_in, structure_tag, duration_ms, mime_type,
-//            title, artist, theme, gift_note, gifted_by, meta }
-// File: supabase/functions/play-m-kut/index.ts
+// Edge Function: play-k-kupid
+// Returns a signed URL for K-kUpId (KPD) audio playback.
+// K-kUpId shares the exact-excerpt audio strategy of K-KUT, curated for
+// 5 romance levels: Interest → Date → Love → Sex → Forever.
+// Tries variant='K-kUpId' first, then falls back to 'K-KUT'.
+// Endpoint: POST /functions/v1/play-k-kupid
+// Body: { k_kut_id?: string, pix_pck_id?: string, tag?: SectionTag, romance_level?: string }
+// Auth: Bearer JWT required (org-scoped via RLS)
+// Returns: { signed_url, expires_in, romance_level, meta }
+// File: supabase/functions/play-k-kupid/index.ts
 
 import { supabaseAdmin } from "../_shared/supabaseClient.ts";
 import { bad, ok, preflight, withRetry } from "../_shared/responses.ts";
 
-const SIGNED_URL_EXPIRY = 3600; // 1 hour — reduced refresh frequency at scale
+const SIGNED_URL_EXPIRY = 3600; // 1 hour
 // Canonical song-section taxonomy (matches lib/kkut-sections.ts SECTION_ORDER
 // and the k_kut_assets_structure_tag_check DB constraint).
 const ALLOWED_TAGS = ['Intro','V1','Pre1','Ch1','V2','Pre2','Ch2','BR','Ch3','Outro'] as const;
-// Try K-KUT first (canonical), then K-kut
-const VARIANT_PRIORITY = ['K-KUT', 'K-kut'] as const;
+// K-kUpId variant first, fall back to K-KUT (same audio assets, romance-level overlay)
+const VARIANT_PRIORITY = ['K-kUpId', 'K-KUT'] as const;
+// Valid romance levels for K-kUpId experiences
+const ROMANCE_LEVELS = ['Interest', 'Date', 'Love', 'Sex', 'Forever'] as const;
 
 Deno.serve(async (req: Request) => {
   if (req.method === 'OPTIONS') return preflight();
@@ -30,14 +31,20 @@ Deno.serve(async (req: Request) => {
       return bad('Provide k_kut_id OR (pix_pck_id + tag)');
     }
 
-    if (body.tag && !ALLOWED_TAGS.includes(body.tag)) {
+    // Validate tag if provided
+    if (body.tag && !(ALLOWED_TAGS as readonly string[]).includes(body.tag)) {
       return bad(`tag must be one of: ${ALLOWED_TAGS.join(', ')}`);
+    }
+
+    // Validate romance_level if provided (optional metadata)
+    if (body.romance_level && !(ROMANCE_LEVELS as readonly string[]).includes(body.romance_level)) {
+      return bad(`romance_level must be one of: ${ROMANCE_LEVELS.join(', ')}`);
     }
 
     let asset: Record<string, unknown> | null = null;
 
     if (body.k_kut_id) {
-      // Direct lookup by asset ID — try both variants
+      // Direct lookup by asset ID — try K-kUpId variant, then K-KUT
       for (const variant of VARIANT_PRIORITY) {
         const { data } = await supabaseAdmin
           .from('k_kut_assets')
@@ -48,9 +55,9 @@ Deno.serve(async (req: Request) => {
           .single();
         if (data) { asset = data; break; }
       }
-      if (!asset) return bad('mKUT asset not found or not active', 404);
+      if (!asset) return bad('K-kUpId asset not found or not active', 404);
     } else {
-      // Lookup by pix_pck_id + structure_tag — try both variants
+      // Lookup by pix_pck_id + structure_tag — try K-kUpId variant, then K-KUT
       for (const variant of VARIANT_PRIORITY) {
         const { data } = await supabaseAdmin
           .from('k_kut_assets')
@@ -62,7 +69,7 @@ Deno.serve(async (req: Request) => {
           .single();
         if (data) { asset = data; break; }
       }
-      if (!asset) return bad('mKUT not found for pix_pck_id + tag', 404);
+      if (!asset) return bad('K-kUpId asset not found for pix_pck_id + tag', 404);
     }
 
     // Generate signed URL (with retry on transient failures)
@@ -73,31 +80,27 @@ Deno.serve(async (req: Request) => {
     );
 
     if (signErr || !signed?.signedUrl) {
-      console.error('[play-m-kut] Signed URL error:', signErr);
+      console.error('[play-k-kupid] Signed URL error:', signErr);
       return bad(`Failed to generate signed URL: ${signErr?.message ?? 'unknown'}`, 500);
     }
 
     // Audit log (fire and forget)
     supabaseAdmin.from('audit_log').insert({
-      action: 'PLAY_M_KUT',
+      action: 'PLAY_K_KUPID',
       table_name: 'k_kut_assets',
       row_pk: String(asset.id),
-      diff: { variant: asset.variant, structure_tag: asset.structure_tag, pix_pck_id: asset.pix_pck_id },
+      diff: {
+        variant: asset.variant,
+        structure_tag: asset.structure_tag,
+        pix_pck_id: asset.pix_pck_id,
+        romance_level: body.romance_level ?? null,
+      },
     }).then(() => {}).catch(() => {});
 
     return ok({
       signed_url: signed.signedUrl,
       expires_in: SIGNED_URL_EXPIRY,
-      structure_tag: asset.structure_tag,
-      duration_ms: asset.duration_ms ?? null,
-      mime_type: asset.mime_type ?? null,
-      // title/artist are not stored on k_kut_assets; the player has defaults.
-      // Populated here when a richer join becomes available (4PE ingestion).
-      title: null,
-      artist: null,
-      theme: 'nature',
-      gift_note: null,
-      gifted_by: null,
+      romance_level: body.romance_level ?? null,
       meta: {
         id: asset.id,
         variant: asset.variant,
@@ -108,7 +111,7 @@ Deno.serve(async (req: Request) => {
       },
     });
   } catch (e) {
-    console.error('[play-m-kut] Unexpected error:', e);
+    console.error('[play-k-kupid] Unexpected error:', e);
     return bad(e instanceof Error ? e.message : 'Unknown error', 500);
   }
 });
