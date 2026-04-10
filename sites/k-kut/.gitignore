@@ -1,6 +1,0 @@
-# K-KUT site build artifacts and dependencies
-node_modules/
-.next/
-.env.local
-.env*.local
-*.tsbuildinfo
