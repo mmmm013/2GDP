@@ -24,6 +24,7 @@ const TIERS = [
     accent: '#4da6ff',
     border: 'border-[#4da6ff]/40',
     ring: 'hover:border-[#4da6ff]/80',
+    featured: false as const,
   },
   {
     id: 'kruiser',

@@ -326,8 +326,7 @@ function HomeFP() {
           setIdx(0);
         }
         setLoading(false);
-      })
-      .catch(() => setLoading(false));
+      }, () => setLoading(false));
   }, []);
 
   const current = tracks[idx];

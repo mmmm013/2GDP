@@ -1,4 +1,4 @@
-import { CENTRAL_IL_INDUSTRIES, BIZ_TIERS } from '@/lib/4pe-engine';
+import { CENTRAL_IL_INDUSTRIES, BIZ_TIERS } from '../lib/4pe-engine';
 
 export default function Home() {
   return (
