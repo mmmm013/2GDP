@@ -2,18 +2,17 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
-import BotDemo from "@/components/BotDemo";
-import OccasionHero from "@/components/OccasionHero";
 import ArtistPromo from "@/components/ArtistPromo";
+import KutWizard from "@/components/KutWizard";
 
 export const metadata: Metadata = {
   title: "Demo",
   description:
-    "Pick your occasion. Hear the K-KUT. Send it. That's it.",
+    "Tell us the feeling. We find the K-KUT. You send it. Five guided steps.",
   alternates: { canonical: "https://k-kut.com/demo" },
   openGraph: {
     title: "Demo | K-KUT",
-    description: "Pick your occasion. Hear the K-KUT. Send it.",
+    description: "Tell us the feeling. We find the K-KUT. You send it.",
     url: "https://k-kut.com/demo",
   },
 };
@@ -36,36 +35,26 @@ export default function DemoPage() {
               Live Demo
             </p>
             <h1 className="text-4xl sm:text-5xl font-bold text-[var(--text)] mb-4 leading-tight">
-              Pick it. Hear it. Send it.
+              Feel it. Find it. Send it.
             </h1>
             <p className="text-base text-[var(--text-muted)] leading-relaxed">
-              Tell us the occasion — we&rsquo;ll find the K&#8209;KUT.
-              Press play, then send it. One step.
+              Five guided steps — BOT-assisted. So simple a 6-year-old can manage.
             </p>
           </div>
         </section>
 
-        {/* ─── Occasion Strip + BOTY Player ─────── */}
+        {/* ─── 5-Step K-KUT Wizard ───────────────── */}
         <section className="border-b border-[var(--border)]">
-          <OccasionHero />
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 py-16">
+            <p className="text-[10px] uppercase tracking-[0.3em] text-[var(--accent)] text-center mb-8">
+              Your K-KUT Journey
+            </p>
+            <KutWizard />
+          </div>
         </section>
 
         {/* ─── Artist Promo: Michael Scherer ────── */}
         <ArtistPromo />
-
-        {/* ─── BOT Demos ────────────────────────── */}
-        <section className="border-t border-[var(--border)]">
-          <div className="max-w-5xl mx-auto px-4 sm:px-6 py-16">
-            <h2 className="text-2xl font-semibold text-center text-[var(--text)] mb-3">
-              Three inventions. Three BOTs.
-            </h2>
-            <p className="text-center text-sm text-[var(--text-muted)] mb-10 max-w-xl mx-auto">
-              Press ▶ on K-KUT BOT to see an exact section get sent — with audio.
-              Hit the buy button when it clicks.
-            </p>
-            <BotDemo />
-          </div>
-        </section>
 
         {/* ─── Final CTA ────────────────────────── */}
         <section className="border-t border-[var(--border)]">
