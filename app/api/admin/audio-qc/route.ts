@@ -4,61 +4,50 @@ import { createClient } from '@supabase/supabase-js'
 // ---------------------------------------------------------------------------
 // POST /api/admin/audio-qc
 //
-// Records an audio QC result for a k_kut_assets row or a pix_pck row.
-// A 'pass' result allows the item to be activated (status → 'active' /
-// is_active → true).  A 'fail' result automatically marks the item as
-// free (is_free = true) so anon users can still access it.
+// Lone Admin endpoint — records an audio QC result (pass | fail) on a
+// k_kut_assets row or a pix_pck row.
 //
-// Auth: Bearer token matching ADMIN_SECRET (falls back to CRON_SECRET).
-//       In non-production without a secret the check is skipped for dev/CI.
+// The database triggers do the heavy lifting:
+//   • FAIL  → is_free is automatically set to true     (Failure = FREE)
+//   • PASS  → asset/package can now be activated
+//   • Any attempt to activate without a PASS is blocked by DB trigger
 //
-// Request body (JSON):
+// Auth: Bearer token matching CRON_SECRET (same pattern as lt-pix-mkut-check).
+//       In non-production without CRON_SECRET the check is skipped for local dev.
+//
+// Request body:
 //   {
-//     item_type : 'k_kut_asset' | 'pix_pck',  // which table to update
-//     item_id   : string,                       // UUID of the row
-//     result    : 'pass' | 'fail',              // QC outcome
-//     notes?    : string,                       // optional admin notes (not persisted)
+//     target:   'asset' | 'package',   // k_kut_assets or pix_pck
+//     id:       string,                // UUID of the row
+//     result:   'pass' | 'fail',
+//     note?:    string,                // optional QC note
 //   }
 //
 // Response 200:
 //   {
-//     ok         : true,
-//     item_type  : string,
-//     item_id    : string,
-//     audio_qc_status : 'pass' | 'fail',
-//     is_free    : boolean,
-//     updated_at : string,
+//     ok:             true,
+//     target:         'asset' | 'package',
+//     id:             string,
+//     audio_qc_status: 'pass' | 'fail',
+//     is_free:        boolean,
+//     audio_qc_at:    string,          // ISO timestamp
 //   }
+//
+// Response 422 — if trying to activate an item that has not yet passed QC,
+//   the DB will throw; this route surfaces that as a structured error.
 // ---------------------------------------------------------------------------
 
-type ItemType = 'k_kut_asset' | 'pix_pck'
-type QcResult = 'pass' | 'fail'
-
-interface QcRequestBody {
-  item_type: ItemType
-  item_id: string
-  result: QcResult
-  notes?: string
-}
-
 function isAuthorized(request: Request): boolean {
-  const secret = process.env.ADMIN_SECRET ?? process.env.CRON_SECRET
-  const isProd = process.env.NODE_ENV === 'production'
-
-  if (isProd && !secret) {
-    return false
-  }
-
-  if (!secret) {
-    return true
-  }
-
+  const secret = process.env.CRON_SECRET
+  const isProd  = process.env.NODE_ENV === 'production'
+  if (isProd && !secret) return false
+  if (!secret) return true
   return request.headers.get('authorization') === `Bearer ${secret}`
 }
 
 function getServiceClient() {
   const url = process.env.SUPABASE_URL ?? process.env.NEXT_PUBLIC_SUPABASE_URL
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY
+  const key  = process.env.SUPABASE_SERVICE_ROLE_KEY
   if (!url || !key) {
     throw new Error('Missing Supabase env vars (SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY)')
   }
@@ -70,29 +59,30 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  let body: QcRequestBody
+  let body: unknown
   try {
     body = await request.json()
   } catch {
     return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 })
   }
 
-  const { item_type, item_id, result } = body
+  const { target, id, result, note } = body as {
+    target?: unknown
+    id?: unknown
+    result?: unknown
+    note?: unknown
+  }
 
-  // Validate item_type
-  if (item_type !== 'k_kut_asset' && item_type !== 'pix_pck') {
+  // Validate inputs
+  if (target !== 'asset' && target !== 'package') {
     return NextResponse.json(
-      { error: 'item_type must be "k_kut_asset" or "pix_pck"' },
+      { error: 'target must be "asset" or "package"' },
       { status: 400 }
     )
   }
-
-  // Validate item_id is a non-empty string (UUID format)
-  if (!item_id || typeof item_id !== 'string' || item_id.trim() === '') {
-    return NextResponse.json({ error: 'item_id is required and must be a UUID string' }, { status: 400 })
+  if (typeof id !== 'string' || !id.trim()) {
+    return NextResponse.json({ error: 'id (UUID string) is required' }, { status: 400 })
   }
-
-  // Validate result
   if (result !== 'pass' && result !== 'fail') {
     return NextResponse.json(
       { error: 'result must be "pass" or "fail"' },
@@ -100,99 +90,134 @@ export async function POST(request: Request) {
     )
   }
 
-  try {
-    const supabase = getServiceClient()
-    const tableName = item_type === 'k_kut_asset' ? 'k_kut_assets' : 'pix_pck'
+  const supabase = getServiceClient()
 
-    // GAP-1: For a QC pass on k_kut_asset, verify the storage file actually exists
-    // before committing the status change. A missing file would create a ghost-pass
-    // (QC='pass' but audio 404s at play time).
-    if (result === 'pass' && item_type === 'k_kut_asset') {
-      const { data: asset, error: fetchErr } = await supabase
+  try {
+    if (target === 'asset') {
+      // ── k_kut_assets ─────────────────────────────────────────────────────
+
+      // GAP-1: For a QC pass, verify the storage file actually exists before
+      // committing the status change. A missing file would create a ghost-pass
+      // (QC='pass' but audio 404s at play time).
+      if (result === 'pass') {
+        const { data: assetCheck, error: fetchErr } = await supabase
+          .from('k_kut_assets')
+          .select('storage_bucket, storage_path')
+          .eq('id', id)
+          .single()
+
+        if (fetchErr || !assetCheck) {
+          return NextResponse.json({ error: 'k_kut_assets row not found', id }, { status: 404 })
+        }
+
+        if (!assetCheck.storage_bucket || !assetCheck.storage_path) {
+          return NextResponse.json(
+            { error: 'storage_bucket or storage_path is null — cannot pass QC without a file', id },
+            { status: 422 }
+          )
+        }
+
+        // Use storage.list() to confirm the file exists at the expected path.
+        const lastSlash = assetCheck.storage_path.lastIndexOf('/')
+        const folder   = lastSlash >= 0 ? assetCheck.storage_path.slice(0, lastSlash) : ''
+        const filename = lastSlash >= 0 ? assetCheck.storage_path.slice(lastSlash + 1) : assetCheck.storage_path
+
+        const { data: fileList, error: listErr } = await supabase.storage
+          .from(assetCheck.storage_bucket)
+          .list(folder, { search: filename, limit: 1 })
+
+        const fileExists = !listErr && Array.isArray(fileList) && fileList.some((f) => f.name === filename)
+
+        if (!fileExists) {
+          console.error(`[audio-qc] Storage file not found: ${assetCheck.storage_bucket}/${assetCheck.storage_path}`, listErr)
+          return NextResponse.json(
+            {
+              error: 'Storage file not found — upload the audio file before marking QC pass',
+              storage_bucket: assetCheck.storage_bucket,
+              storage_path: assetCheck.storage_path,
+            },
+            { status: 422 }
+          )
+        }
+      }
+
+      const updatePayload: Record<string, unknown> = {
+        audio_qc_status: result,
+        audio_qc_at:     new Date().toISOString(),
+      }
+      if (typeof note === 'string' && note.trim()) {
+        updatePayload.audio_qc_note = note.trim()
+      }
+
+      const { data, error } = await supabase
         .from('k_kut_assets')
-        .select('storage_bucket, storage_path')
-        .eq('id', item_id)
+        .update(updatePayload)
+        .eq('id', id)
+        .select('id, variant, structure_tag, audio_qc_status, audio_qc_at, is_free, status')
         .single()
 
-      if (fetchErr || !asset) {
+      if (error) {
+        console.error('[audio-qc] k_kut_assets update error:', error)
         return NextResponse.json(
-          { error: 'k_kut_assets row not found', item_id },
-          { status: 404 }
+          { error: 'Failed to record QC result', detail: error.message },
+          { status: 500 }
         )
       }
 
-      if (!asset.storage_bucket || !asset.storage_path) {
-        return NextResponse.json(
-          { error: 'storage_bucket or storage_path is null — cannot pass QC without a file', item_id },
-          { status: 422 }
-        )
-      }
+      return NextResponse.json({
+        ok: true,
+        target: 'asset',
+        id: data.id,
+        variant: data.variant,
+        structure_tag: data.structure_tag,
+        audio_qc_status: data.audio_qc_status,
+        is_free: data.is_free,
+        audio_qc_at: data.audio_qc_at,
+        activation_status: data.status,
+        ...(result === 'fail'
+          ? { policy: 'Failure=FREE: is_free has been set to true. This item is now free for all users.' }
+          : { policy: 'PASS recorded. Item may now be activated (status → active).' }),
+      })
+    }
 
-      // Use storage.list() to confirm the file exists at the expected path.
-      // storage_path may be 'folder/file.mp3' — split to (prefix, filename).
-      const lastSlash = asset.storage_path.lastIndexOf('/')
-      const folder = lastSlash >= 0 ? asset.storage_path.slice(0, lastSlash) : ''
-      const filename = lastSlash >= 0 ? asset.storage_path.slice(lastSlash + 1) : asset.storage_path
-
-      const { data: fileList, error: listErr } = await supabase.storage
-        .from(asset.storage_bucket)
-        .list(folder, { search: filename, limit: 1 })
-
-      const fileExists = !listErr && Array.isArray(fileList) && fileList.some((f) => f.name === filename)
-
-      if (!fileExists) {
-        console.error(`[audio-qc] Storage file not found: ${asset.storage_bucket}/${asset.storage_path}`, listErr)
-        return NextResponse.json(
-          {
-            error: 'Storage file not found — upload the audio file before marking QC pass',
-            storage_bucket: asset.storage_bucket,
-            storage_path: asset.storage_path,
-          },
-          { status: 422 }
-        )
-      }
+    // ── pix_pck (mini-KUT parent packages) ─────────────────────────────────
+    const updatePayload: Record<string, unknown> = {
+      audio_qc_status: result,
+      audio_qc_at:     new Date().toISOString(),
+    }
+    if (typeof note === 'string' && note.trim()) {
+      updatePayload.audio_qc_note = note.trim()
     }
 
     const { data, error } = await supabase
-      .from(tableName)
-      .update({ audio_qc_status: result })
-      .eq('id', item_id)
-      .select('id, audio_qc_status, is_free, updated_at')
+      .from('pix_pck')
+      .update(updatePayload)
+      .eq('id', id)
+      .select('id, title, pck_type, audio_qc_status, audio_qc_at, is_free, is_active')
       .single()
 
     if (error) {
-      console.error(`[audio-qc] Supabase error updating ${tableName}:`, error)
-      // Surface DB-level guard violations clearly
-      if (error.code === '23514') {
-        return NextResponse.json(
-          { error: 'DB constraint violation', detail: error.message },
-          { status: 422 }
-        )
-      }
+      console.error('[audio-qc] pix_pck update error:', error)
       return NextResponse.json(
-        { error: 'Failed to update QC status', detail: error.message },
+        { error: 'Failed to record QC result', detail: error.message },
         { status: 500 }
       )
     }
 
-    if (!data) {
-      return NextResponse.json(
-        { error: `${tableName} row not found`, item_id },
-        { status: 404 }
-      )
-    }
-
-    return NextResponse.json(
-      {
-        ok: true,
-        item_type,
-        item_id: data.id,
-        audio_qc_status: data.audio_qc_status,
-        is_free: data.is_free,
-        updated_at: data.updated_at,
-      },
-      { status: 200 }
-    )
+    return NextResponse.json({
+      ok: true,
+      target: 'package',
+      id: data.id,
+      title: data.title,
+      pck_type: data.pck_type,
+      audio_qc_status: data.audio_qc_status,
+      is_free: data.is_free,
+      audio_qc_at: data.audio_qc_at,
+      is_active: data.is_active,
+      ...(result === 'fail'
+        ? { policy: 'Failure=FREE: is_free has been set to true. This package (and its mini-KUTs) is now free for all users.' }
+        : { policy: 'PASS recorded. Package may now be activated (is_active → true).' }),
+    })
   } catch (err) {
     console.error('[audio-qc] Unexpected error:', err)
     return NextResponse.json(
@@ -200,4 +225,54 @@ export async function POST(request: Request) {
       { status: 500 }
     )
   }
+}
+
+// ---------------------------------------------------------------------------
+// GET /api/admin/audio-qc?target=asset|package&id=<uuid>
+// Quick status check for a single item.
+// ---------------------------------------------------------------------------
+export async function GET(request: Request) {
+  if (!isAuthorized(request)) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  const { searchParams } = new URL(request.url)
+  const target = searchParams.get('target')
+  const id     = searchParams.get('id')
+
+  if (target !== 'asset' && target !== 'package') {
+    return NextResponse.json(
+      { error: 'target must be "asset" or "package"' },
+      { status: 400 }
+    )
+  }
+  if (!id) {
+    return NextResponse.json({ error: 'id is required' }, { status: 400 })
+  }
+
+  const supabase = getServiceClient()
+
+  if (target === 'asset') {
+    const { data, error } = await supabase
+      .from('k_kut_assets')
+      .select('id, variant, structure_tag, audio_qc_status, audio_qc_at, audio_qc_note, is_free, status')
+      .eq('id', id)
+      .single()
+
+    if (error || !data) {
+      return NextResponse.json({ error: 'Asset not found', detail: error?.message }, { status: 404 })
+    }
+    return NextResponse.json({ target: 'asset', ...data })
+  }
+
+  const { data, error } = await supabase
+    .from('pix_pck')
+    .select('id, title, pck_type, audio_qc_status, audio_qc_at, audio_qc_note, is_free, is_active')
+    .eq('id', id)
+    .single()
+
+  if (error || !data) {
+    return NextResponse.json({ error: 'Package not found', detail: error?.message }, { status: 404 })
+  }
+  return NextResponse.json({ target: 'package', ...data })
 }
