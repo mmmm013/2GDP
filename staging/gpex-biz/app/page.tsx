@@ -127,25 +127,10 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── KUT / KKr BUNDLE NOTICE ──────────────────────────────────── */}
-      <section className="py-16 px-6 bg-[#0A0A0A] border-t border-[#1A1A1A]">
-        <div className="max-w-3xl mx-auto text-center">
-          <p className="text-xs tracking-widest text-[#D4AF37] uppercase mb-3">Included in Every Tier</p>
-          <p className="text-gray-500 text-sm leading-relaxed">
-            KUTs (K-KUTs + mini-KUTs) and KKr modules are bundled into all 4PE-BIZ platforms.
-            Music business domain assets stay within the GPM ecosystem — the Excel-A-rator
-            applies GPM-proven process frameworks to Central IL industry verticals.
-          </p>
-        </div>
-      </section>
-
       {/* ── FOOTER ───────────────────────────────────────────────────── */}
       <footer className="py-8 px-6 border-t border-[#1A1A1A] text-center">
         <p className="text-gray-700 text-xs">
-          © {new Date().getFullYear()} GPEx Business — Excel-A-rator · A GPEx (Groom Process Excellarators) Platform ·{' '}
-          <a href="https://www.gputnammusic.com" className="hover:text-[#D4AF37] transition-colors" target="_blank" rel="noreferrer">
-            gputnammusic.com ↗
-          </a>
+          © {new Date().getFullYear()} GPEx Business — Excel-A-rator · Central Illinois Industry Acceleration
         </p>
       </footer>
 

@@ -36,19 +36,23 @@
 ---
 *Protocol Saved for Retrieval.*
 
-## IV. PLATFORM TEMPLATE SYSTEM (4PE / KKr / GPEx)
+## IV. PLATFORM TEMPLATE SYSTEM (4PE / KKr)
 | Acronym | Definition | Role/Context |
 | :--- | :--- | :--- |
 | **STI** | **Standard Template Item** | A template slot/container in the 4PE platform engine. STI-Slots hold space to be filled by BTIs. |
 | **BTI** | **Branded Template Item** | Content payload that fills an STI-Slot. Brand-specific customization layer. |
 | **4PE** | **4 Platform Engine** | The universal platform engine. 4PE-MSC = music prototype. 4PE-BIZ = general business platform. |
-| **KKr** | **K-KUT Router / KKr-MSC** | The MetaGrab + mini-KUT processing system bundled into all 4PE platforms. |
-| **GPEx** | **GPEx Business "Excel-A-rator"** | The renamed GPMCC. Houses 4PE-BIZ platform family for Central IL industries. |
+| **KKr** | **K-KUT Router / KKr-MSC** | The MetaGrab + mini-KUT processing system (music domain). |
 | **K-KUT** | **K-KUT** | Exact excerpt of whole song sections (not time-based). 1 per purchase. |
 | **KPD** | **K-kUpId** | K-KUT variant for singular, romantic repertoire. Same exact-excerpt audio as K-KUT but curated for 5 romance levels (Interest→Date→Love→Sex→Forever) with exhilarating, lively packaging. KPD = K-kUpId. |
 | **mK** | **mini-KUT** | Text unit harvested by KKr-MSC metaGrab from LT-PIX. Types: verb/noun/adj/adv/pron/cmpnd/phrase/hook. |
 | **LT** | **MetaGrab trigger (LT-PIX)** | pck_type='LT' flags a PIX package for KKr-MSC MetaGrab. Result: ≥40 mini-KUTs. NOT "Long Track". |
 | **SWSP** | **Sweet Spot** | Time-based clip marker. IN-PIX + INO-PIX SWSPs must be ≥13 seconds. K-KUTs are section-based only (no time constraint). |
+
+## IV-B. GPEx BUSINESS (NON-MUSIC)
+| Acronym | Definition | Role/Context |
+| :--- | :--- | :--- |
+| **GPEx** | **GPEx Business "Excel-A-rator"** | Standalone business acceleration platform. Houses 4PE-BIZ for Central IL industries. **Has NOTHING to do with music.** |
 
 ## V. AUTOMATION AGENTS (BOTS)
 | Acronym | Definition | Role/Context |

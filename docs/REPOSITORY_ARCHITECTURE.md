@@ -8,16 +8,11 @@
 
 ## Overview
 
-This document describes the G Putnam Music platform architecture and repository organization under GPEx (Groom Process Excellarators).
+This document describes the G Putnam Music platform architecture and repository organization.
 
 ---
 
 ## Business Structure
-
-### Parent Company
-- **GPEx** (Groom Process Excellarators)
-  - Parent company overseeing all operations
-  - Name currently unstable, subject to change
 
 ### Business Units
 
@@ -28,6 +23,9 @@ This document describes the G Putnam Music platform architecture and repository 
 
 #### 2. Konsulting Operations
 - **The Vektor [Konsulting]** — Separate from all music operations. Lives in its own repository. Has ZERO connection to GPMC or music.
+
+#### 3. GPEx Business (NON-MUSIC — completely separate)
+- **GPEx** — GPEx Business "Excel-A-rator" — standalone business acceleration platform for Central IL industries. **Has NOTHING to do with music or GPM.**
 
 ---
 

@@ -7,8 +7,6 @@
  *   P2: People   — workforce + culture alignment
  *   P3: Platform — technology + data infrastructure
  *   P4: Profit   — revenue model + cost optimization
- *
- * KUTs + KKr are bundled into ALL 4PE platforms.
  */
 
 export type Industry =
@@ -65,7 +63,7 @@ export const BIZ_TIERS: BizTier[] = [
     priceMonthly: 97,
     features: [
       '4PE Audit (Process + People)',
-      'KUT Library Access (read-only)',
+      'Ops workflow documentation',
       'Monthly ops report',
       'Email support',
     ],
@@ -78,7 +76,7 @@ export const BIZ_TIERS: BizTier[] = [
     priceMonthly: 297,
     features: [
       'Full 4PE Audit suite',
-      'KUT + KKr Library (full access)',
+      'All ops modules (full access)',
       'Weekly ops cadence',
       'OPS-BOT integration',
       'Dedicated account lead',
@@ -93,7 +91,7 @@ export const BIZ_TIERS: BizTier[] = [
     features: [
       'Platform white-label rights',
       'All 4PE modules',
-      'KUT + KKr full bundle',
+      'Full ops bundle',
       'Revenue share model',
       'Priority build queue',
     ],
