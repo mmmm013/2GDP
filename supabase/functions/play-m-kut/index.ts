@@ -11,9 +11,9 @@
 // File: supabase/functions/play-m-kut/index.ts
 
 import { supabaseAdmin } from "../_shared/supabaseClient.ts";
-import { bad, ok, preflight } from "../_shared/responses.ts";
+import { bad, ok, preflight, withRetry } from "../_shared/responses.ts";
 
-const SIGNED_URL_EXPIRY = 300; // 5 minutes
+const SIGNED_URL_EXPIRY = 3600; // 1 hour — reduced refresh frequency at scale
 const ALLOWED_TAGS = ['Verse', 'BR', 'Ch'] as const;
 // Try K-KUT first (canonical), then K-kut
 const VARIANT_PRIORITY = ['K-KUT', 'K-kut'] as const;
@@ -63,10 +63,12 @@ Deno.serve(async (req: Request) => {
       if (!asset) return bad('mKUT not found for pix_pck_id + tag', 404);
     }
 
-    // Generate signed URL
-    const { data: signed, error: signErr } = await supabaseAdmin.storage
-      .from(asset.storage_bucket as string)
-      .createSignedUrl(asset.storage_path as string, SIGNED_URL_EXPIRY);
+    // Generate signed URL (with retry on transient failures)
+    const { data: signed, error: signErr } = await withRetry(
+      () => supabaseAdmin.storage
+        .from(asset.storage_bucket as string)
+        .createSignedUrl(asset.storage_path as string, SIGNED_URL_EXPIRY)
+    );
 
     if (signErr || !signed?.signedUrl) {
       console.error('[play-m-kut] Signed URL error:', signErr);

@@ -26,3 +26,22 @@ export const ok = (data: Record<string, unknown> = {}): Response =>
 /** Handle CORS preflight */
 export const preflight = (): Response =>
   new Response(null, { status: 204, headers: CORS_HEADERS });
+
+/**
+ * withRetry — retry an async fn up to `attempts` times with per-attempt backoff.
+ * Intended for Supabase storage.createSignedUrl() calls that may transiently fail.
+ */
+export async function withRetry<T>(
+  fn: () => Promise<{ data: T | null; error: unknown }>,
+  opts: { attempts: number; backoffMs: readonly number[] } = { attempts: 3, backoffMs: [500, 1000, 2000] }
+): Promise<{ data: T | null; error: unknown }> {
+  let last: { data: T | null; error: unknown } = { data: null, error: null };
+  for (let i = 0; i < opts.attempts; i++) {
+    last = await fn();
+    if (last.data && !last.error) return last;
+    if (i < opts.attempts - 1) {
+      await new Promise((r) => setTimeout(r, opts.backoffMs[i] ?? opts.backoffMs[opts.backoffMs.length - 1]));
+    }
+  }
+  return last;
+}
