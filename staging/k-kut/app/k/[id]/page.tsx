@@ -8,7 +8,7 @@
  * Audio QC must be 'pass' and status must be 'active' for the asset to resolve.
  */
 
-import { useEffect, useState } from 'react';
+import { use, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { createClient } from '../../../lib/supabase/browser';
 
@@ -27,7 +27,8 @@ interface PlayResponse {
   meta: PlayMeta;
 }
 
-export default function KKutPlayPage({ params }: { params: { id: string } }) {
+export default function KKutPlayPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params);
   const [data, setData] = useState<PlayResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -46,7 +47,7 @@ export default function KKutPlayPage({ params }: { params: { id: string } }) {
               'Content-Type': 'application/json',
               Authorization: `Bearer ${session?.access_token ?? process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
             },
-            body: JSON.stringify({ k_kut_id: params.id }),
+            body: JSON.stringify({ k_kut_id: id }),
           }
         );
 
@@ -65,7 +66,7 @@ export default function KKutPlayPage({ params }: { params: { id: string } }) {
     }
 
     fetchSignedUrl();
-  }, [params.id]);
+  }, [id]);
 
   return (
     <div className="min-h-screen flex flex-col">
