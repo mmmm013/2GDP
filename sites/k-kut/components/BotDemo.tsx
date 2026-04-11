@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
+import KutAudioPlayer from "./KutAudioPlayer";
 
 /* ═══════════════════════════════════════════════════════════
    K-KUT BOT — SMS / DM chat simulation
@@ -248,6 +249,12 @@ function KKutBot() {
                   <p className="text-[10px] text-[var(--text-muted)] mt-1">
                     Section: {c.section} · K-KUT
                   </p>
+                  <KutAudioPlayer
+                    invention="KK"
+                    tag={c.section}
+                    label={c.title}
+                    color={c.color}
+                  />
                   <div
                     className="mt-2 h-1 rounded-full"
                     style={{ background: `rgba(${c.color},0.5)`, width: "70%" }}
@@ -341,11 +348,17 @@ function MiniKutBot() {
     <div className="flex flex-col h-full">
       {/* Track label */}
       <div className="px-4 pt-4 pb-2 flex items-center justify-between">
-        <div>
+        <div className="flex-1 min-w-0">
           <p className="text-[9px] uppercase tracking-widest text-[var(--accent)]">
             Master Track
           </p>
           <p className="text-sm font-bold text-[var(--text)]">{batch.track}</p>
+          <KutAudioPlayer
+            invention="mK"
+            tag="Ch1"
+            label={batch.track}
+            color="251,191,36"
+          />
         </div>
         <span className="text-[9px] uppercase tracking-widest text-[var(--text-muted)] border border-[var(--border)] px-2 py-1 rounded-sm">
           {words.length}/12 mini-KUTs
@@ -520,6 +533,13 @@ function KupidBot() {
                       K-kUpId · {lv.label}
                     </p>
                     <p className="text-xs font-bold text-[var(--text)]">{lv.track}</p>
+                    <KutAudioPlayer
+                      invention="KPD"
+                      tag="Ch1"
+                      romanceLevel={lv.label.charAt(0) + lv.label.slice(1).toLowerCase()}
+                      label={lv.track}
+                      color={col}
+                    />
                     <div
                       className="mt-2 h-0.5 rounded-full"
                       style={{ background: `rgba(${col},0.5)`, width: "65%" }}
