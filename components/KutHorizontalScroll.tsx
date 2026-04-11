@@ -90,15 +90,22 @@ export default function KutHorizontalScroll({
           });
       }
     },
-    [items]
+    [items, setIsPlaying, setBlocked]
   );
+
+  // ── Scroll active chip into view ───────────────────────────────────────────
+  const scrollToChip = useCallback((idx: number) => {
+    const container = scrollRef.current;
+    if (!container) return;
+    const chip = container.children[idx] as HTMLElement | undefined;
+    if (chip) chip.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+  }, []);
 
   // ── Auto-play on mount ─────────────────────────────────────────────────────
   useEffect(() => {
     if (items.length === 0) return;
     loadTrack(0, autoPlay);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [items.length, autoPlay, loadTrack]);
 
   // ── Auto-advance to next item ──────────────────────────────────────────────
   const advanceToNext = useCallback(() => {
@@ -107,17 +114,17 @@ export default function KutHorizontalScroll({
       const next = prev + 1;
       if (next >= items.length) {
         if (loop) {
-          loadTrack(0, true);
           scrollToChip(0);
+          loadTrack(0, true);
           return 0;
         }
         return prev;
       }
-      loadTrack(next, true);
       scrollToChip(next);
+      loadTrack(next, true);
       return next;
     });
-  }, [autoStream, items.length, loop, loadTrack]);
+  }, [autoStream, items.length, loop, loadTrack, scrollToChip]);
 
   // ── Wire audio events ──────────────────────────────────────────────────────
   useEffect(() => {
@@ -140,14 +147,6 @@ export default function KutHorizontalScroll({
       audio.removeEventListener('pause', onPause);
     };
   }, [advanceToNext]);
-
-  // ── Scroll active chip into view ───────────────────────────────────────────
-  const scrollToChip = (idx: number) => {
-    const container = scrollRef.current;
-    if (!container) return;
-    const chip = container.children[idx] as HTMLElement | undefined;
-    if (chip) chip.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
-  };
 
   // ── User taps a chip ───────────────────────────────────────────────────────
   const handleChipClick = (idx: number) => {
@@ -247,7 +246,7 @@ export default function KutHorizontalScroll({
 
           <div className="flex-1 min-w-0">
             <p className="text-[10px] uppercase tracking-widest text-amber-400/80 truncate">
-              {activeItem.type === 'mini-KUT' ? 'mK' : 'K-KUT'} &nbsp;·&nbsp;{' '}
+              {activeItem.type === 'mini-KUT' ? 'mK' : 'K-KUT'}{' · '}
               {activeItem.title}
             </p>
             <p className="text-[9px] text-white/40 truncate">{activeItem.artist}</p>

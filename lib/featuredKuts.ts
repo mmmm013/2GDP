@@ -40,14 +40,17 @@ export async function getFeaturedKuts(): Promise<KutItem[]> {
     // Secondary: fetch remaining featured / top tracks
     const loveRenewsIds = (loveRenews ?? []).map((t) => t.id);
 
+    // Sanitize IDs (numeric only) before embedding in filter string
+    const safeIds = loveRenewsIds.filter((id) => /^\d+$/.test(String(id)));
+
     let restQuery = supabase
       .from('tracks')
       .select('id, title, artist, url, duration, tags')
       .order('created_at', { ascending: false })
       .limit(20);
 
-    if (loveRenewsIds.length > 0) {
-      restQuery = restQuery.not('id', 'in', `(${loveRenewsIds.join(',')})`);
+    if (safeIds.length > 0) {
+      restQuery = restQuery.not('id', 'in', `(${safeIds.join(',')})`);
     }
 
     const { data: rest } = await restQuery;
