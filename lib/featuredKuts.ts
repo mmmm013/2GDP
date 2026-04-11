@@ -40,8 +40,10 @@ export async function getFeaturedKuts(): Promise<KutItem[]> {
     // Secondary: fetch remaining featured / top tracks
     const loveRenewsIds = (loveRenews ?? []).map((t) => t.id);
 
-    // Sanitize IDs (numeric only) before embedding in filter string
-    const safeIds = loveRenewsIds.filter((id) => /^\d+$/.test(String(id)));
+    // Cast IDs to numbers (tracks.id is a numeric primary key); filter out any NaN values
+    const safeIds = loveRenewsIds
+      .map((id) => Number(id))
+      .filter((id) => !Number.isNaN(id) && id > 0);
 
     let restQuery = supabase
       .from('tracks')

@@ -38,7 +38,7 @@ export default function KutHorizontalScroll({
   const [blocked, setBlocked] = useState(false);
   // Waveform bar animation heights (8 bars)
   const [bars, setBars] = useState<number[]>([3, 5, 8, 4, 6, 3, 7, 4]);
-  const animFrameRef = useRef<number | null>(null);
+  const animTimeoutRef = useRef<number | null>(null);
 
   const activeItem = items[activeIndex] ?? null;
 
@@ -48,18 +48,18 @@ export default function KutHorizontalScroll({
     setBars((prev) =>
       prev.map(() => Math.floor(Math.random() * 14) + 2)
     );
-    animFrameRef.current = window.setTimeout(animateBars, 150);
+    animTimeoutRef.current = window.setTimeout(animateBars, 150);
   }, [isPlaying]);
 
   useEffect(() => {
     if (isPlaying) {
-      animFrameRef.current = window.setTimeout(animateBars, 150);
+      animTimeoutRef.current = window.setTimeout(animateBars, 150);
     } else {
-      if (animFrameRef.current) clearTimeout(animFrameRef.current);
+      if (animTimeoutRef.current) clearTimeout(animTimeoutRef.current);
       setBars([3, 5, 8, 4, 6, 3, 7, 4]);
     }
     return () => {
-      if (animFrameRef.current) clearTimeout(animFrameRef.current);
+      if (animTimeoutRef.current) clearTimeout(animTimeoutRef.current);
     };
   }, [isPlaying, animateBars]);
 
@@ -245,8 +245,12 @@ export default function KutHorizontalScroll({
           </div>
 
           <div className="flex-1 min-w-0">
-            <p className="text-[10px] uppercase tracking-widest text-amber-400/80 truncate">
-              {activeItem.type === 'mini-KUT' ? 'mK' : 'K-KUT'}{' · '}
+            <p
+              className="text-[10px] uppercase tracking-widest text-amber-400/80 truncate"
+              aria-label={`${activeItem.type === 'mini-KUT' ? 'mini-KUT' : 'K-KUT'} - ${activeItem.title}`}
+            >
+              {activeItem.type === 'mini-KUT' ? 'mK' : 'K-KUT'}
+              <span aria-hidden="true">{' · '}</span>
               {activeItem.title}
             </p>
             <p className="text-[9px] text-white/40 truncate">{activeItem.artist}</p>
