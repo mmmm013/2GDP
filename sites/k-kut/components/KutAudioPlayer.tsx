@@ -8,12 +8,21 @@ import { useCallback, useEffect, useRef, useState } from "react";
    invention type, receives a signed URL, and plays it via
    the HTML5 Audio API.
 
-   Invention routing:
+   Priority order for URL resolution:
+     1. demoSrc        — direct URL, no edge call (static demo)
+     2. audioPath      — calls get-audio-url (AUDIO bucket, no DB)
+                         USE THIS when files exist in the AUDIO
+                         bucket but k_kut_assets rows don't yet.
+     3. kutId / pixPckId+tag — calls invention-specific edge fn
+                         (requires k_kut_assets DB rows)
+
+   Invention routing (when using kutId/pixPckId):
      KK  → POST /functions/v1/play-k-kut
      mK  → POST /functions/v1/play-m-kut    (public, no auth)
      KPD → POST /functions/v1/play-k-kupid
 
-   All three share the same anon-key auth header pattern.
+   audioPath routing:
+     Any → POST /functions/v1/get-audio-url  { bucket, path }
    ═══════════════════════════════════════════════════════════ */
 
 type Invention = "KK" | "mK" | "KPD";
@@ -35,6 +44,17 @@ export interface KutAudioPlayerProps {
   invention?: Invention;
   /** KPD only — Interest | Date | Love | Sex | Forever */
   romanceLevel?: string;
+  /**
+   * Direct AUDIO-bucket path — bypasses k_kut_assets DB lookup entirely.
+   * Use this when MP3 files exist in the AUDIO bucket but no DB rows yet.
+   * Convention:
+   *   KK  → "k-kut/<slug>-<section>.mp3"  e.g. "k-kut/love-renews-Ch1.mp3"
+   *   mK  → "mk/<slug>-<phrase>.mp3"       e.g. "mk/love-renews-rise-up.mp3"
+   *   KPD → "kpd/<level>-<slug>.mp3"       e.g. "kpd/interest-find-me.mp3"
+   */
+  audioPath?: string;
+  /** Override bucket name when using audioPath (default: "AUDIO") */
+  audioBucket?: string;
   /** Display label shown next to play button */
   label?: string;
   /** "r,g,b" accent color string */
@@ -61,6 +81,8 @@ export default function KutAudioPlayer({
   tag,
   invention = "mK",
   romanceLevel,
+  audioPath,
+  audioBucket = "AUDIO",
   label,
   color = "0,229,255",
   demoSrc,
@@ -108,7 +130,35 @@ export default function KutAudioPlayer({
     };
   }
 
-  // ── fetch signed URL from edge function ──────────────────
+  // ── fetch signed URL via get-audio-url (direct bucket path) ──
+  async function fetchAudioPathUrl(): Promise<string | null> {
+    const supaUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    if (!supaUrl || !anonKey || !audioPath) return null;
+
+    try {
+      const res = await fetch(`${supaUrl}/functions/v1/get-audio-url`, {
+        method: "POST",
+        headers: {
+          "Content-Type":  "application/json",
+          "apikey":        anonKey,
+          "Authorization": `Bearer ${anonKey}`,
+        },
+        body: JSON.stringify({ bucket: audioBucket, path: audioPath }),
+      });
+
+      if (res.status === 404) { setState("unavailable"); return null; }
+      if (!res.ok) { setState("error"); return null; }
+
+      const json = await res.json();
+      return (json.signed_url as string) ?? null;
+    } catch {
+      setState("error");
+      return null;
+    }
+  }
+
+  // ── fetch signed URL from invention-specific edge function ──────────────────
   async function fetchSignedUrl(): Promise<string | null> {
     const supaUrl  = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const anonKey  = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -161,7 +211,10 @@ export default function KutAudioPlayer({
 
     setState("loading");
 
-    const src = demoSrc ?? (await fetchSignedUrl());
+    // Priority: demoSrc > audioPath (direct bucket) > DB-backed edge fn
+    const src = demoSrc
+      ?? (audioPath ? await fetchAudioPathUrl() : null)
+      ?? (await fetchSignedUrl());
     if (!src) {
       if (state !== "unavailable" && state !== "error") setState("unavailable");
       return;

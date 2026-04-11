@@ -4,6 +4,14 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import KutAudioPlayer from "./KutAudioPlayer";
 
 /* ═══════════════════════════════════════════════════════════
+   Path helper — converts a track title to the AUDIO bucket slug.
+   "LOVE RENEWS" → "love-renews"
+   ═══════════════════════════════════════════════════════════ */
+function toSlug(title: string): string {
+  return title.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
+}
+
+/* ═══════════════════════════════════════════════════════════
    K-KUT BOT — SMS / DM chat simulation
    Shows a scripted conversation where a K-KUT section is sent
    ═══════════════════════════════════════════════════════════ */
@@ -109,6 +117,7 @@ const KUPID_LEVELS: Array<{
   opener: string;
   track: string;
   reply: string;
+  audioPath: string;
 }> = [
   {
     level: "01",
@@ -118,6 +127,7 @@ const KUPID_LEVELS: Array<{
     opener: "I see you.",
     track: "FIND ME — K-kUpId · Interest",
     reply: "wait… how did you know this was my song",
+    audioPath: "kpd/interest-find-me.mp3",
   },
   {
     level: "02",
@@ -127,6 +137,7 @@ const KUPID_LEVELS: Array<{
     opener: "Tonight?",
     track: "ONE NIGHT — K-kUpId · Date",
     reply: "ok yes. absolutely yes.",
+    audioPath: "kpd/date-one-night.mp3",
   },
   {
     level: "03",
@@ -136,6 +147,7 @@ const KUPID_LEVELS: Array<{
     opener: "Always.",
     track: "LOVE RENEWS — K-kUpId · Love",
     reply: "I didn't think anyone could say it better than words.",
+    audioPath: "kpd/love-love-renews.mp3",
   },
   {
     level: "04",
@@ -145,6 +157,7 @@ const KUPID_LEVELS: Array<{
     opener: "You know.",
     track: "BURN — K-kUpId · Sex",
     reply: "🔥🔥🔥",
+    audioPath: "kpd/sex-burn.mp3",
   },
   {
     level: "05",
@@ -154,6 +167,7 @@ const KUPID_LEVELS: Array<{
     opener: "This is the one.",
     track: "FOREVER YOURS — K-kUpId · Forever",
     reply: "Forever it is.",
+    audioPath: "kpd/forever-forever-yours.mp3",
   },
 ];
 
@@ -252,6 +266,7 @@ function KKutBot() {
                   <KutAudioPlayer
                     invention="KK"
                     tag={c.section}
+                    audioPath={`k-kut/${toSlug(c.title)}-${c.section}.mp3`}
                     label={c.title}
                     color={c.color}
                   />
@@ -356,6 +371,7 @@ function MiniKutBot() {
           <KutAudioPlayer
             invention="mK"
             tag="Ch1"
+            audioPath={`mk/${toSlug(batch.track)}-Ch1.mp3`}
             label={batch.track}
             color="251,191,36"
           />
@@ -536,6 +552,7 @@ function KupidBot() {
                     <KutAudioPlayer
                       invention="KPD"
                       tag="Ch1"
+                      audioPath={lv.audioPath}
                       romanceLevel={lv.label.charAt(0) + lv.label.slice(1).toLowerCase()}
                       label={lv.track}
                       color={col}

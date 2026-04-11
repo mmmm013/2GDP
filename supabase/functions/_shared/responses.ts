@@ -2,7 +2,10 @@
 // File: supabase/functions/_shared/responses.ts
 
 const CORS_HEADERS = {
-  "Access-Control-Allow-Origin": Deno.env.get("ALLOWED_ORIGIN") ?? "https://gputnammusic.com",
+  // Default to * so consumer sites (k-kut.com, gputnammusic.com, etc.) can call
+  // edge functions from the browser using the anon key. Override per-environment
+  // via the ALLOWED_ORIGIN secret if tighter control is needed.
+  "Access-Control-Allow-Origin": Deno.env.get("ALLOWED_ORIGIN") ?? "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
   "Access-Control-Allow-Methods": "POST, GET, OPTIONS",
 };
