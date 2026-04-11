@@ -15,16 +15,39 @@ interface KutHorizontalScrollProps {
   loop?: boolean;
 }
 
+/** Per-invention color tokens */
+const INVENTION_COLORS: Record<KutItem['type'], { active: string; passive: string; pill: string; bar: string }> = {
+  'K-KUT': {
+    active: 'border-amber-400/80 bg-amber-400/10 text-amber-300',
+    passive: 'border-white/10 bg-white/5 text-white/60 hover:border-white/30 hover:text-white/80',
+    pill: 'text-amber-400/80',
+    bar: 'bg-amber-400',
+  },
+  'mK': {
+    active: 'border-violet-400/80 bg-violet-400/10 text-violet-300',
+    passive: 'border-violet-400/20 bg-violet-400/5 text-white/60 hover:border-violet-400/50 hover:text-violet-200',
+    pill: 'text-violet-400/80',
+    bar: 'bg-violet-400',
+  },
+  'KPD': {
+    active: 'border-rose-400/80 bg-rose-400/10 text-rose-300',
+    passive: 'border-rose-400/20 bg-rose-400/5 text-white/60 hover:border-rose-400/50 hover:text-rose-200',
+    pill: 'text-rose-400/80',
+    bar: 'bg-rose-400',
+  },
+};
+
+
 /**
  * KutHorizontalScroll
  *
- * Viral audio stream for the Home Page.
- * Every item is a K-KUT — an exact audio excerpt from an original PIX
- * delivered through the 4PE-BIZ-MSC pipeline.
- * – Renders a horizontally-scrollable list of K-KUT chips.
- * – Auto-streams through items (autoStream=true).
- * – Low-profile "Heart-Tap" waveform visualizer.
- * – Respects browser autoplay policies with graceful fallback.
+ * Viral audio stream — works for ALL THREE inventions:
+ *   K-KUT (KK)  → amber   — exact audio excerpt from original PIX (4PE-BIZ-MSC)
+ *   mini-KUT (mK) → violet — short exact audio hook; ASCAP-tied per PIX-PCK (LOOP 8)
+ *   K-kUpId (KPD) → rose  — romance-level exact audio excerpt (Interest→Forever)
+ *
+ * Renders a horizontally-scrollable chip rail, auto-streams, and shows
+ * a per-invention Heart-Tap waveform visualizer.
  */
 export default function KutHorizontalScroll({
   items,
@@ -38,18 +61,16 @@ export default function KutHorizontalScroll({
   const [activeIndex, setActiveIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [blocked, setBlocked] = useState(false);
-  // Waveform bar animation heights (8 bars)
   const [bars, setBars] = useState<number[]>([3, 5, 8, 4, 6, 3, 7, 4]);
   const animTimeoutRef = useRef<number | null>(null);
 
   const activeItem = items[activeIndex] ?? null;
+  const colors = activeItem ? INVENTION_COLORS[activeItem.type] : INVENTION_COLORS['K-KUT'];
 
   // ── Waveform animation ─────────────────────────────────────────────────────
   const animateBars = useCallback(() => {
     if (!isPlaying) return;
-    setBars((prev) =>
-      prev.map(() => Math.floor(Math.random() * 14) + 2)
-    );
+    setBars((prev) => prev.map(() => Math.floor(Math.random() * 14) + 2));
     animTimeoutRef.current = window.setTimeout(animateBars, 150);
   }, [isPlaying]);
 
@@ -65,7 +86,7 @@ export default function KutHorizontalScroll({
     };
   }, [isPlaying, animateBars]);
 
-  // ── Load track into audio element ──────────────────────────────────────────
+  // ── Load track ─────────────────────────────────────────────────────────────
   const loadTrack = useCallback(
     (idx: number, andPlay: boolean) => {
       const item = items[idx];
@@ -81,21 +102,14 @@ export default function KutHorizontalScroll({
       if (andPlay && item.url) {
         audio
           .play()
-          .then(() => {
-            setIsPlaying(true);
-            setBlocked(false);
-          })
-          .catch(() => {
-            // Browser autoplay policy blocked playback — show tap-to-play UI
-            setIsPlaying(false);
-            setBlocked(true);
-          });
+          .then(() => { setIsPlaying(true); setBlocked(false); })
+          .catch(() => { setIsPlaying(false); setBlocked(true); });
       }
     },
-    [items, setIsPlaying, setBlocked]
+    [items]
   );
 
-  // ── Scroll active chip into view ───────────────────────────────────────────
+  // ── Scroll chip into view ──────────────────────────────────────────────────
   const scrollToChip = useCallback((idx: number) => {
     const container = scrollRef.current;
     if (!container) return;
@@ -109,17 +123,13 @@ export default function KutHorizontalScroll({
     loadTrack(0, autoPlay);
   }, [items.length, autoPlay, loadTrack]);
 
-  // ── Auto-advance to next item ──────────────────────────────────────────────
+  // ── Auto-advance ───────────────────────────────────────────────────────────
   const advanceToNext = useCallback(() => {
     if (!autoStream) return;
     setActiveIndex((prev) => {
       const next = prev + 1;
       if (next >= items.length) {
-        if (loop) {
-          scrollToChip(0);
-          loadTrack(0, true);
-          return 0;
-        }
+        if (loop) { scrollToChip(0); loadTrack(0, true); return 0; }
         return prev;
       }
       scrollToChip(next);
@@ -132,14 +142,9 @@ export default function KutHorizontalScroll({
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
-
-    const onEnded = () => {
-      setIsPlaying(false);
-      advanceToNext();
-    };
+    const onEnded = () => { setIsPlaying(false); advanceToNext(); };
     const onPlay = () => setIsPlaying(true);
     const onPause = () => setIsPlaying(false);
-
     audio.addEventListener('ended', onEnded);
     audio.addEventListener('play', onPlay);
     audio.addEventListener('pause', onPause);
@@ -150,24 +155,15 @@ export default function KutHorizontalScroll({
     };
   }, [advanceToNext]);
 
-  // ── User taps a chip ───────────────────────────────────────────────────────
+  // ── Chip click ─────────────────────────────────────────────────────────────
   const handleChipClick = (idx: number) => {
     const audio = audioRef.current;
     if (!audio) return;
-
     if (idx === activeIndex) {
-      // Toggle play / pause on current item
-      if (isPlaying) {
-        audio.pause();
-      } else {
-        if (activeItem?.url) {
-          audio.play().then(() => setIsPlaying(true)).catch(() => setBlocked(true));
-        }
-      }
+      if (isPlaying) { audio.pause(); }
+      else if (activeItem?.url) { audio.play().then(() => setIsPlaying(true)).catch(() => setBlocked(true)); }
       return;
     }
-
-    // Switch to a new item
     setActiveIndex(idx);
     loadTrack(idx, true);
     scrollToChip(idx);
@@ -185,14 +181,11 @@ export default function KutHorizontalScroll({
         className={`flex ${chipGap} overflow-x-auto pb-2 scrollbar-hide snap-x snap-mandatory`}
         style={{ scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}
         role="list"
-        aria-label="Featured K-KUT stream — audio excerpts from original PIX"
+        aria-label={`${activeItem?.type ?? 'Invention'} audio stream`}
       >
         {items.map((item, idx) => {
           const isActive = idx === activeIndex;
-          const isLoveRenews =
-            item.title?.toLowerCase().includes('love renews') ||
-            item.tags?.toLowerCase().includes('love_renews') ||
-            item.tags?.toLowerCase().includes('love renews');
+          const c = INVENTION_COLORS[item.type];
 
           return (
             <button
@@ -203,20 +196,19 @@ export default function KutHorizontalScroll({
                 'flex-shrink-0 snap-start rounded-sm px-3 py-1.5 text-left transition-all duration-200',
                 density === 'high' ? 'text-[10px]' : 'text-xs',
                 'border',
-                isActive
-                  ? 'border-amber-400/80 bg-amber-400/10 text-amber-300'
-                  : isLoveRenews
-                  ? 'border-pink-500/40 bg-pink-500/5 text-pink-300 hover:border-pink-400/70'
-                  : 'border-white/10 bg-white/5 text-white/60 hover:border-white/30 hover:text-white/80',
+                isActive ? c.active : c.passive,
               ].join(' ')}
               aria-current={isActive ? 'true' : undefined}
-              aria-label={`K-KUT: ${item.title} by ${item.artist}`}
+              aria-label={`${item.type}: ${item.title} by ${item.artist}${item.romance_level ? ` — ${item.romance_level}` : ''}`}
             >
               <span className="block font-semibold tracking-wide truncate max-w-[120px]">
                 {item.title}
               </span>
               <span className="block opacity-50 truncate max-w-[120px] mt-0.5">
-                {item.artist}
+                {/* KPD: show romance level; mK: show track ref; KK: show artist */}
+                {item.type === 'KPD' && item.romance_level
+                  ? item.romance_level
+                  : item.artist}
               </span>
             </button>
           );
@@ -239,7 +231,7 @@ export default function KutHorizontalScroll({
               <span
                 key={i}
                 className={`block w-[3px] rounded-full transition-all duration-150 ${
-                  isPlaying ? 'bg-amber-400' : 'bg-white/25'
+                  isPlaying ? colors.bar : 'bg-white/25'
                 }`}
                 style={{ height: `${h}px` }}
               />
@@ -247,18 +239,17 @@ export default function KutHorizontalScroll({
           </div>
 
           <div className="flex-1 min-w-0">
-            <p
-              className="text-[10px] uppercase tracking-widest text-amber-400/80 truncate"
-              aria-label={`K-KUT - ${activeItem.title}`}
-            >
-              {'K-KUT'}
-              <span aria-hidden="true">{' · '}</span>
+            <p className={`text-[10px] uppercase tracking-widest truncate ${colors.pill}`}>
+              {activeItem.type === 'K-KUT' ? 'K\u2011KUT'
+                : activeItem.type === 'mK' ? 'mK'
+                : 'KPD'}
+              {' \u00b7 '}
               {activeItem.title}
+              {activeItem.romance_level ? ` \u00b7 ${activeItem.romance_level}` : ''}
             </p>
             <p className="text-[9px] text-white/40 truncate">{activeItem.artist}</p>
           </div>
 
-          {/* Blocked / tap-to-play notice */}
           {blocked && (
             <span className="text-[9px] uppercase tracking-widest text-white/40 shrink-0">
               tap to play
@@ -267,7 +258,6 @@ export default function KutHorizontalScroll({
         </div>
       )}
 
-      {/* Hidden audio element */}
       <audio ref={audioRef} preload="metadata" />
     </div>
   );

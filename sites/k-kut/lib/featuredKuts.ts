@@ -4,43 +4,43 @@ const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const SUPABASE_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
 /**
- * A K-KUT is an exact audio excerpt from an original PIX (PIX-PCK package)
- * delivered through the 4PE-BIZ-MSC pipeline.
- * ALL items in this stream are K-KUTs — never text-only mini-KUTs.
+ * The three co-equal K-KUT inventions — ALL deliver exact audio snippets:
+ *
+ *  K-KUT (KK)  — exact audio excerpt from a whole song section (original PIX via 4PE-BIZ-MSC)
+ *  mini-KUT (mK) — short exact audio hook/phrase; tied to its ASCAP track + Track ID,
+ *                  aggregates within the SAME PIX-PCK per title (LOOP 8 aggregation rule)
+ *  K-kUpId (KPD) — exact audio excerpt curated for 5 romance levels:
+ *                  Interest → Date → Love → Sex → Forever
  */
 export interface KutItem {
   id: number | string;
   title: string;
   artist: string;
-  /** Direct audio URL for this PIX excerpt */
+  /** Direct audio URL — ALL three invention types carry exact audio snippets */
   url: string;
   duration?: number | string;
   tags?: string;
-  /** Always 'K-KUT' — every item is an audio excerpt from an original PIX */
-  type: 'K-KUT';
+  /** Invention type — K-KUT, mK (mini-KUT), or KPD (K-kUpId) */
+  type: 'K-KUT' | 'mK' | 'KPD';
+  /** K-kUpId (KPD) only: the romance level for this excerpt */
+  romance_level?: 'Interest' | 'Date' | 'Love' | 'Sex' | 'Forever';
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// K-KUT fetcher
+// ─────────────────────────────────────────────────────────────────────────────
 
 /**
  * Fetches the Top 13 K-KUT audio excerpts from the GPM-Warehouse / Supabase pipeline.
- *
- * ALL K-KUTs are exact audio excerpts of original PIX via 4PE-BIZ-MSC.
- *
- * Content priority (ADMIN DIRECTIVE):
- *  1. "Love Renews" PIX excerpts lead
- *  2. Remaining Top 13 PIX excerpts follow
- *
- * Only tracks with an actual audio URL are included (real PIX excerpts only).
- * Falls back to static seed data if the DB is unavailable or empty.
+ * K-KUTs are exact audio excerpts of original PIX via 4PE-BIZ-MSC.
+ * "Love Renews" PIX excerpts lead (ADMIN DIRECTIVE).
  */
 export async function getFeaturedKuts(): Promise<KutItem[]> {
   try {
-    if (!SUPABASE_URL || !SUPABASE_KEY) {
-      return FALLBACK_KUTS;
-    }
+    if (!SUPABASE_URL || !SUPABASE_KEY) return FALLBACK_KUTS;
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // Primary: fetch "Love Renews" PIX excerpts first (ADMIN DIRECTIVE)
     const { data: loveRenews } = await supabase
       .from('tracks')
       .select('id, title, artist, url, duration, tags')
@@ -48,10 +48,7 @@ export async function getFeaturedKuts(): Promise<KutItem[]> {
       .not('url', 'is', null)
       .limit(5);
 
-    // Secondary: remaining PIX excerpts (tracks with audio URL, most recent first)
     const loveRenewsIds = (loveRenews ?? []).map((t) => t.id);
-
-    // Cast IDs to numbers (tracks.id is a numeric primary key); filter out any NaN values
     const safeIds = loveRenewsIds
       .map((id) => Number(id))
       .filter((id) => !Number.isNaN(id) && id > 0);
@@ -69,7 +66,6 @@ export async function getFeaturedKuts(): Promise<KutItem[]> {
 
     const { data: rest } = await restQuery;
 
-    // All items are K-KUT audio excerpts from original PIX via 4PE-BIZ-MSC
     const combined: KutItem[] = [
       ...(loveRenews ?? []).map((t) => ({ ...t, type: 'K-KUT' as const })),
       ...(rest ?? []).map((t) => ({ ...t, type: 'K-KUT' as const })),
@@ -81,11 +77,7 @@ export async function getFeaturedKuts(): Promise<KutItem[]> {
   }
 }
 
-/**
- * Static fallback seed — used when DB is unreachable.
- * ALL items are K-KUT audio excerpts from original PIX via 4PE-BIZ-MSC.
- * "Love Renews" PIX excerpts lead per ADMIN DIRECTIVE.
- */
+/** Static fallback — K-KUT audio excerpts from original PIX. "Love Renews" leads. */
 export const FALLBACK_KUTS: KutItem[] = [
   { id: 'lr-01', title: 'Love Renews', artist: 'KLEIGH', url: '', type: 'K-KUT', tags: 'love_renews' },
   { id: 'lr-02', title: 'Love Renews (Reprise)', artist: 'KLEIGH', url: '', type: 'K-KUT', tags: 'love_renews' },
@@ -101,3 +93,126 @@ export const FALLBACK_KUTS: KutItem[] = [
   { id: 'kk-09', title: 'Dreamy State', artist: 'G Putnam Music', url: '', type: 'K-KUT', tags: 'dreamy' },
   { id: 'kk-10', title: 'Cloud Nine', artist: 'KLEIGH', url: '', type: 'K-KUT', tags: 'uplifting' },
 ];
+
+// ─────────────────────────────────────────────────────────────────────────────
+// mini-KUT (mK) fetcher
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Fetches mini-KUT (mK) audio snippets from the Supabase pipeline.
+ *
+ * Each mK is a short exact audio hook/phrase from a registered ASCAP track.
+ * mKs NEVER aggregate by title or artist — they remain tied to their
+ * ASCAP Track ID and aggregate within the SAME PIX-PCK per title (LOOP 8).
+ * Multiple mKs per title give users dozens of emotional word/phrase options
+ * from ONE track while preserving full royalty traceability.
+ */
+export async function getFeaturedMKuts(): Promise<KutItem[]> {
+  try {
+    if (!SUPABASE_URL || !SUPABASE_KEY) return FALLBACK_MKUTS;
+
+    const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    const { data } = await supabase
+      .from('tracks')
+      .select('id, title, artist, url, duration, tags')
+      .or('type.eq.mK,tags.ilike.%mkut%,tags.ilike.%mini_kut%,tags.ilike.%mini-kut%')
+      .not('url', 'is', null)
+      .order('created_at', { ascending: false })
+      .limit(13);
+
+    const items: KutItem[] = (data ?? []).map((t) => ({ ...t, type: 'mK' as const }));
+    return items.length > 0 ? items : FALLBACK_MKUTS;
+  } catch {
+    return FALLBACK_MKUTS;
+  }
+}
+
+/** Static fallback — mini-KUT audio snippets, ASCAP-tied per PIX-PCK title. */
+export const FALLBACK_MKUTS: KutItem[] = [
+  { id: 'mk-01', title: 'Love Renews', artist: 'KLEIGH', url: '', type: 'mK', tags: 'love_renews mkut' },
+  { id: 'mk-02', title: 'Love Renews', artist: 'KLEIGH', url: '', type: 'mK', tags: 'love_renews mkut' },
+  { id: 'mk-03', title: 'Love Renews', artist: 'KLEIGH', url: '', type: 'mK', tags: 'love_renews mkut' },
+  { id: 'mk-04', title: 'Love Renews', artist: 'KLEIGH', url: '', type: 'mK', tags: 'love_renews mkut' },
+  { id: 'mk-05', title: 'Wounded & Willing', artist: 'G Putnam Music', url: '', type: 'mK', tags: 'healing mkut' },
+  { id: 'mk-06', title: 'Wounded & Willing', artist: 'G Putnam Music', url: '', type: 'mK', tags: 'healing mkut' },
+  { id: 'mk-07', title: 'Wounded & Willing', artist: 'G Putnam Music', url: '', type: 'mK', tags: 'healing mkut' },
+  { id: 'mk-08', title: 'Midnight Jazz', artist: 'G Putnam Music', url: '', type: 'mK', tags: 'jazz mkut' },
+  { id: 'mk-09', title: 'Midnight Jazz', artist: 'G Putnam Music', url: '', type: 'mK', tags: 'jazz mkut' },
+  { id: 'mk-10', title: 'Heart Tap', artist: 'KLEIGH', url: '', type: 'mK', tags: 'emotional mkut' },
+  { id: 'mk-11', title: 'Heart Tap', artist: 'KLEIGH', url: '', type: 'mK', tags: 'emotional mkut' },
+  { id: 'mk-12', title: 'High Energy', artist: 'G Putnam Music', url: '', type: 'mK', tags: 'energy mkut' },
+  { id: 'mk-13', title: 'Cloud Nine', artist: 'KLEIGH', url: '', type: 'mK', tags: 'uplifting mkut' },
+];
+
+// ─────────────────────────────────────────────────────────────────────────────
+// K-kUpId (KPD) fetcher
+// ─────────────────────────────────────────────────────────────────────────────
+
+const ROMANCE_LEVELS = ['Interest', 'Date', 'Love', 'Sex', 'Forever'] as const;
+
+function tagToRomanceLevel(tags?: string): KutItem['romance_level'] {
+  if (!tags) return undefined;
+  const t = tags.toLowerCase();
+  if (t.includes('forever')) return 'Forever';
+  if (t.includes('sex')) return 'Sex';
+  if (t.includes('love')) return 'Love';
+  if (t.includes('date')) return 'Date';
+  if (t.includes('interest')) return 'Interest';
+  return undefined;
+}
+
+/**
+ * Fetches K-kUpId (KPD) audio excerpts from the Supabase pipeline.
+ *
+ * KPD is a standalone invention: same exact-excerpt audio strategy as K-KUT,
+ * curated for 5 romance levels: Interest → Date → Love → Sex → Forever.
+ * Cryptographically signed, shareable/giftable — every share is traceable.
+ */
+export async function getFeaturedKPDs(): Promise<KutItem[]> {
+  try {
+    if (!SUPABASE_URL || !SUPABASE_KEY) return FALLBACK_KPDS;
+
+    const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    const { data } = await supabase
+      .from('tracks')
+      .select('id, title, artist, url, duration, tags')
+      .or('type.eq.KPD,tags.ilike.%kupid%,tags.ilike.%k_kupid%,tags.ilike.%kpd%')
+      .not('url', 'is', null)
+      .order('created_at', { ascending: false })
+      .limit(13);
+
+    const items: KutItem[] = (data ?? []).map((t) => ({
+      ...t,
+      type: 'KPD' as const,
+      romance_level: tagToRomanceLevel(t.tags),
+    }));
+    return items.length > 0 ? items : FALLBACK_KPDS;
+  } catch {
+    return FALLBACK_KPDS;
+  }
+}
+
+/** Static fallback — K-kUpId audio excerpts, one per romance level (+ multiples for Love). */
+export const FALLBACK_KPDS: KutItem[] = [
+  { id: 'kpd-01', title: 'Love Renews', artist: 'KLEIGH', url: '', type: 'KPD', tags: 'interest kupid', romance_level: 'Interest' },
+  { id: 'kpd-02', title: 'Love Renews', artist: 'KLEIGH', url: '', type: 'KPD', tags: 'date kupid', romance_level: 'Date' },
+  { id: 'kpd-03', title: 'Love Renews', artist: 'KLEIGH', url: '', type: 'KPD', tags: 'love kupid', romance_level: 'Love' },
+  { id: 'kpd-04', title: 'Love Renews', artist: 'KLEIGH', url: '', type: 'KPD', tags: 'love kupid', romance_level: 'Love' },
+  { id: 'kpd-05', title: 'Love Renews', artist: 'KLEIGH', url: '', type: 'KPD', tags: 'love kupid', romance_level: 'Love' },
+  { id: 'kpd-06', title: 'Heart Tap', artist: 'KLEIGH', url: '', type: 'KPD', tags: 'sex kupid', romance_level: 'Sex' },
+  { id: 'kpd-07', title: 'Heart Tap', artist: 'KLEIGH', url: '', type: 'KPD', tags: 'sex kupid', romance_level: 'Sex' },
+  { id: 'kpd-08', title: 'Cloud Nine', artist: 'KLEIGH', url: '', type: 'KPD', tags: 'forever kupid', romance_level: 'Forever' },
+  { id: 'kpd-09', title: 'Cloud Nine', artist: 'KLEIGH', url: '', type: 'KPD', tags: 'forever kupid', romance_level: 'Forever' },
+  { id: 'kpd-10', title: 'Wounded & Willing', artist: 'G Putnam Music', url: '', type: 'KPD', tags: 'interest kupid', romance_level: 'Interest' },
+  { id: 'kpd-11', title: 'Wounded & Willing', artist: 'G Putnam Music', url: '', type: 'KPD', tags: 'date kupid', romance_level: 'Date' },
+  { id: 'kpd-12', title: 'Midnight Jazz', artist: 'G Putnam Music', url: '', type: 'KPD', tags: 'love kupid', romance_level: 'Love' },
+  { id: 'kpd-13', title: 'Deep Focus', artist: 'G Putnam Music', url: '', type: 'KPD', tags: 'forever kupid', romance_level: 'Forever' },
+];
+
+/** All romance levels in order — used for KPD level filter UI */
+export { ROMANCE_LEVELS };
+
+
+
