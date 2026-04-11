@@ -1,17 +1,20 @@
 'use client'
 
 import { useSearchParams } from 'next/navigation'
-import { Suspense, useEffect, useState } from 'react'
+import { Suspense, useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import { supabase } from '@/lib/supabaseClient'
+import { resolveAudioUrl } from '@/lib/audio/resolveAudioUrl'
 
 interface Track {
   id: string
   title: string
   artist: string
-  image?: string
+  url?: string | null
+  file_path?: string | null
+  image?: string | null
 }
 
 function GiftBehindPageContent() {
@@ -19,12 +22,14 @@ function GiftBehindPageContent() {
   const trackId = searchParams.get('track') ?? ''
   const [track, setTrack] = useState<Track | null>(null)
   const [loading, setLoading] = useState(!!trackId)
+  const audioRef = useRef<HTMLAudioElement | null>(null)
+  const [playing, setPlaying] = useState(false)
 
   useEffect(() => {
     if (!trackId) return
     supabase
       .from('gpm_tracks')
-      .select('id, title, artist, image')
+      .select('id, title, artist, url, file_path, image')
       .eq('id', trackId)
       .single()
       .then(({ data }) => {
@@ -32,6 +37,15 @@ function GiftBehindPageContent() {
         setLoading(false)
       })
   }, [trackId])
+
+  const audioUrl = track ? resolveAudioUrl(track.url || track.file_path || '') : ''
+
+  const toggle = () => {
+    const audio = audioRef.current
+    if (!audio) return
+    if (playing) { audio.pause(); setPlaying(false) }
+    else { audio.play().then(() => setPlaying(true)).catch(() => {}) }
+  }
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-black via-gray-950 to-black text-white">
@@ -67,9 +81,26 @@ function GiftBehindPageContent() {
               )}
               <h2 className="text-2xl font-bold text-white mb-1">{track.title}</h2>
               <p className="text-purple-400 font-medium mb-4">{track.artist}</p>
-              <p className="text-white/50 text-sm">
-                The behind-the-music story for this K-KUT is loading. Once activated, this space reveals the creative context, studio notes, and personal reflections from the artist.
+              <p className="text-white/50 text-sm mb-4">
+                Hear the track while you explore the story behind it.
               </p>
+              {audioUrl && (
+                <div className="mt-2">
+                  <button
+                    onClick={toggle}
+                    className="w-12 h-12 mx-auto rounded-full flex items-center justify-center text-xl shadow-lg transition-all active:scale-95"
+                    style={{ background: '#7c3aed', color: '#fff' }}
+                    aria-label={playing ? 'Pause' : 'Play track'}
+                  >
+                    {playing ? '⏸' : '▶'}
+                  </button>
+                  <p className="text-white/30 text-[10px] mt-2 uppercase tracking-widest">
+                    {playing ? 'Now Playing' : 'Tap to play'}
+                  </p>
+                  <audio ref={audioRef} src={audioUrl} preload="metadata"
+                    onEnded={() => setPlaying(false)} />
+                </div>
+              )}
             </>
           ) : (
             <>

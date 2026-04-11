@@ -8,9 +8,17 @@ const PROMOS = [
     id: 'kk-create',
     bg: 'bg-amber-500',
     text: 'text-black',
+<<<<<<< HEAD
     label: '⚡ K-KUT QUICKSTART — All KKs are pre-made. Pick your Sweet Spot and launch instantly.',
     cta: 'OPEN PRE-MADE KK →',
     href: '/kkut/create',
+=======
+    // NOTE: K-KUT language is product/inventory language; this bar is sponsor-focused.
+    // Keep it sponsor-centric (KUB) because /join is where sponsors join.
+    label: '⚡ FOUNDER SPECIAL — First 50 KUBs get permanent ELDER status for the price of JOEY. Limited.',
+    cta: 'CLAIM IT →',
+    href: '/join',
+>>>>>>> origin/copilot/fix-audio-playback-issues
   },
   {
     id: 'mk-play',
@@ -37,6 +45,17 @@ const PROMOS = [
     href: '/gift',
   },
   {
+<<<<<<< HEAD
+=======
+    id: 'kleigh',
+    bg: 'bg-purple-900',
+    text: 'text-purple-200',
+    label: "🐨 KLEIGH KUB — Alt rock from Down Under. KUBs are KLEIGH's koala crew. Stream free, join the pride.",
+    cta: 'BECOME A KUB →',
+    href: 'https://2kleigh.com',
+  },
+  {
+>>>>>>> origin/copilot/fix-audio-playback-issues
     id: 'heroes',
     bg: 'bg-[#1a1a1a]',
     text: 'text-amber-300',

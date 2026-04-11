@@ -1,16 +1,20 @@
 'use client';
+
 import { useState, useEffect } from 'react';
-import { Heart, TreePine, Mountain, Crown, Check, Users, ShieldCheck, Compass, Zap, Gift } from 'lucide-react';
+import { 
+  Heart, TreePine, Mountain, Crown, Check, Users, 
+  ShieldCheck, Compass, Zap, Gift, Music, Star, Trophy
+} from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import Link from 'next/link';
 import PromoBar from '@/components/PromoBar';
 
-// FOUNDER SPECIAL: first N slots, updates from localStorage to simulate real scarcity
+// FOUNDER SPECIAL: first N slots
 const FOUNDER_TOTAL = 50;
 
 function useFounderCount() {
-  const [claimed, setClaimed] = useState(23); // seed realistic mid-progress
+  const [claimed, setClaimed] = useState(23);
   useEffect(() => {
     const stored = localStorage.getItem('gpmc_founder_claimed');
     if (stored) setClaimed(Math.min(parseInt(stored, 10), FOUNDER_TOTAL));
@@ -18,12 +22,35 @@ function useFounderCount() {
   return claimed;
 }
 
-// Random "flash" specials — one rotates on page load
 const FLASH_SPECIALS = [
-  { emoji: '🎷', title: 'MSJ Jazz Pack', desc: 'Support Michael Scherer + unlock 3 exclusive jazz stems. One-time $4.99.', href: '/gift', cta: 'GRAB IT' },
-  { emoji: '🎸', title: 'KLEIGH Fan Drop', desc: 'Name your price for a KLEIGH lyric sheet + album art download. Min $1.', href: '/gift', cta: 'FAN DROP' },
-  { emoji: '⭐', title: 'Hero Sponsor', desc: 'Your name on a Hero Story of your choice. $10 one-time. Limited slots.', href: '/heroes', cta: 'SPONSOR' },
-  { emoji: '🎁', title: 'Surprise Pack', desc: 'Random artist merch + track unlock. $2.99. Different every week.', href: '/gift', cta: 'SURPRISE ME' },
+  { 
+    emoji: '🎷', 
+    title: 'MSJ Jazz Pack', 
+    desc: 'Support Michael Scherer + unlock 3 exclusive jazz stems. One-time $4.99.', 
+    href: '/gift', 
+    cta: 'GRAB IT' 
+  },
+  { 
+    emoji: '🎸', 
+    title: 'KLEIGH Fan Drop', 
+    desc: 'Name your price for a KLEIGH lyric sheet + album art download. Min $1.', 
+    href: '/gift', 
+    cta: 'FAN DROP' 
+  },
+  { 
+    emoji: '⭐', 
+    title: 'Hero Sponsor', 
+    desc: 'Your name on a Hero Story of your choice. $10 one-time. Limited slots.', 
+    href: '/heroes', 
+    cta: 'SPONSOR' 
+  },
+  { 
+    emoji: '🎁', 
+    title: 'Surprise Pack', 
+    desc: 'Random artist merch + track unlock. $2.99. Different every week.', 
+    href: '/gift', 
+    cta: 'SURPRISE ME' 
+  },
 ];
 
 export default function JoinPage() {
@@ -56,47 +83,61 @@ export default function JoinPage() {
   };
 
   return (
-    <main className="min-h-screen w-full bg-gradient-to-b from-[#FFD54F] to-[#FF8F00] text-[#3E2723] font-sans selection:bg-[#3E2723] selection:text-[#FFD54F]">
+    <main className="min-h-screen w-full bg-[#1A1A1A] text-white selection:bg-[#FFD54F] selection:text-black">
       <PromoBar />
       <Header />
 
-      {/* FOUNDER SPECIAL BANNER */}
-      <div className="w-full bg-[#3E2723] text-[#FFD54F] py-4 px-4">
-        <div className="max-w-3xl mx-auto text-center">
-          <p className="text-xs font-black uppercase tracking-[0.2em] mb-1 opacity-70">⚡ Limited Time — Founder Special</p>
-          <p className="text-lg font-black leading-tight">
-            First {FOUNDER_TOTAL} K-KUTs get <span className="text-white">ELDER status at the JOEY price</span> — forever.
+      {/* Hero Section */}
+      <section className="relative pt-20 pb-16 px-6">
+        <div className="max-w-4xl mx-auto text-center">
+          <h1 className="text-6xl md:text-8xl font-black tracking-tighter mb-4 leading-none uppercase">
+            Join the <br />
+            <span className="text-[#FFD54F]">Pride.</span>
+          </h1>
+          <p className="text-xl md:text-2xl font-medium opacity-80 max-w-2xl mx-auto">
+            Partner with us to keep the music flowing. We value every Sponsor.
           </p>
-          <div className="mt-2 flex items-center justify-center gap-3">
-            <div className="h-2 bg-[#FFD54F]/20 rounded-full flex-1 max-w-xs overflow-hidden">
-              <div
-                className="h-full bg-[#FFD54F] rounded-full transition-all"
-                style={{ width: `${(founderClaimed / FOUNDER_TOTAL) * 100}%` }}
-              />
-            </div>
-            <span className="text-sm font-black text-white">{remaining} left</span>
-          </div>
         </div>
-      </div>
+      </section>
 
-      {/* FLASH SPECIAL */}
-      <div className="w-full bg-black/10 border-b border-[#3E2723]/10">
-        <div className="max-w-3xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <span className="text-2xl">{flash.emoji}</span>
-            <div>
-              <p className="font-black text-sm leading-tight">{flash.title} <span className="font-normal opacity-70 text-xs">— {flash.desc}</span></p>
+      {/* Founder Alert */}
+      {remaining > 0 && (
+        <section className="bg-[#FFD54F] text-black py-4">
+          <div className="max-w-4xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <Zap className="fill-black" />
+              <span className="font-bold uppercase tracking-widest text-sm">Founder Special</span>
+            </div>
+            <p className="font-bold text-center md:text-left">
+              First {FOUNDER_TOTAL} Sponsors get <span className="underline italic">ELDER status</span> at the <span className="underline italic">JOEY price</span> — forever.
+            </p>
+            <div className="bg-black text-white px-4 py-1 rounded-full font-black text-sm">
+              {remaining} SLOTS LEFT
             </div>
           </div>
-          <Link
+        </section>
+      )}
+
+      {/* Flash Special */}
+      <section className="border-y border-white/10 py-8 bg-white/5">
+        <div className="max-w-4xl mx-auto px-6 flex items-center justify-between gap-6">
+          <div className="flex items-center gap-4">
+            <span className="text-4xl">{flash.emoji}</span>
+            <div>
+              <h3 className="font-black uppercase text-sm tracking-wider text-[#FFD54F]">{flash.title}</h3>
+              <p className="text-sm opacity-60 font-medium">{flash.desc}</p>
+            </div>
+          </div>
+          <Link 
             href={flash.href}
-            className="shrink-0 bg-[#3E2723] text-[#FFD54F] px-4 py-2 rounded-full text-xs font-black uppercase tracking-wider hover:bg-black transition-colors"
+            className="whitespace-nowrap bg-white text-black px-6 py-2 font-black text-xs uppercase tracking-widest hover:bg-[#FFD54F] transition-colors"
           >
             {flash.cta}
           </Link>
         </div>
-      </div>
+      </section>
 
+<<<<<<< HEAD
       <div className="container mx-auto px-4 mt-10 text-center max-w-3xl">
         <div className="inline-block p-6 rounded-full bg-[#3E2723] mb-6 shadow-xl">
           <Users size={48} className="text-[#FFD54F]" strokeWidth={2} />
@@ -147,107 +188,152 @@ export default function JoinPage() {
           </div>
 
           <div className="space-y-4">
+=======
+      {/* Tiers Grid */}
+      <section className="py-20 px-6">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            
+>>>>>>> origin/copilot/fix-audio-playback-issues
             {/* JOEY */}
-            <div className="bg-[#3E2723] text-[#FFD54F] p-6 rounded-2xl border-2 border-[#3E2723] shadow-lg flex items-center justify-between hover:scale-[1.02] transition">
-              <div className="flex items-center gap-4">
-                <div className="bg-[#FFD54F] text-[#3E2723] p-3 rounded-full"><Heart size={24} /></div>
-                <div>
-                  <div className="font-black text-xl">JOEY</div>
-                  <div className="text-xs opacity-70 font-bold uppercase">The Young One</div>
-                  {remaining > 0 && <div className="text-[10px] text-white bg-red-600 px-2 py-0.5 rounded-full mt-1 inline-block font-black">FOUNDER: Gets ELDER perks</div>}
-                </div>
-              </div>
-              <div className="text-right">
-                <div className="font-black text-2xl">$5</div>
-                <button onClick={() => handleJoin('joey')} disabled={loading === 'joey'} className="text-[10px] underline hover:text-white cursor-pointer disabled:opacity-50">{loading === 'joey' ? 'LOADING...' : 'JOIN'}</button>
-              </div>
-            </div>
+            <TierCard 
+              name="JOEY"
+              desc="The Young One"
+              price={5}
+              loading={loading === 'joey'}
+              onJoin={() => handleJoin('joey')}
+              isFounder={remaining > 0}
+            />
 
             {/* CLIMBER */}
-            <div className="bg-white border-2 border-[#3E2723] p-6 rounded-2xl shadow-sm flex items-center justify-between hover:scale-[1.02] transition group">
-              <div className="flex items-center gap-4">
-                <div className="bg-[#E65100] text-white p-3 rounded-full"><TreePine size={24} /></div>
-                <div>
-                  <div className="font-black text-xl text-[#3E2723]">CLIMBER</div>
-                  <div className="text-xs text-[#3E2723] opacity-60 font-bold uppercase">On the Rise</div>
-                </div>
-              </div>
-              <div className="text-right">
-                <div className="font-black text-2xl text-[#3E2723]">$10</div>
-                <button onClick={() => handleJoin('climber')} disabled={loading === 'climber'} className="text-[10px] text-[#3E2723] font-bold underline hover:text-[#E65100] cursor-pointer disabled:opacity-50">{loading === 'climber' ? 'LOADING...' : 'JOIN'}</button>
-              </div>
-            </div>
+            <TierCard 
+              name="CLIMBER"
+              desc="On the Rise"
+              price={10}
+              loading={loading === 'climber'}
+              onJoin={() => handleJoin('climber')}
+              highlight
+            />
 
             {/* ALPHA */}
-            <div className="bg-white border-2 border-[#3E2723] p-6 rounded-2xl shadow-sm flex items-center justify-between hover:scale-[1.02] transition group">
-              <div className="flex items-center gap-4">
-                <div className="bg-[#2E7D32] text-white p-3 rounded-full"><Mountain size={24} /></div>
-                <div>
-                  <div className="font-black text-xl text-[#3E2723]">ALPHA</div>
-                  <div className="text-xs text-[#3E2723] opacity-60 font-bold uppercase">The Leader</div>
-                </div>
-              </div>
-              <div className="text-right">
-                <div className="font-black text-2xl text-[#3E2723]">$15</div>
-                <button onClick={() => handleJoin('alpha')} disabled={loading === 'alpha'} className="text-[10px] text-[#3E2723] font-bold underline hover:text-[#2E7D32] cursor-pointer disabled:opacity-50">{loading === 'alpha' ? 'LOADING...' : 'JOIN'}</button>
-              </div>
-            </div>
+            <TierCard 
+              name="ALPHA"
+              desc="The Leader"
+              price={15}
+              loading={loading === 'alpha'}
+              onJoin={() => handleJoin('alpha')}
+            />
 
             {/* ELDER */}
-            <div className="bg-gradient-to-r from-[#FFD54F] to-[#FFB300] border-2 border-[#3E2723] p-6 rounded-2xl shadow-lg flex items-center justify-between hover:scale-[1.02] transition">
-              <div className="flex items-center gap-4">
-                <div className="bg-[#3E2723] text-[#FFD54F] p-3 rounded-full"><Crown size={24} /></div>
-                <div>
-                  <div className="font-black text-xl text-[#3E2723]">ELDER</div>
-                  <div className="text-xs text-[#3E2723] font-bold uppercase">The Patriarch</div>
-                  <div className="text-[10px] text-[#3E2723] opacity-60 font-bold">Max access. Max love.</div>
-                </div>
-              </div>
-              <div className="text-right">
-                <div className="font-black text-2xl text-[#3E2723]">$20</div>
-                <button onClick={() => handleJoin('elder')} disabled={loading === 'elder'} className="text-[10px] text-[#3E2723] font-bold underline hover:text-white cursor-pointer disabled:opacity-50">{loading === 'elder' ? 'LOADING...' : 'JOIN'}</button>
-              </div>
+            <TierCard 
+              name="ELDER"
+              desc="The Patriarch"
+              price={20}
+              loading={loading === 'elder'}
+              onJoin={() => handleJoin('elder')}
+              perks={["Max access", "Max love"]}
+            />
+
+          </div>
+        </div>
+      </section>
+
+      {/* Values Section */}
+      <section className="py-20 bg-white text-black">
+        <div className="max-w-4xl mx-auto px-6 text-center">
+          <h2 className="text-4xl font-black uppercase mb-12">The Engine</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 text-left">
+            <div>
+              <p className="text-xl font-bold mb-4 italic">"Money cares for itself when the process is right."</p>
+              <p className="opacity-70 font-medium leading-relaxed">
+                Your contribution keeps the Singalongs free for pediatric wards and the KLEIGH stream running for fans worldwide. 100% of proceeds fuel artist support.
+              </p>
             </div>
+            <div className="space-y-4">
+              <BenefitItem text="Access to URU Story Engine" />
+              <BenefitItem text="Unlimited Plays (No Limits)" />
+              <BenefitItem text="Verified 'Sponsor' Rank" />
+              <BenefitItem text="Monthly Flash Specials" />
+            </div>
+          </div>
+        </div>
+      </section>
 
-            {/* URGENCY NOTE */}
-            <p className="text-[11px] font-bold text-[#3E2723]/60 text-center pt-2">
-              Every subscription directly funds artist development &amp; keeps the stream alive. Thank you.
+      {/* MSJ Spotlight */}
+      <section className="py-20 px-6 bg-blue-600">
+        <div className="max-w-4xl mx-auto flex flex-col md:flex-row items-center gap-12">
+          <div className="text-6xl">🎹</div>
+          <div>
+            <h2 className="text-xs font-black uppercase tracking-[0.3em] mb-2 opacity-80">Michael Scherer Jazz</h2>
+            <h3 className="text-4xl font-black mb-6 uppercase leading-tight">KEZ — Keys for a Keyboard</h3>
+            <p className="text-lg font-medium mb-8 opacity-90 leading-relaxed">
+              Michael is fighting through serious personal challenges. Your support goes directly to keeping his craft alive. Press a key. Keep him playing.
             </p>
+            <div className="flex flex-wrap gap-4">
+              <button className="bg-white text-blue-600 px-8 py-3 font-black text-sm uppercase tracking-widest hover:bg-[#FFD54F] transition-colors">
+                Become a KEZ
+              </button>
+              <button className="border-2 border-white px-8 py-3 font-black text-sm uppercase tracking-widest hover:bg-white hover:text-blue-600 transition-colors">
+                Stream MSJ Now
+              </button>
+            </div>
           </div>
         </div>
-      </div>
-
-      {/* MSJ SPOTLIGHT */}
-      <div className="w-full bg-[#3E2723] text-white py-10 px-4">
-        <div className="max-w-3xl mx-auto text-center">
-          <p className="text-xs font-black uppercase tracking-[0.25em] text-amber-400 mb-2">KEZ — Keys for a Keyboard</p>
-          <h2 className="text-3xl font-black mb-2">Michael Scherer Jazz 🎹</h2>
-          <p className="text-base opacity-80 leading-relaxed mb-2 max-w-xl mx-auto">
-            40+ TV placements. A career built on craft and discipline. Michael is fighting through serious
-            personal challenges right now. Your support — even $2 — goes directly to keeping his music alive.
-          </p>
-          <p className="text-sm text-amber-300/80 font-bold mb-6 max-w-md mx-auto">
-            KEZs are Michael&apos;s keyboard-keys crew. Press a key. Keep him playing.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              href="/gift"
-              className="bg-amber-500 text-black px-8 py-3 rounded-full font-black uppercase tracking-wider hover:bg-amber-400 transition-colors shadow-lg"
-            >
-              🎹 Become a KEZ
-            </Link>
-            <Link
-              href="/scherer"
-              className="bg-white/10 border border-white/30 text-white px-8 py-3 rounded-full font-black uppercase tracking-wider hover:bg-white/20 transition-colors"
-            >
-              Stream MSJ Now →
-            </Link>
-          </div>
-        </div>
-      </div>
+      </section>
 
       <Footer />
     </main>
   );
 }
 
+function TierCard({ 
+  name, desc, price, loading, onJoin, highlight = false, isFounder = false, perks = [] 
+}: any) {
+  return (
+    <div className={`
+      relative p-8 border-2 flex flex-col
+      ${highlight ? 'bg-[#FFD54F] border-[#FFD54F] text-black scale-105 z-10' : 'border-white/10 bg-white/5'}
+    `}>
+      <h3 className="text-xs font-black uppercase tracking-[0.2em] opacity-60 mb-1">{name}</h3>
+      <p className="font-bold text-lg mb-8 uppercase">{desc}</p>
+      
+      <div className="mt-auto">
+        <div className="flex items-baseline gap-1 mb-6">
+          <span className="text-4xl font-black">${price}</span>
+          <span className="text-xs font-bold opacity-60 uppercase">/ mo</span>
+        </div>
+
+        {isFounder && (
+          <div className="mb-6 bg-black text-white text-[10px] font-black py-1 px-3 inline-block uppercase tracking-widest">
+            FOUNDER: GETS ELDER PERKS
+          </div>
+        )}
+
+        <button 
+          onClick={onJoin}
+          disabled={loading}
+          className={`
+            w-full py-4 font-black text-sm uppercase tracking-[0.2em] transition-all
+            ${highlight 
+              ? 'bg-black text-white hover:bg-white/10' 
+              : 'bg-white text-black hover:bg-[#FFD54F]'}
+            disabled:opacity-50
+          `}
+        >
+          {loading ? 'WAITING...' : 'JOIN'}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function BenefitItem({ text }: { text: string }) {
+  return (
+    <div className="flex items-center gap-3">
+      <div className="h-5 w-5 rounded-full bg-[#FFD54F] flex items-center justify-center">
+        <Check className="h-3 w-3 text-black stroke-[4]" />
+      </div>
+      <span className="font-bold uppercase text-xs tracking-wider">{text}</span>
+    </div>
+  );
+}

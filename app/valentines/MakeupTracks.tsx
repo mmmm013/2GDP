@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect, useCallback , type ChangeEvent } from 'react';
 import { Play, Pause } from 'lucide-react';
 
 interface MakeupTrack {
@@ -131,7 +131,7 @@ function TrackCard({ track, index }: { track: MakeupTrack; index: number }) {
     setIsPlaying((p) => !p);
   }, [isPlaying, index]);
 
-  const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSeek = (e: ChangeEvent<HTMLInputElement>) => {
     const audio = audioRef.current;
     if (!audio) return;
     const t = parseFloat(e.target.value);

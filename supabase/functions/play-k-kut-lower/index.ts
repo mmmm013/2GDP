@@ -14,7 +14,9 @@ import { bad, ok, preflight } from "../_shared/responses.ts";
 
 const VARIANT = 'K-kut';  // lowercase 'k' - the K-kut variant
 const SIGNED_URL_EXPIRY = 300;
-const ALLOWED_TAGS = ['Verse', 'BR', 'Ch'] as const;
+// Canonical song-section taxonomy (matches lib/kkut-sections.ts SECTION_ORDER
+// and the k_kut_assets_structure_tag_check DB constraint).
+const ALLOWED_TAGS = ['Intro','V1','Pre1','Ch1','V2','Pre2','Ch2','BR','Ch3','Outro'] as const;
 
 Deno.serve(async (req: Request) => {
   if (req.method === 'OPTIONS') return preflight();

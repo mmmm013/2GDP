@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState , type FormEvent } from 'react';
 import { createClient } from '@supabase/supabase-js';
 
 // SNIPPET PROMOTIONAL PRICING
@@ -42,7 +42,7 @@ export default function SnippetPromo() {
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   );
 
-  const handleFreeSnippet = async (e: React.FormEvent) => {
+  const handleFreeSnippet = async (e: FormEvent) => {
     e.preventDefault();
     
     if (!userEmail) {

@@ -6,7 +6,18 @@ import { Share2, Copy, Check, Music, Radio, Heart, Sparkles, Zap } from 'lucide-
 import Header from '@/components/Header';
 import { supabase } from '@/lib/supabaseClient';
 import GpmBot from '@/components/GpmBot';
+<<<<<<< HEAD
 import KFamilyVisualStrip from '@/components/KFamilyVisualStrip';
+=======
+import {
+  SECTION_ORDER,
+  SECTION_LABELS,
+  SECTION_BADGES,
+  SectionTag,
+  validateSections,
+  sectionRange,
+} from '@/lib/kkut-sections';
+>>>>>>> origin/copilot/fix-audio-playback-issues
 
 interface CatalogItem {
   id: string;
@@ -26,8 +37,6 @@ const generateShortCode = (): string => {
 };
 
 // Generate canonical mKUT ID: mkut-{type}-{pixPckId}-{structTag}-{base36ts}
-// Embeds pix_pck_id + structure_tag so the player can call the edge function
-// without a secondary lookup.
 const generateMkutId = (type: string, pixPckId: string, structTag: string): string => {
   const ts = Date.now().toString(36);
   return `mkut-${type.toLowerCase()}-${pixPckId}-${structTag.toLowerCase()}-${ts}`;
@@ -41,7 +50,15 @@ export default function KKKCreatorPage() {
   const [copied, setCopied] = useState(false);
   const [kutMode, setKutMode] = useState<'kkut' | 'mkut'>('kkut');
   const [mkutId, setMkutId] = useState<string>('');
-  const [structTag, setStructTag] = useState<'Verse' | 'BR' | 'Ch'>('Verse');
+
+  // Section selection state for K-KUT mode (STI type)
+  const [sectionFrom, setSectionFrom] = useState<SectionTag>('V1');
+  const [sectionTo,   setSectionTo]   = useState<SectionTag>('Ch1');
+  const [sectionError, setSectionError] = useState<string>('');
+
+  // mKUT section (single section only)
+  const [mkutTag, setMkutTag] = useState<'V1' | 'BR' | 'Ch1'>('V1');
+
   const [tracks, setTracks] = useState<CatalogItem[]>([]);
   const [playlists, setPlaylists] = useState<CatalogItem[]>([]);
   const [itemsLoading, setItemsLoading] = useState(true);
@@ -57,24 +74,38 @@ export default function KKKCreatorPage() {
     });
   }, []);
 
-  // Build the relative destination path for a given type + itemId.
-  const buildDestination = (type: string, itemId: string): string => {
+  // Derive the selected section range for K-KUT STI
+  const selectedSections: SectionTag[] = sectionRange(sectionFrom, sectionTo);
+
+  // Build the relative destination path for a given type + itemId + optional sections
+  const buildDestination = (type: string, itemId: string, sections?: SectionTag[]): string => {
     switch (type) {
-      case 'STI': return `/gift/songs?track=${encodeURIComponent(itemId)}`;
+      case 'STI': {
+        let url = `/gift/songs?track=${encodeURIComponent(itemId)}`;
+        if (sections && sections.length > 0) {
+          url += `&sections=${encodeURIComponent(sections.join(','))}`;
+        }
+        return url;
+      }
       case 'BTI': return `/gift/behind?track=${encodeURIComponent(itemId)}`;
       case 'FP':  return `/gift/playlists?playlist=${encodeURIComponent(itemId)}`;
       default:    return '/kupid';
     }
   };
 
-  const generateKUT = async (id: string, type: string) => {
+  const generateKUT = (id: string, type: string) => {
     setSelectedItem(id);
+    setSectionError('');
+
     if (kutMode === 'mkut') {
       // Canonical mKUT format: mkut-{type}-{pixPckId}-{structTag}-{base36ts}
-      const mId = generateMkutId(type, id, structTag);
+      // For mKUT, use a single section tag (mapped to legacy Verse/BR/Ch for edge fn)
+      const legacyTag = mkutTag === 'Ch1' ? 'Ch' : mkutTag === 'BR' ? 'BR' : 'Verse';
+      const mId = generateMkutId(type, id, legacyTag);
       setMkutId(mId);
       setGeneratedKUT(`${window.location.origin}/mkut/${mId}`);
       setShortCode('');
+<<<<<<< HEAD
     } else {
       // K-KUT: short 6-char code stored in Supabase for gateway resolution
       const code = generateShortCode();
@@ -88,7 +119,37 @@ export default function KKKCreatorPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ code, destination, item_type: type, item_id: id }),
       }).catch(() => { /* creator still works if offline */ });
+=======
+      return;
+>>>>>>> origin/copilot/fix-audio-playback-issues
     }
+
+    // K-KUT mode — validate and encode sections for STI type
+    let sections: SectionTag[] | undefined;
+    if (type === 'STI') {
+      const err = validateSections(selectedSections);
+      if (err) { setSectionError(err); return; }
+      sections = selectedSections;
+    }
+
+    const code = generateShortCode();
+    const destination = buildDestination(type, id, sections);
+    setShortCode(code);
+    setMkutId('');
+    setGeneratedKUT(`kkupid.com/k/${code}`);
+
+    // Fire-and-forget: persist code → destination mapping with sections
+    fetch('/api/k/create', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        code,
+        destination,
+        item_type: type,
+        item_id: id,
+        ...(sections ? { sections } : {}),
+      }),
+    }).catch(() => { /* creator still works offline */ });
   };
 
   const copyToClipboard = async () => {
@@ -116,7 +177,7 @@ export default function KKKCreatorPage() {
         <GpmBot
           bot="GD-BOT"
           steps={[
-            { title: 'Select your track type', hint: 'Choose STI (studio), BTI (behind the scenes), or FP (full playlist).', action: 'Pick Type' },
+            { title: 'Select your track type', hint: 'Choose STI (Standard Template Item), BTI (Branded Template Item), or FP (Featured Playlist).', action: 'Pick Type' },
             { title: 'Find your track', hint: 'Search or browse the catalog. Select the exact track you want to link.' },
             { title: 'Set your Sweet Spot', hint: 'Toggle K-KUT (full sweet-spot link) or mini-KUT (short clip). Enter your timestamp.' },
             { title: 'Generate your code', hint: 'Hit Generate — your 6-character K-KUT code is created instantly.', action: 'Generate' },
@@ -186,25 +247,95 @@ export default function KKKCreatorPage() {
           </div>
         </div>
 
-        {/* Structure tag selector — mKUT mode only */}
+        {/* ── K-KUT mode: Song Section Picker (STI only) ── */}
+        {kutMode === 'kkut' && selectedType === 'STI' && (
+          <div className="mb-8 max-w-2xl mx-auto bg-[#2a1f0f] border border-[#C8A882]/20 rounded-2xl p-5">
+            <p className="text-[10px] font-bold tracking-[0.3em] uppercase text-[#C8A882]/70 mb-3">
+              Song Sections — K-KUT Excerpt
+            </p>
+            <p className="text-xs text-[#F5E6D3]/50 mb-4">
+              Select <strong className="text-[#C8A882]">contiguous sections</strong> in original song order (ASCAP rule — no rearranging).
+              Pick start and end; all sections in between are included.
+            </p>
+
+            {/* Section range: FROM */}
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-6 mb-4">
+              <div className="flex-1">
+                <p className="text-[10px] font-bold tracking-widest uppercase text-[#4a8060] mb-2">From</p>
+                <div className="flex flex-wrap gap-1.5">
+                  {SECTION_ORDER.map(tag => (
+                    <button
+                      key={tag}
+                      onClick={() => { setSectionFrom(tag); setGeneratedKUT(''); setSectionError(''); }}
+                      className={`px-2.5 py-1 rounded text-[11px] font-bold transition-all ${
+                        sectionFrom === tag
+                          ? 'bg-gradient-to-r from-[#8B4513] to-[#CD853F] text-[#3E2723] shadow-sm'
+                          : 'bg-[#3E2723] border border-[#C8A882]/20 text-[#F5E6D3]/60 hover:text-[#F5E6D3]'
+                      }`}
+                    >
+                      {SECTION_BADGES[tag]}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="text-[#C8A882]/40 font-bold hidden sm:block">→</div>
+
+              <div className="flex-1">
+                <p className="text-[10px] font-bold tracking-widest uppercase text-[#4a8060] mb-2">To</p>
+                <div className="flex flex-wrap gap-1.5">
+                  {SECTION_ORDER.map(tag => (
+                    <button
+                      key={tag}
+                      onClick={() => { setSectionTo(tag); setGeneratedKUT(''); setSectionError(''); }}
+                      className={`px-2.5 py-1 rounded text-[11px] font-bold transition-all ${
+                        sectionTo === tag
+                          ? 'bg-gradient-to-r from-[#8B4513] to-[#CD853F] text-[#3E2723] shadow-sm'
+                          : 'bg-[#3E2723] border border-[#C8A882]/20 text-[#F5E6D3]/60 hover:text-[#F5E6D3]'
+                      }`}
+                    >
+                      {SECTION_BADGES[tag]}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Preview of selected range */}
+            <div className="flex flex-wrap gap-1.5 items-center mt-1">
+              <span className="text-[10px] text-[#F5E6D3]/40 uppercase tracking-widest mr-1">Excerpt:</span>
+              {selectedSections.map(tag => (
+                <span key={tag} className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#8B4513]/30 text-[#C8A882] border border-[#8B4513]/30">
+                  {SECTION_LABELS[tag]}
+                </span>
+              ))}
+            </div>
+
+            {sectionError && (
+              <p className="mt-3 text-xs text-red-400/80">{sectionError}</p>
+            )}
+          </div>
+        )}
+
+        {/* mKUT section tag — single section only */}
         {kutMode === 'mkut' && (
           <div className="flex justify-center mb-6">
             <div className="bg-[#2a1f0f] border border-[#4a8060]/30 rounded-xl p-4 text-center">
               <p className="text-[10px] font-bold tracking-[0.25em] uppercase text-[#4a8060] mb-3">
-                Structure Tag — which excerpt?
+                Structure Tag — which section?
               </p>
               <div className="flex gap-2 justify-center">
-                {(['Verse', 'BR', 'Ch'] as const).map(tag => (
+                {(['V1', 'BR', 'Ch1'] as const).map(tag => (
                   <button
                     key={tag}
-                    onClick={() => setStructTag(tag)}
+                    onClick={() => setMkutTag(tag)}
                     className={`px-4 py-2 rounded-lg text-sm font-bold transition-all duration-200 ${
-                      structTag === tag
+                      mkutTag === tag
                         ? 'bg-gradient-to-r from-[#2a6e48] to-[#3a9e65] text-white shadow-md'
                         : 'bg-[#3E2723] border border-[#4a8060]/30 text-[#F5E6D3]/60 hover:text-[#F5E6D3]'
                     }`}
                   >
-                    {tag === 'Verse' ? 'Verse' : tag === 'BR' ? 'Bridge' : 'Chorus'}
+                    {tag === 'V1' ? 'Verse' : tag === 'BR' ? 'Bridge' : 'Chorus'}
                   </button>
                 ))}
               </div>

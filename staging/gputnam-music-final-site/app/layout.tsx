@@ -1,5 +1,6 @@
 import './globals.css';
 import type { Metadata, Viewport } from 'next';
+import { BraveEagleBanner } from './brave-banner';
 
 export const metadata: Metadata = {
   title: 'G Putnam Music',
@@ -29,6 +30,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body className="bg-[#1a1207] text-[#F5e6c8] antialiased min-h-screen">
+        <BraveEagleBanner />
         <main className="relative w-full overflow-x-hidden">
           {children}
         </main>

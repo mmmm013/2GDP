@@ -1,0 +1,42 @@
+# GPMC-BIZ-MSC — Next.js CI
+# Runs lint → type-check → build on every PR and push to main.
+# Part of the DMAIC Control Phase automation stack.
+
+name: Next.js CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    name: Lint, type-check, build
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint --if-present
+
+      - name: Type-check
+        run: npx tsc --noEmit
+
+      - name: Build
+        run: npm run build
+        env:
+          # Provide stub values so the build doesn't error on missing env vars.
+          # Real secrets are NOT needed for a compile-only build check.
+          NEXT_PUBLIC_SUPABASE_URL: https://placeholder.supabase.co
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: placeholder-anon-key
+          SUPABASE_SERVICE_ROLE_KEY: placeholder-service-key
+          ADMIN_SECRET: placeholder-admin-secret

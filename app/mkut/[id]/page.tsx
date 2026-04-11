@@ -15,34 +15,49 @@ type MKutRecord = {
   id: string
   title: string
   artist: string
-  structure_tag: 'Verse' | 'BR' | 'Ch'
+  structure_tag: string
   duration_ms: number | null
   theme: 'nature' | 'cosmos' | 'minimal'
   gift_note: string | null
   gifted_by: string | null
 }
 
-// Derive a display label from the canonical structure tag
-const structureLabel = (tag: string) => {
-  switch (tag) {
-    case 'Verse': return 'Verse'
-    case 'BR':    return 'Bridge'
-    case 'Ch':    return 'Chorus'
-    default:      return tag
-  }
+// Canonical song-section taxonomy — mirrors lib/kkut-sections.ts SECTION_ORDER
+const SECTION_LABELS: Record<string, string> = {
+  Intro: 'Intro',
+  V1:    'Verse 1',
+  Pre1:  'Pre-Chorus 1',
+  Ch1:   'Chorus 1',
+  V2:    'Verse 2',
+  Pre2:  'Pre-Chorus 2',
+  Ch2:   'Chorus 2',
+  BR:    'Bridge',
+  Ch3:   'Final Chorus',
+  Outro: 'Outro',
 }
+
+// Derive a display label from the canonical structure tag
+const structureLabel = (tag: string) => SECTION_LABELS[tag] ?? tag
 
 // Parse canonical mKUT ID: mkut-{type}-{pixPckId}-{structTag}-{base36ts}
 // Returns { pix_pck_id, tag } for the edge function's (pix_pck_id + tag) path.
 // Falls back to sending raw k_kut_id if the format is unrecognised (UUID path).
 type ParsedMkutId =
-  | { mode: 'pix'; pix_pck_id: string; tag: 'Verse' | 'BR' | 'Ch' }
+  | { mode: 'pix'; pix_pck_id: string; tag: string }
   | { mode: 'raw'; k_kut_id: string }
 
-const STRUCT_MAP: Record<string, 'Verse' | 'BR' | 'Ch'> = {
-  verse: 'Verse',
+// Canonical section tags — keys are lowercase URL slugs, values are DB-canonical.
+const STRUCT_MAP: Record<string, string> = {
+  intro: 'Intro',
+  v1:    'V1',
+  pre1:  'Pre1',
+  ch1:   'Ch1',
+  v2:    'V2',
+  pre2:  'Pre2',
+  ch2:   'Ch2',
   br:    'BR',
-  ch:    'Ch',
+  ch3:   'Ch3',
+  outro: 'Outro',
 }
 
 function parseMkutId(id: string): ParsedMkutId {
@@ -115,7 +130,7 @@ export default function MKutPlayer() {
           id,
           title:         data.title         ?? meta.title        ?? 'Untitled',
           artist:        data.artist        ?? meta.artist       ?? 'G Putnam Music',
-          structure_tag: data.structure_tag ?? meta.structure_tag ?? 'Verse',
+          structure_tag: data.structure_tag ?? meta.structure_tag ?? 'V1',
           duration_ms:   data.duration_ms   ?? meta.duration_ms  ?? null,
           theme:         data.theme         ?? 'nature',
           gift_note:     data.gift_note     ?? null,

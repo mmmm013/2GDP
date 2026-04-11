@@ -18,7 +18,7 @@ export async function GET(
 
   const { data, error } = await supabaseAdmin
     .from('k_kut_codes')
-    .select('destination, item_type, item_id')
+    .select('destination, item_type, item_id, pix_pck_id, sections')
     .eq('code', code)
     .single()
 
@@ -30,6 +30,8 @@ export async function GET(
           destination: fallback.destination,
           item_type: fallback.item_type,
           item_id: fallback.item_id,
+          pix_pck_id: null,
+          sections: null,
           source: 'fallback-store',
         })
       }
@@ -38,8 +40,10 @@ export async function GET(
   }
 
   return NextResponse.json({
-    destination: data.destination,
-    item_type:   data.item_type,
-    item_id:     data.item_id,
+    destination:  data.destination,
+    item_type:    data.item_type,
+    item_id:      data.item_id,
+    pix_pck_id:   data.pix_pck_id  ?? null,
+    sections:     data.sections    ?? null,
   })
 }

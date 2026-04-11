@@ -19,6 +19,7 @@ import HomeFP from '@/components/HomeFP';
 import T20Grid from '@/components/T20Grid';
 import PromoBar from '@/components/PromoBar';
 import GpmBot from '@/components/GpmBot';
+import GlobalPlayer from '@/components/GlobalPlayer';
 
 // ---------------------------------------------------------------------------
 // Hero image rotation — shuffle-based, one image on screen at a time
@@ -152,7 +153,14 @@ export default function HomePage() {
       {/* Row 3 — Top 20 streaming activities */}
       <T20Grid />
 
+<<<<<<< HEAD
       {/* Row 4 — Footer */}
+=======
+      {/* GlobalPlayer: receives play-track events from T20Grid + FPPixBar */}
+      <GlobalPlayer />
+
+      {/* ROW 4: STO GPM Footer */}
+>>>>>>> origin/copilot/fix-audio-playback-issues
       <Footer />
     </>
   );

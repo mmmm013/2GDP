@@ -11,7 +11,17 @@ export default function AdminPage() {
         </div>
         
         <AdminUpload />
-        
+
+        <div className="mt-8 border-t border-white/10 pt-6">
+          <h2 className="text-xs font-bold text-[#FFD54F] tracking-widest mb-3">DMAIC CONTROL</h2>
+          <Link
+            href="/admin/audio-health"
+            className="inline-block text-xs text-white/70 hover:text-[#FFD54F] border border-white/10 hover:border-[#FFD54F]/40 rounded px-4 py-2 transition-colors"
+          >
+            📊 Audio Health Dashboard →
+          </Link>
+        </div>
+
         <div className="mt-8 text-center text-white/20 text-xs font-mono">
           System Authority: G. Putnam & M. Clay<br/>
           Six Sigma Control Active

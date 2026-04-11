@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState , type ChangeEvent, type FormEvent } from 'react';
 import { createClient } from '@supabase/supabase-js';
 
 export default function FanCamUpload() {
@@ -22,7 +22,7 @@ export default function FanCamUpload() {
     return `uru-${timestamp}-${randomStr}`.toUpperCase();
   };
 
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       setSelectedFile(file);
@@ -35,7 +35,7 @@ export default function FanCamUpload() {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     
     if (!selectedFile) {

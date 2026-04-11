@@ -43,7 +43,7 @@ export async function GET(request: Request) {
     if (inPlaylist) {
       // Track is featured - allow free play
       const { data: signedUrl } = await supabase.storage
-        .from('audio')
+        .from('tracks')
         .createSignedUrl(`${track_id}.mp3`, 3600)
 
       return NextResponse.json({

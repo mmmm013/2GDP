@@ -8,26 +8,31 @@
 
 ## Overview
 
-This document describes the G Putnam Music platform architecture and repository organization under GPEx (Groom Process Excellarators).
+This document describes the G Putnam Music platform architecture and repository organization.
 
 ---
 
 ## Business Structure
 
-### Parent Company
-- **GPEx** (Groom Process Excellarators)
-  - Parent company overseeing all operations
-  - Name currently unstable, subject to change
-
 ### Business Units
 
 #### 1. Music Operations
-- **GPMC** — G Putnam Music Catalog
-- **GPMCC** — G Putnam Music Commercial Catalog
+- **GPMC** — G Putnam Music Catalog (this repo)
 - **GPME** — G Putnam Music Engine (shared music library)
 
-#### 2. Konsulting Operations
-- **The Vektor [Konsulting]** — Separate from all music operations. Lives in its own repository. Has ZERO connection to GPMC or music.
+#### 2. The Vektor — Parent Company (GPEx)
+- **The Vektor** = **GPEx** = **Parent Company**. Domain: **2gdp.com**. Display name: **The Vektor**.
+- **Sole association:** GPEx is the parent entity. It is The Vektor. Nothing else.
+- **Role:** Drafts and owns the **GENERIC versions of 4PE** — universally-pertinent templates adaptable to any industry of focus.
+- **4PE absolute components (immutable):**
+  - **STI** — Standard Template Item (slot/container)
+  - **STI-Slot** — the container space that houses BTI(s)
+  - **BTI** — Branded Template Item (fills STI-Slots)
+- **4PE is a process** — a ubiquitous, universally-applicable process created and owned by GPEx (The Vektor). Its generic model uses **KKr per industry**. Adaptable to all industries of focus.
+- **2GDP** (repo: `mmmm013/2GDP`, domain: `2gdp.com`) houses the 4PE platform engine, KKr, Business Konsulting, Admin Platform. **Zero music content ever.**
+
+#### 3. GPEx Business "Excel-A-rator" (NON-MUSIC — completely separate)
+- **GPEx** — standalone business acceleration platform for Central IL industries. **Has NOTHING to do with music or GPM.**
 
 ---
 

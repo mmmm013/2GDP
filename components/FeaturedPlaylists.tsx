@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect, useCallback , type ChangeEvent } from 'react';
 import { Play, Pause, SkipBack, SkipForward, Volume2, Repeat, Shuffle } from 'lucide-react';
 import { resolveAudioUrl } from '@/lib/audio/resolveAudioUrl';
 
@@ -317,7 +317,7 @@ export default function FeaturedPlaylists() {
     if (!isPlaying) setIsPlaying(true);
   }, [globalTrackIndex, isPlaying]);
 
-  const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSeek = (e: ChangeEvent<HTMLInputElement>) => {
     const audio = audioRef.current;
     if (!audio) return;
     const newTime = parseFloat(e.target.value);

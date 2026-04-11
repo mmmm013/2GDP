@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState , type FormEvent } from 'react';
 import { Search as SearchIcon, Music } from 'lucide-react';
 import { createClient } from '@supabase/supabase-js';
 
@@ -11,7 +11,7 @@ export default function Search() {
   const [results, setResults] = useState<any[]>([]);
   const [searching, setSearching] = useState(false);
 
-  const handleSearch = async (e: React.FormEvent) => {
+  const handleSearch = async (e: FormEvent) => {
     e.preventDefault();
     setSearching(true);
 

@@ -4,7 +4,7 @@
 --
 -- Covers:
 --   A) public.pix_pck — canonical PIX package registry.
---      pck_type = 'LT' (Long Track), 'ST' (Short Track), 'EP' (EP cut).
+--      pck_type = 'LT' (LT-PIX — MetaGrab cue for KKr-MSC), 'EP'.
 --      LT-type packages must always hold at least 40 active mini-KUT
 --      assets in k_kut_assets.
 --   B) FK on k_kut_assets.pix_pck_id → public.pix_pck(id).
@@ -34,11 +34,10 @@ CREATE TABLE IF NOT EXISTS public.pix_pck (
   title       text        NOT NULL,
 
   -- Package type:
-  --   LT  Long Track  — standard full-length track package; requires ≥40 active mini-KUTs
-  --   ST  Short Track — sub-3-minute track; no minimum enforced at DB level
-  --   EP  EP Cut      — EP-specific excerpt package; no minimum enforced at DB level
-  pck_type    text        NOT NULL DEFAULT 'ST'
-                CHECK (pck_type IN ('LT', 'ST', 'EP')),
+  --   LT  LT-PIX  — MetaGrab cue for KKr-MSC; MetaGrab harvests mini-KUTs; requires ≥40 active mini-KUTs
+  --   EP  EP Cut  — EP-specific excerpt package; no minimum enforced at DB level
+  pck_type    text        NOT NULL
+                CHECK (pck_type IN ('LT', 'EP')),
 
   -- Owning organisation (mirrors org_id on k_kut_assets for RLS scope)
   org_id      uuid        NOT NULL,
@@ -81,7 +80,7 @@ BEGIN
   SELECT
     a.pix_pck_id,
     'Recovered Package ' || LEFT(a.pix_pck_id::text, 8),
-    'ST',
+    'LT',
     MIN(a.org_id::text)::uuid AS org_id,
     true
   FROM public.k_kut_assets a

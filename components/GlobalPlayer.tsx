@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef , type ChangeEvent } from 'react';
 import { Pause, Play, AlertCircle, Radio, Volume2, VolumeX } from 'lucide-react';
 import { gpmET } from '@/lib/gpm-et';
 import { resolveAudioUrl } from '@/lib/audio/resolveAudioUrl';
@@ -270,7 +270,7 @@ export default function GlobalPlayer() {
     setIsMuted(!isMuted);
   };
 
-  const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleVolumeChange = (e: ChangeEvent<HTMLInputElement>) => {
     const newVol = parseFloat(e.target.value);
     setVolume(newVol);
     if (newVol > 0 && isMuted) {

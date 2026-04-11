@@ -19,11 +19,21 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { createClient } from '@supabase/supabase-js';
 
 // ─── Supabase ────────────────────────────────────────────────────────────────
-const SUPABASE_URL = 'https://lbzpfqarraegkghxwbah.supabase.co';
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL ?? 'https://lbzpfqarraegkghxwbah.supabase.co';
 const SUPABASE_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? '';
 const supabase = SUPABASE_KEY ? createClient(SUPABASE_URL, SUPABASE_KEY) : null;
 
 const STORAGE_BASE = `${SUPABASE_URL}/storage/v1/object/public/tracks/`;
+
+// ─── FP Fallback Playlist (always plays — per FP Master Protocol) ─────────────
+// These tracks MUST exist in the public `tracks` bucket. Used when Supabase
+// returns empty or is unreachable. Player never goes silent.
+const FP_FALLBACK: Track[] = [
+  { id: 'fp-1', title: 'The First Note',          artist: 'G Putnam Music',   url: `${STORAGE_BASE}first-note.mp3`,                              mood: 'SONIC BRAND' },
+  { id: 'fp-2', title: 'Bought Into Your Game',   artist: 'KLEIGH',           url: `${STORAGE_BASE}038 - kleigh - bought into your game.mp3`,    mood: 'GPMC LEGACY' },
+  { id: 'fp-3', title: 'Scherer Feature',         artist: 'Michael Scherer',  url: `${STORAGE_BASE}scherer-feature.mp3`,                         mood: 'CO-COPYRIGHT' },
+  { id: 'fp-4', title: 'Nelson Feature',          artist: 'Erik W. Nelson',   url: `${STORAGE_BASE}nelson-feature.mp3`,                          mood: 'CO-COPYRIGHT' },
+];
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface Track {
@@ -284,14 +294,17 @@ function McBot() {
 
 // ─────────────────────────────────────────────────────────────────────────────
 // ROW 2 (right) — HOME FEATURED PLAYLIST PLAYER
+// Always displays + plays. Loads live tracks from Supabase; falls back to
+// FP_FALLBACK if Supabase is unreachable or returns nothing.
 // ─────────────────────────────────────────────────────────────────────────────
 function HomeFP() {
-  const [tracks, setTracks]   = useState<Track[]>([]);
+  const [tracks, setTracks]   = useState<Track[]>(FP_FALLBACK);
   const [idx, setIdx]         = useState(0);
   const [playing, setPlaying] = useState(false);
   const [loading, setLoading] = useState(true);
   const audioRef              = useRef<HTMLAudioElement | null>(null);
 
+  // Load live tracks; keep fallback if nothing comes back
   useEffect(() => {
     if (!supabase) { setLoading(false); return; }
     supabase
@@ -301,25 +314,30 @@ function HomeFP() {
       .limit(60)
       .then(({ data }) => {
         const filtered = (data ?? []).filter((t: any) => {
-          const title = (t.title ?? '').toLowerCase();
+          const title  = (t.title  ?? '').toLowerCase();
           const artist = (t.artist ?? '').toLowerCase();
           return !title.includes('instro') && !title.includes('instrumental') &&
-                 !artist.includes('sybc') && !artist.includes('wounded');
+                 !artist.includes('sybc')  && !artist.includes('wounded');
         });
-        const shuffled = [...filtered].sort(() => Math.random() - 0.5);
-        setTracks(shuffled);
+        // Only swap in live data if we actually got tracks back
+        if (filtered.length > 0) {
+          const shuffled = [...filtered].sort(() => Math.random() - 0.5);
+          setTracks(shuffled);
+          setIdx(0);
+        }
         setLoading(false);
-      });
+      }, () => setLoading(false));
   }, []);
 
   const current = tracks[idx];
 
+  // When track index changes, update audio src and resume if playing
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio || !current?.url) return;
     audio.src = resolveUrl(current.url);
     if (playing) audio.play().catch(() => {});
-  }, [idx, current]);
+  }, [idx]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const toggle = () => {
     const audio = audioRef.current;
@@ -329,19 +347,26 @@ function HomeFP() {
   };
 
   const skip = (dir: 1 | -1) => {
-    setIdx(i => Math.max(0, Math.min(tracks.length - 1, i + dir)));
+    setPlaying(false);
+    setIdx(i => {
+      const next = i + dir;
+      if (next < 0) return tracks.length - 1;
+      if (next >= tracks.length) return 0;
+      return next;
+    });
   };
 
   return (
     <div className="flex flex-col h-full min-h-[280px] bg-[#110d06] p-6 justify-between">
       <div>
         <div className="text-[10px] uppercase tracking-[0.3em] text-[#D4A017] font-bold mb-3 flex items-center gap-1.5">
-          <span className="w-1.5 h-1.5 rounded-full bg-[#D4A017] animate-pulse" />
+          <span className={`w-1.5 h-1.5 rounded-full bg-[#D4A017] ${playing ? 'animate-pulse' : ''}`} />
           GPM Featured Stream
         </div>
+
         {loading ? (
           <div className="text-[#C8A882]/40 text-sm animate-pulse">Loading tracks…</div>
-        ) : current ? (
+        ) : (
           <>
             <div className="text-white font-bold text-lg leading-tight truncate">{current.title}</div>
             <div className="text-[#C8A882]/70 text-sm mt-1 truncate">{current.artist ?? 'G Putnam Music'}</div>
@@ -351,16 +376,14 @@ function HomeFP() {
               </div>
             )}
           </>
-        ) : (
-          <div className="text-[#C8A882]/40 text-sm">Stream unavailable — check ENV config.</div>
         )}
       </div>
 
-      {/* Controls */}
+      {/* Controls — always rendered */}
       <div>
         <div className="flex items-center justify-center gap-4 mt-6">
-          <button onClick={() => skip(-1)} disabled={idx === 0}
-            className="p-3 rounded-full bg-[#2A1506] text-[#C8A882] hover:text-[#D4A017] hover:bg-[#3a2208] disabled:opacity-30 transition-all">
+          <button onClick={() => skip(-1)}
+            className="p-3 rounded-full bg-[#2A1506] text-[#C8A882] hover:text-[#D4A017] hover:bg-[#3a2208] transition-all">
             ⏮
           </button>
           <button onClick={toggle}
@@ -368,13 +391,13 @@ function HomeFP() {
             style={{ background: '#D4A017', color: '#1a1207' }}>
             {playing ? '⏸' : '▶'}
           </button>
-          <button onClick={() => skip(1)} disabled={idx === tracks.length - 1}
-            className="p-3 rounded-full bg-[#2A1506] text-[#C8A882] hover:text-[#D4A017] hover:bg-[#3a2208] disabled:opacity-30 transition-all">
+          <button onClick={() => skip(1)}
+            className="p-3 rounded-full bg-[#2A1506] text-[#C8A882] hover:text-[#D4A017] hover:bg-[#3a2208] transition-all">
             ⏭
           </button>
         </div>
         <div className="text-center text-[10px] text-[#C8A882]/30 mt-3 font-mono">
-          {idx + 1} / {tracks.length || '—'}
+          {idx + 1} / {tracks.length}
         </div>
         <audio ref={audioRef} onEnded={() => skip(1)} preload="none" />
       </div>
