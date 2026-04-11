@@ -24,10 +24,10 @@ const INVENTION_COLORS: Record<KutItem['type'], { active: string; passive: strin
     bar: 'bg-amber-400',
   },
   'mK': {
-    active: 'border-violet-400/80 bg-violet-400/10 text-violet-300',
-    passive: 'border-violet-400/20 bg-violet-400/5 text-white/60 hover:border-violet-400/50 hover:text-violet-200',
-    pill: 'text-violet-400/80',
-    bar: 'bg-violet-400',
+    active: 'border-[#8B5E3C]/80 bg-[#8B5E3C]/10 text-[#C8A882]',
+    passive: 'border-[#8B5E3C]/25 bg-[#8B5E3C]/5 text-white/60 hover:border-[#8B5E3C]/55 hover:text-[#C8A882]',
+    pill: 'text-[#C8A882]/80',
+    bar: 'bg-[#8B5E3C]',
   },
   'KPD': {
     active: 'border-rose-400/80 bg-rose-400/10 text-rose-300',

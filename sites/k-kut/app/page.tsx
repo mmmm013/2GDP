@@ -60,13 +60,13 @@ export default function KKutPage() {
           />
         </section>
 
-        {/* ── Invention 2: mini-KUT (mK) ── violet ──────────────────────── */}
+        {/* ── Invention 2: mini-KUT (mK) ── rich brown / tan ──────────────── */}
         <section aria-labelledby="mk-heading">
           <div className="mb-4">
-            <p className="text-[10px] tracking-[0.3em] uppercase text-violet-400/50 mb-1">
+            <p className="text-[10px] tracking-[0.3em] uppercase text-[#8B5E3C]/60 mb-1">
               Invention 02 · mK
             </p>
-            <h2 id="mk-heading" className="text-2xl font-bold tracking-tight text-violet-300">
+            <h2 id="mk-heading" className="text-2xl font-bold tracking-tight text-[#C8A882]">
               mini&#8209;KUT
             </h2>
             <p className="text-xs text-white/40 mt-1 leading-relaxed max-w-xs">
