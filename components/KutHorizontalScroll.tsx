@@ -5,7 +5,7 @@ import type { KutItem } from '@/lib/featuredKuts';
 
 interface KutHorizontalScrollProps {
   items: KutItem[];
-  /** 'high' = denser chip layout (target 40–80 mini-KUTs visible) */
+  /** 'high' = denser chip layout */
   density?: 'high' | 'normal';
   /** Auto-advances to next item on completion */
   autoStream?: boolean;
@@ -18,8 +18,10 @@ interface KutHorizontalScrollProps {
 /**
  * KutHorizontalScroll
  *
- * Viral audio stream component for the Home Page.
- * – Renders a horizontally-scrollable list of KUT items.
+ * Viral audio stream for the Home Page.
+ * Every item is a K-KUT — an exact audio excerpt from an original PIX
+ * delivered through the 4PE-BIZ-MSC pipeline.
+ * – Renders a horizontally-scrollable list of K-KUT chips.
  * – Auto-streams through items (autoStream=true).
  * – Low-profile "Heart-Tap" waveform visualizer.
  * – Respects browser autoplay policies with graceful fallback.
@@ -183,7 +185,7 @@ export default function KutHorizontalScroll({
         className={`flex ${chipGap} overflow-x-auto pb-2 scrollbar-hide snap-x snap-mandatory`}
         style={{ scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}
         role="list"
-        aria-label="Featured KUT stream"
+        aria-label="Featured K-KUT stream — audio excerpts from original PIX"
       >
         {items.map((item, idx) => {
           const isActive = idx === activeIndex;
@@ -208,7 +210,7 @@ export default function KutHorizontalScroll({
                   : 'border-white/10 bg-white/5 text-white/60 hover:border-white/30 hover:text-white/80',
               ].join(' ')}
               aria-current={isActive ? 'true' : undefined}
-              aria-label={`${item.type ?? 'KUT'}: ${item.title} by ${item.artist}`}
+              aria-label={`K-KUT: ${item.title} by ${item.artist}`}
             >
               <span className="block font-semibold tracking-wide truncate max-w-[120px]">
                 {item.title}
@@ -247,9 +249,9 @@ export default function KutHorizontalScroll({
           <div className="flex-1 min-w-0">
             <p
               className="text-[10px] uppercase tracking-widest text-amber-400/80 truncate"
-              aria-label={`${activeItem.type === 'mini-KUT' ? 'mini-KUT' : 'K-KUT'} - ${activeItem.title}`}
+              aria-label={`K-KUT - ${activeItem.title}`}
             >
-              {activeItem.type === 'mini-KUT' ? 'mK' : 'K-KUT'}
+              {'K-KUT'}
               <span aria-hidden="true">{' · '}</span>
               {activeItem.title}
             </p>
