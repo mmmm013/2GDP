@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
+import FrontPanel from "@/components/FrontPanel";
 
 export const metadata: Metadata = {
   title: "K-KUT — Send a Feeling.",
@@ -88,6 +89,21 @@ export default function HomePage() {
             <span className="text-[10px] uppercase tracking-widest">Scroll</span>
             <span className="block w-px h-8 bg-gradient-to-b from-[var(--border)] to-transparent" />
           </div>
+        </section>
+
+        {/* ─── FrontPanel — Live Audio Preview ─── */}
+        <section className="max-w-5xl mx-auto px-4 sm:px-6 py-16">
+          <p className="text-[10px] uppercase tracking-[0.3em] text-[var(--accent)] mb-3 text-center">
+            Hear it now
+          </p>
+          <h2 className="text-xl sm:text-2xl font-semibold text-center text-[var(--text)] mb-2">
+            Three inventions. All playing live.
+          </h2>
+          <p className="text-center text-sm text-[var(--text-muted)] mb-8 max-w-xl mx-auto">
+            K&#8209;KUT, mini&#8209;KUT, and K&#8209;kUpId — tap any snippet to
+            hear the exact excerpt. Play, pause, stop, or loop it.
+          </p>
+          <FrontPanel />
         </section>
 
         {/* ─── The Problem ──────────────────────── */}
