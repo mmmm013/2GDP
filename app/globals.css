@@ -2,19 +2,153 @@
 @tailwind components;
 @tailwind utilities;
 
+/*
+ * BIC MOBILE-FIRST CSS
+ * These rules make mobile Safari behave like a native app.
+ * Apple Music has these. Spotify has these. We need these.
+ */
+
 :root {
-  --foreground-rgb: 255, 255, 255;
-  --background-start-rgb: 101, 67, 33; /* Deep Brown RGB (#654321) */
-  --background-end-rgb: 101, 67, 33; /* Deep Brown RGB (#654321) */
+  --foreground-rgb: 245, 230, 200;
+  --background-start-rgb: 26, 18, 7;
+  --background-end-rgb: 10, 9, 8;
+  --gpm-amber: #D4A017;
+  --gpm-brown: #8B4513;
+  --gpm-slate: #708090;
+  --gpm-stone: #C4A882;
+}
+
+/* MOBILE: Eliminate 300ms tap delay */
+html {
+  touch-action: manipulation;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 body {
   color: rgb(var(--foreground-rgb));
-  background: #654321; /* DEEP BROWN BACKGROUND */
+  background: rgb(var(--background-start-rgb));
+  min-height: 100vh;
+  min-height: 100dvh; /* Dynamic viewport height for mobile */
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: none; /* Prevent pull-to-refresh */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* MOBILE: Safe area padding for notch/home indicator */
+@supports (padding: env(safe-area-inset-bottom)) {
+  .fixed.bottom-0 {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+/* MOBILE: Prevent iOS zoom on input focus */
+input[type="range"],
+input[type="text"],
+select,
+textarea {
+  font-size: 16px;
+}
+
+/* MOBILE: Smooth range input styling for audio seekers */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  height: 16px;
+  width: 16px;
+  border-radius: 50%;
+  background: #D0A917;
+  margin-top: -6px;
+}
+
+input[type="range"]::-webkit-slider-runnable-track {
+  height: 4px;
+  border-radius: 2px;
+}
+
+/* MOBILE: Button touch targets minimum 44px (Apple HIG) */
+button {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+/* Prevent text selection on interactive elements */
+button,
+[role="button"] {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* MOBILE: Hide scrollbars but allow scrolling */
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
 }
 
 @layer utilities {
   .text-balance {
     text-wrap: balance;
+  }
+}
+
+@layer components {
+  .k-family-kicker {
+    @apply uppercase font-black text-[10px] md:text-xs;
+    letter-spacing: 0.28em;
+  }
+
+  .k-family-title {
+    @apply font-black leading-[0.95] tracking-tight text-4xl md:text-6xl lg:text-7xl;
+  }
+
+  .k-family-subtitle {
+    @apply font-semibold text-base md:text-lg;
+    letter-spacing: 0.01em;
+  }
+
+  .k-family-capsule-title {
+    @apply font-black leading-tight text-[1.3rem] md:text-[1.45rem];
+    letter-spacing: -0.01em;
+  }
+
+  .kk-visual-shell {
+    @apply mt-8 mx-auto rounded-2xl border backdrop-blur p-3 shadow-2xl;
+  }
+
+  .kk-visual-grid {
+    @apply grid gap-3;
+    grid-template-columns: minmax(0, 1.8fr) minmax(0, 1fr);
+  }
+
+  .kk-visual-pane {
+    @apply relative overflow-hidden rounded-xl;
+    min-height: 11rem;
+  }
+
+  .kk-visual-badge {
+    @apply text-[10px] uppercase font-black;
+    letter-spacing: 0.28em;
+  }
+
+  .kk-visual-copy {
+    @apply text-xs font-semibold;
+  }
+
+  @media (max-width: 768px) {
+    .kk-visual-grid {
+      grid-template-columns: 1fr;
+    }
   }
 }

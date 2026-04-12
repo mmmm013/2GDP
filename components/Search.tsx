@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState , type FormEvent } from 'react';
 import { Search as SearchIcon, Music } from 'lucide-react';
 import { createClient } from '@supabase/supabase-js';
 
@@ -11,12 +11,12 @@ export default function Search() {
   const [results, setResults] = useState<any[]>([]);
   const [searching, setSearching] = useState(false);
 
-  const handleSearch = async (e: React.FormEvent) => {
+  const handleSearch = async (e: FormEvent) => {
     e.preventDefault();
     setSearching(true);
 
     // GPM PROTOCOL: ACCESS ALL TRACKS
-    // We search Title, Artist, Tags, and Moods across the ENTIRE GPMC.
+    // We search Title, Vocalist, Tags, and Moods across the ENTIRE GPMC.
     const { data, error } = await supabase
       .from('tracks')
       .select('*')
@@ -34,7 +34,7 @@ export default function Search() {
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search GPM Catalog (Mood, Artist, Title)..."
+          placeholder="Search GPM Catalog (Mood, Vocalist, Title)..."
           className="w-full bg-[#3E2723]/10 border-2 border-[#3E2723] rounded-full px-6 py-4 text-[#3E2723] placeholder-[#3E2723]/50 font-bold focus:outline-none focus:bg-[#FFF8E1] transition"
         />
         <button type="submit" className="absolute right-2 top-2 bg-[#3E2723] text-[#FFD54F] p-2 rounded-full hover:scale-110 transition">

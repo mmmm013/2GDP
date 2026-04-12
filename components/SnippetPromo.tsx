@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { useState , type FormEvent } from 'react';
+import { createClient } from '@supabase/supabase-js';
 
 // SNIPPET PROMOTIONAL PRICING
 const SNIPPET_TIERS = {
@@ -37,9 +37,12 @@ export default function SnippetPromo() {
   const [uploading, setUploading] = useState(false);
   const [uploadStatus, setUploadStatus] = useState('');
   const [showUpsell, setShowUpsell] = useState(false);
-  const supabase = createClientComponentClient();
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
 
-  const handleFreeSnippet = async (e: React.FormEvent) => {
+  const handleFreeSnippet = async (e: FormEvent) => {
     e.preventDefault();
     
     if (!userEmail) {

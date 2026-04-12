@@ -11,9 +11,9 @@ export interface LicenseInfo {
 
 export interface Track {
   id: string;
-  title: string;
-  artist: string;
-  url: string; // The DIRECT audio link from Disco (use signed URLs or short-lived tokens when possible)
+  title: string;   // ASCAP title — single source of truth for track identity
+  vocalist: string;
+  url: string; // Internal GPMC audio URL (Supabase Storage or signed proxy)
   coverImage: string;
   moods: Mood[];
   isPremium: boolean;
@@ -33,15 +33,15 @@ export interface Track {
 
 // ---------------------------------------------------------
 // THE MASTER MANIFEST
-// These tracks stream directly from your Disco servers.
-// Keep direct links secure (prefer signed URLs or proxy).
+// Tracks are identified by ASCAP title — never by a third-party
+// numeric ID. Audio resolves via internal GPMC/Supabase Storage.
 // ---------------------------------------------------------
 export const KLEIGH_LIBRARY: Track[] = [
   {
     id: 'k1',
     title: 'Kleigh Song 01',
-    artist: 'Kleigh',
-    url: 'https://musicmaykers.disco.ac/your-direct-mp3-link-here',
+    vocalist: 'Kleigh',
+    url: '/api/resolve-audio?title=Kleigh+Song+01',
     coverImage: '/images/kleigh-cover.jpg',
     moods: ['Melancholy', 'Focus'],
     isPremium: true,
@@ -52,20 +52,20 @@ export const KLEIGH_LIBRARY: Track[] = [
     key: 'Em',
     explicit: false,
     format: 'mp3',
-    previewUrl: 'https://musicmaykers.disco.ac/preview/k1-clip.mp3',
+    previewUrl: '/api/resolve-audio?title=Kleigh+Song+01&preview=true',
     waveformUrl: '/waveforms/k1.json',
     licenseInfo: {
       holder: 'Kleigh / MusicMaykers',
       type: 'non-exclusive',
       territories: ['US', 'CA'],
     },
-    metadata: { source: 'disco', catalogId: 'disco:k1' }
+    metadata: { ascapTitle: 'Kleigh Song 01' }
   },
   {
     id: 'k2',
     title: 'Kleigh Song 02',
-    artist: 'Kleigh',
-    url: 'https://musicmaykers.disco.ac/your-direct-mp3-link-here',
+    vocalist: 'Kleigh',
+    url: '/api/resolve-audio?title=Kleigh+Song+02',
     coverImage: '/images/kleigh-cover.jpg',
     moods: ['High Energy', 'Uplifting'],
     isPremium: true,
@@ -76,14 +76,14 @@ export const KLEIGH_LIBRARY: Track[] = [
     key: 'C',
     explicit: false,
     format: 'mp3',
-    previewUrl: 'https://musicmaykers.disco.ac/preview/k2-clip.mp3',
+    previewUrl: '/api/resolve-audio?title=Kleigh+Song+02&preview=true',
     waveformUrl: '/waveforms/k2.json',
     licenseInfo: {
       holder: 'Kleigh / MusicMaykers',
       type: 'non-exclusive',
       territories: ['Global']
     },
-    metadata: { source: 'disco', catalogId: 'disco:k2' }
+    metadata: { ascapTitle: 'Kleigh Song 02' }
   }
   // add more tracks following the shape above
 ];

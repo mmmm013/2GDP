@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import { resolveAudioUrl } from '@/lib/audio/resolveAudioUrl';
 
 // FIX: Explicitly typing props as 'any' to stop the TypeScript crash
 export default function Player({ 
@@ -77,7 +78,7 @@ export default function Player({
       {/* Hidden Audio Element handles the actual sound */}
       <audio
         ref={audioRef}
-        src={currentTrack.url}
+        src={resolveAudioUrl(currentTrack?.url || currentTrack?.public_url || '') || undefined}
         onEnded={onNext}
         onTimeUpdate={(e) => setProgress(e.currentTarget.currentTime)}
       />

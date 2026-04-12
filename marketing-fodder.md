@@ -19,5 +19,5 @@
 
 ## 4. GIFT STRATEGY (The Funnel)
 * **Offer:** New Track Reviewer Status (Community Building).
-* **Offer:** 5-Min Artist Zoom (High-Value Connection).
+* **Offer:** 5-Min Vocalist Zoom (High-Value Connection).
 * **Offer:** 3 Free K-Messages (Product Sampling).

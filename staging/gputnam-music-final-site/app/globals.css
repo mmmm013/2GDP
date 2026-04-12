@@ -1,0 +1,31 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --gpm-amber:     #D4A017;
+  --gpm-amber-lt:  #C8A882;
+  --gpm-dark:      #2A1506;
+  --gpm-bg:        #1a1207;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--gpm-bg);
+  color: var(--gpm-amber-lt);
+}
+
+/* Smooth scroll */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom scrollbar (amber tint) */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #110d06; }
+::-webkit-scrollbar-thumb { background: #5C3A1E; border-radius: 3px; }

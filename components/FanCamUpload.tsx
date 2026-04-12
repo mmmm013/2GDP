@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { useState , type ChangeEvent, type FormEvent } from 'react';
+import { createClient } from '@supabase/supabase-js';
 
 export default function FanCamUpload() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -10,7 +10,10 @@ export default function FanCamUpload() {
   const [uploading, setUploading] = useState(false);
   const [uploadStatus, setUploadStatus] = useState('');
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const supabase = createClientComponentClient();
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
 
   // Generate URU ID (Clean ID)
   const generateUruId = () => {
@@ -19,7 +22,7 @@ export default function FanCamUpload() {
     return `uru-${timestamp}-${randomStr}`.toUpperCase();
   };
 
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       setSelectedFile(file);
@@ -32,7 +35,7 @@ export default function FanCamUpload() {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     
     if (!selectedFile) {

@@ -1,0 +1,109 @@
+'use client';
+
+import React, { useState, useRef } from 'react';
+
+export default function MusicSystem({ tracks = [] }: { tracks?: any[] }) {
+    const [currentTrack, setCurrentTrack] = useState<any | null>(null);
+    const [isPlaying, setIsPlaying] = useState(false);
+    const audioRef = useRef<HTMLAudioElement | null>(null);
+
+    const playTrack = (track: any) => {
+        setCurrentTrack(track);
+        setIsPlaying(true);
+        if (audioRef.current) {
+            audioRef.current.src = track.audio_url;
+            audioRef.current.play();
+        }
+    };
+
+    const togglePlay = () => {
+        if (!audioRef.current || !currentTrack) return;
+        if (isPlaying) {
+            audioRef.current.pause();
+        } else {
+            audioRef.current.play();
+        }
+        setIsPlaying(!isPlaying);
+    };
+
+    const handleShare = async () => {
+        if (!currentTrack || !currentTrack.audio_url) {
+            alert("SYSTEM ERROR: No K-KUT selected. Please select a track first.");
+            return;
+        }
+        try {
+            await navigator.clipboard.writeText(currentTrack.audio_url);
+            alert("SECURED: Link for K-KUT copied to clipboard. Ready to distribute.");
+        } catch (err) {
+            console.error('Failed to copy K-KUT link: ', err);
+            alert("ERROR: Could not copy link.");
+        }
+    };
+
+    return (
+        <div className="w-full max-w-4xl mx-auto p-4 bg-black text-white rounded-lg shadow-lg border border-amber-500">
+            <h2 className="text-2xl font-bold text-amber-500 mb-4">GPM FLAGSHIP - K-KUT SYSTEM</h2>
+            
+            {/* Player Interface */}
+            <div className="mb-6 p-4 bg-zinc-900 rounded border border-zinc-700">
+                <div className="flex justify-between items-center mb-4">
+                    <div>
+                        <h3 className="text-xl font-semibold uppercase">
+                            {currentTrack ? currentTrack.title : "SELECT A K-KUT"}
+                        </h3>
+                        <p className="text-amber-400 font-medium">
+                            {currentTrack ? currentTrack.artist || 'G Putnam Music' : "System Ready"}
+                        </p>
+                    </div>
+                    <button 
+                        onClick={handleShare}
+                        disabled={!currentTrack}
+                        className="px-6 py-2 bg-amber-600 text-black font-bold rounded hover:bg-amber-500 disabled:opacity-50 transition uppercase tracking-wide"
+                        title="Copy K-KUT Link"
+                    >
+                        Share K-KUT
+                    </button>
+                </div>
+
+                <audio 
+                    ref={audioRef}
+                    onEnded={() => setIsPlaying(false)}
+                    className="w-full hidden" 
+                    controls 
+                />
+
+                <div className="flex gap-4">
+                    <button 
+                        onClick={togglePlay}
+                        disabled={!currentTrack}
+                        className="flex-1 py-3 bg-amber-500 text-black font-bold rounded hover:bg-amber-400 disabled:opacity-50 transition uppercase tracking-widest"
+                    >
+                        {isPlaying ? "PAUSE K-KUT" : "PLAY K-KUT"}
+                    </button>
+                </div>
+            </div>
+
+            {/* Track List */}
+            <div className="space-y-2 max-h-96 overflow-y-auto pr-2">
+                {tracks.length === 0 ? (
+                    <p className="text-zinc-500 text-center py-4 font-mono">No K-KUTs loaded in the database.</p>
+                ) : (
+                    tracks.map((track, idx) => (
+                        <button
+                            key={idx}
+                            onClick={() => playTrack(track)}
+                            className={`w-full text-left p-4 rounded transition flex justify-between items-center ${
+                                currentTrack?.audio_url === track.audio_url 
+                                ? 'bg-amber-600 text-black font-bold' 
+                                : 'bg-zinc-800 hover:bg-zinc-700 text-zinc-200'
+                            }`}
+                        >
+                            <span className="uppercase tracking-wide">{track.title}</span>
+                            <span className="text-sm opacity-75">{track.artist || 'GPM'}</span>
+                        </button>
+                    ))
+                )}
+            </div>
+        </div>
+    );
+}

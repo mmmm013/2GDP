@@ -1,5 +1,5 @@
 {
-  "name": "k-kut",
+  "name": "k-kut-site",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -14,6 +14,11 @@
     "next": "15.5.15",
     "react": "^18",
     "react-dom": "^18"
+    "@supabase/supabase-js": "^2.99.0",
+    "next": "^15.3.0",
+    "react": "^18",
+    "react-dom": "^18",
+    "stripe": "^20.2.0"
   },
   "devDependencies": {
     "@types/node": "^20",

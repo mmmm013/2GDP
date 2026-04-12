@@ -8,14 +8,14 @@ export interface Track {
   id: number;
   title: string;
   artist: string;
-  url: string;      // ⚠️ Verify this matches your Supabase column name in 'tracks'
+  url: string;
   duration?: string;
 }
 
 interface PlayerContextType {
   currentTrack: Track | null;
   isPlaying: boolean;
-  queue: Track[]; 
+  queue: Track[];
   playTrack: (track: Track, newQueue?: Track[]) => void;
   togglePlay: () => void;
   nextTrack: () => void;
@@ -32,33 +32,36 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
   // --- FETCH SONGS FROM 'tracks' TABLE ---
   useEffect(() => {
     const fetchMusic = async () => {
-      console.log("🎵 Connecting to G Putnam Archives (tracks)...");
-      
-      const supabase = createBrowserClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-      );
+      try {
+        const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+        const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-      // We switched from 'songs' to 'tracks' based on your screenshot
-      const { data, error } = await supabase
-        .from('tracks') 
-        .select('*');
+        if (!supabaseUrl || !supabaseKey) {
+          console.warn('Supabase env vars not set - skipping music fetch');
+          return;
+        }
 
-      if (error) {
-        console.error('❌ Error loading music:', error.message);
-      } else if (data && data.length > 0) {
-        console.log(`✅ Loaded ${data.length} tracks`);
-        setQueue(data);
-        setCurrentTrack(data[0]); // Load the first song
-      } else {
-        console.warn('⚠️ Connected to tracks table, but found 0 rows.');
+        const supabase = createBrowserClient(supabaseUrl, supabaseKey);
+
+        const { data, error } = await supabase
+          .from('tracks')
+          .select('*');
+
+        if (error) {
+          console.error('Error loading music:', error.message);
+        } else if (data && data.length > 0) {
+          setQueue(data);
+          setCurrentTrack(data[0]);
+        } else {
+          console.warn('Connected to tracks table, but found 0 rows.');
+        }
+      } catch (err) {
+        console.error('PlayerContext: Supabase init failed silently', err);
       }
     };
-
     fetchMusic();
   }, []);
 
-  // 1. Play a specific track 
   const playTrack = (track: Track, newQueue?: Track[]) => {
     setCurrentTrack(track);
     setIsPlaying(true);
@@ -69,32 +72,27 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  // 2. Toggle Play/Pause
   const togglePlay = () => {
-    if (!currentTrack) return; 
+    if (!currentTrack) return;
     setIsPlaying((prev) => !prev);
   };
 
-  // 3. Next Track Logic
   const nextTrack = () => {
     if (!currentTrack || queue.length === 0) return;
     const currentIndex = queue.findIndex((t) => t.id === currentTrack.id);
-    
     if (currentIndex === -1 || currentIndex === queue.length - 1) {
-      setCurrentTrack(queue[0]); 
+      setCurrentTrack(queue[0]);
     } else {
       setCurrentTrack(queue[currentIndex + 1]);
     }
-    setIsPlaying(true); 
+    setIsPlaying(true);
   };
 
-  // 4. Previous Track Logic
   const prevTrack = () => {
     if (!currentTrack || queue.length === 0) return;
     const currentIndex = queue.findIndex((t) => t.id === currentTrack.id);
-
     if (currentIndex <= 0) {
-      setCurrentTrack(queue[queue.length - 1]); 
+      setCurrentTrack(queue[queue.length - 1]);
     } else {
       setCurrentTrack(queue[currentIndex - 1]);
     }

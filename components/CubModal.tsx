@@ -35,7 +35,7 @@ export default function CubModal({ onClose }: { onClose: () => void }) {
 
         {/* Footer */}
         <div className="mt-6 text-center text-xs text-muted">
-          Powered by GPM SHIPs Secure
+          Powered by GPM KUBs Secure
         </div>
       </div>
     </div>

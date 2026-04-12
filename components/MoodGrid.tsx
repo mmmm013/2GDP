@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState } from 'react';
-import { usePlayer } from './PlayerContext';
 
 // 1. Define strict type to enforce the Primary Key
 interface Track {
@@ -21,7 +20,6 @@ const VIBES = [
 ];
 
 export default function MoodGrid() {
-  const { setPlaylist } = usePlayer() as any;
   const [loadingVibe, setLoadingVibe] = useState<string | null>(null);
 
   const fetchTracksByMood = async (selectedVibe: string) => {
@@ -71,8 +69,8 @@ export default function MoodGrid() {
           stream_url: t.stream_url || t.url || t.file_url
         }));
 
-        console.log(`Playlist updated with ${validTracks.length} valid tracks.`);
-        setPlaylist(validTracks); 
+        console.log(`Fetched ${validTracks.length} valid tracks for ${selectedVibe}.`);
+        // TODO: Integrate with player queue if needed 
       } else {
         console.warn("No tracks returned for this vibe.");
       }

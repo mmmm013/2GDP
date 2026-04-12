@@ -6,22 +6,41 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "audio:validate": "node scripts/validate-audio-assets.mjs",
+    "audio:smoke:local": "node scripts/audio-smoke.mjs http://localhost:3000",
+    "audio:smoke:prod": "node scripts/audio-smoke.mjs https://www.gputnammusic.com",
+    "audio:verify": "npm run audio:validate && npm run audio:smoke:prod",
+    "audio:e2e:install": "playwright install chromium",
+    "audio:e2e:local": "playwright test tests/audio.e2e.spec.ts",
+    "audio:e2e:prod": "PLAYWRIGHT_BASE_URL=https://www.gputnammusic.com playwright test tests/audio.e2e.spec.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.39.0",
     "next": "15.5.15",
+    "@simplewebauthn/browser": "^13.3.0",
+    "@simplewebauthn/server": "^13.3.0",
+    "@supabase/ssr": "^0.8.0",
+    "@supabase/supabase-js": "^2.99.0",
+    "@vercel/analytics": "^1.0.0",
+    "clsx": "^2.1.1",
+    "dotenv": "^17.2.3",
+    "jsonwebtoken": "^9.0.3",
+    "lucide-react": "^0.300.0",
     "react": "^18",
     "react-dom": "^18",
-    "lucide-react": "^0.300.0"
+    "stripe": "^20.2.0",
+    "tailwind-merge": "^3.5.0"
   },
   "devDependencies": {
-    "autoprefixer": "^10.0.1",
-    "postcss": "^8",
-    "tailwindcss": "^3.3.0",
-    "typescript": "^5",
+    "@playwright/test": "^1.59.1",
     "@types/node": "^20",
     "@types/react": "^18",
-    "@types/react-dom": "^18"
+    "@types/react-dom": "^18",
+    "autoprefixer": "^10.0.1",
+    "next": "^16.2.3",
+    "postcss": "^8",
+    "tailwindcss": "^3.3.0",
+    "typescript": "^5"
   }
 }

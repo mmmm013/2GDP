@@ -11,24 +11,24 @@ The FP Grid must always follow this alternating A-B-A-B-A pattern to balance Leg
     * *Action:* Link to `/heroes`
     * *Icon:* BookOpen
 
-* **SLOT 2 (LISTEN): "The First Note" (or Rotated Artist)**
-    * *Type:* Sonic Brand / Artist Feature
+* **SLOT 2 (LISTEN): "The First Note" (or Rotated Vocalist)**
+    * *Type:* Sonic Brand / Vocalist Feature
     * *Action:* Play Audio
     * *Icon:* Music
     * *Requirement:* File must exist in Supabase `songs` bucket.
 
 * **SLOT 3 (READ): "Who is G Putnam Music"**
-    * *Type:* Artist Bio
+    * *Type:* Vocalist Bio
     * *Action:* Link to `/who`
     * *Icon:* Users
 
-* **SLOT 4 (LISTEN): "Studio Session A" (or Rotated Artist)**
+* **SLOT 4 (LISTEN): "Studio Session A" (or Rotated Vocalist)**
     * *Type:* GPMC Catalog / Co-Copyright
     * *Action:* Play Audio
     * *Icon:* Play
     * *Requirement:* File must exist in Supabase `songs` bucket.
 
-* **SLOT 5 (READ): "The SHIPS Engine"**
+* **SLOT 5 (READ): "The FLAGSHIP Engine"**
     * *Type:* Business / Sponsorship
     * *Action:* Link to `/ships`
     * *Icon:* Anchor

@@ -1,0 +1,145 @@
+# Supabase CI/CD - BIC-Level MSP
+# On PR: lint SQL, BIC gate (no destructive changes without ALLOW_BIC)
+# On push to main: apply migrations + deploy Edge Functions via Supabase CLI
+# Secrets required in GitHub repo settings:
+#   SUPABASE_ACCESS_TOKEN  - Personal access token from supabase.com/account/tokens
+#   SUPABASE_PROJECT_ID    - Project ref from supabase.com/dashboard/project/<ref>/settings/general
+#   SUPABASE_DB_PASSWORD   - Database password for linking
+#   SUPABASE_ANON_KEY      - For smoke tests
+#   SUPABASE_FUNCTION_URL  - e.g. https://<ref>.supabase.co/functions/v1
+
+name: Supabase CI/CD
+
+on:
+  pull_request:
+    paths:
+      - 'supabase/migrations/**'
+      - 'supabase/seed/**'
+      - 'supabase/functions/**'
+      - '.github/workflows/supabase-ci.yml'
+  push:
+    branches: [ main ]
+    paths:
+      - 'supabase/migrations/**'
+      - 'supabase/seed/**'
+      - 'supabase/functions/**'
+      - '.github/workflows/supabase-ci.yml'
+
+jobs:
+  # -----------------------------------------------------------------------
+  # PR JOB: Validate migrations, lint SQL, BIC gate
+  # -----------------------------------------------------------------------
+  validate:
+    name: Validate migrations (PR)
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Lint migrations (syntax check - non-empty files)
+        run: |
+          set -e
+          for f in $(ls -1 supabase/migrations/*.sql | sort); do
+            echo ">>> Checking: $f"
+            [ -s "$f" ] || (echo "ERROR: Empty migration file $f" && exit 1)
+          done
+          echo "Migration lint passed."
+
+      - name: BIC gate - block destructive changes without ALLOW_BIC
+        run: |
+          set -e
+          if grep -RniE '\bDROP[[:space:]]+(TABLE|COLUMN)\b' supabase/migrations/ | grep -Ev ':[0-9]+:[[:space:]]*--' | grep -vi 'ALLOW_BIC'; then
+            echo "ERROR: Detected DROP TABLE/COLUMN without -- ALLOW_BIC approval comment."
+            echo "Add '-- ALLOW_BIC' to the migration file to explicitly allow this change."
+            exit 1
+          fi
+          echo "BIC gate passed - no unapproved destructive changes."
+
+  # -----------------------------------------------------------------------
+  # MAIN PUSH JOB: Apply migrations + deploy functions to production
+  # -----------------------------------------------------------------------
+  migrate:
+    name: Apply migrations to production
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Check required secrets
+        id: secrets-check
+        env:
+          HAS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN != '' && 'true' || 'false' }}
+          HAS_PROJECT: ${{ secrets.SUPABASE_PROJECT_ID != '' && 'true' || 'false' }}
+        run: |
+          if [ "$HAS_TOKEN" != "true" ] || [ "$HAS_PROJECT" != "true" ]; then
+            echo "::warning::SUPABASE_ACCESS_TOKEN or SUPABASE_PROJECT_ID secret is not set — skipping migration."
+            echo "Add these in GitHub → Settings → Secrets and variables → Actions."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Link Supabase project
+        if: steps.secrets-check.outputs.skip != 'true'
+        run: |
+          supabase link --project-ref "${{ secrets.SUPABASE_PROJECT_ID }}" \
+            --password "${{ secrets.SUPABASE_DB_PASSWORD }}"
+
+      - name: Apply migrations via Supabase CLI (db push)
+        if: steps.secrets-check.outputs.skip != 'true'
+        run: |
+          set -e
+          supabase db push
+          echo "Migrations applied successfully."
+
+      - name: Deploy Edge Functions via Supabase CLI
+        if: steps.secrets-check.outputs.skip != 'true'
+        run: |
+          set -e
+          for fn in magic_link tenant_provision notify get-stream-url stream-audio \
+                    play-k-kut play-k-kut-lower send-k-kuts \
+                    gmarketingoptin gmarketingoptout trackssearch gemini_proxy; do
+            echo ">>> Deploying: $fn"
+            supabase functions deploy "$fn" --project-ref "${{ secrets.SUPABASE_PROJECT_ID }}"
+          done
+          echo "All Edge Functions deployed."
+
+      - name: Smoke test - get-stream-url healthcheck
+        if: steps.secrets-check.outputs.skip != 'true'
+        env:
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          SUPABASE_FUNCTION_URL: ${{ secrets.SUPABASE_FUNCTION_URL }}
+        run: |
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+            -X POST "${SUPABASE_FUNCTION_URL}/get-stream-url" \
+            -H "apikey: ${SUPABASE_ANON_KEY}" \
+            -H "Content-Type: application/json" \
+            -d '{"track_id":"healthcheck"}')
+          if [ "$STATUS" = "500" ]; then
+            echo "FAIL: get-stream-url returned 500 after deploy"
+            exit 1
+          fi
+          echo "Smoke test passed (status: $STATUS)"
+
+      - name: Smoke test - send-k-kuts healthcheck
+        if: steps.secrets-check.outputs.skip != 'true'
+        env:
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          SUPABASE_FUNCTION_URL: ${{ secrets.SUPABASE_FUNCTION_URL }}
+        run: |
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+            -X POST "${SUPABASE_FUNCTION_URL}/send-k-kuts" \
+            -H "apikey: ${SUPABASE_ANON_KEY}" \
+            -H "Content-Type: application/json" \
+            -d '{"k_kut_id":"healthcheck"}')
+          if [ "$STATUS" = "500" ]; then
+            echo "FAIL: send-k-kuts returned 500 after deploy"
+            exit 1
+          fi
+          echo "send-k-kuts smoke test passed (status: $STATUS)"

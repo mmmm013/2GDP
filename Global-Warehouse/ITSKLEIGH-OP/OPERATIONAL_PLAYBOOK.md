@@ -4,7 +4,7 @@
 
 ## 1. BRANDING HIERARCHY (The "Two-Tier" Rule)
 * **Tier 1 (Corporate):** G Putnam Music, LLC (GPM). Must appear at the top of the interface (Logo). This is the legal entity for tax/liability.
-* **Tier 2 (Product):** KLEIGH. The artist brand. Represented by the "Morning High Energy" stream and the QR Code.
+* **Tier 2 (Product):** KLEIGH. The vocalist brand. Represented by the "Morning High Energy" stream and the QR Code.
 * **Rule:** Never remove the GPM Logo; it anchors the S-Corp ownership.
 
 ## 2. COMMERCE & FINANCE

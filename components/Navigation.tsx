@@ -11,7 +11,7 @@ export default function Navigation() {
     { name: 'GPM Is?', href: '/who' },      // BRAND: Replaces "Who's MMMM?"
     { name: 'R-tists', href: '/artists' },  // CREATIVE: "Our Artists" (R-tists)
     { name: 'Heroes', href: '/heroes' },    // STRATEGY: Grandpa's Legacy
-    { name: 'Ships', href: '/ships' },      // BUSINESS: Sponsorships
+    { name: 'K-KUTs', href: '/ships' },      // BUSINESS: Sponsorships
     { name: 'Accolades', href: '/accolades' }
   ];
 

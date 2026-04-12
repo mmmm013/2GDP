@@ -5,6 +5,7 @@ import { Play, Pause, SkipForward, SkipBack, Zap } from 'lucide-react';
 
 export default function PremiumPlayer() {
   const [isPlaying, setIsPlaying] = useState(false);
+  const [error, setError] = useState('');
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   // TRACK CONFIGURATION (Sample Track)
@@ -13,18 +14,23 @@ export default function PremiumPlayer() {
     artist: "G Putnam Music",
     // We use the QR Code as the album art for branding
     cover: "/gpm_qrcode.png", 
-    // This is a sample MP3. For production, you will replace this with a real URL from your Supabase data later.
-    audioSrc: "https://s3.amazonaws.com/media.sample.com/shine_light.mp3" 
+    // Keep this local and reliable so the card always has a working preview source.
+    audioSrc: "/audio/gpm_intro.m4a"
   };
 
   const togglePlay = () => {
     if (audioRef.current) {
       if (isPlaying) {
         audioRef.current.pause();
+        setError('');
+        setIsPlaying(false);
       } else {
-        audioRef.current.play();
+        setError('');
+        audioRef.current.play().then(() => setIsPlaying(true)).catch(() => {
+          setIsPlaying(false);
+          setError('Playback unavailable. Please try again.');
+        });
       }
-      setIsPlaying(!isPlaying);
     }
   };
 
@@ -64,6 +70,7 @@ export default function PremiumPlayer() {
         <div className="text-center mb-8">
           <h2 className="text-2xl font-bold tracking-tight mb-1">{track.title}</h2>
           <p className="text-blue-400 text-sm font-medium tracking-wide uppercase">{track.artist}</p>
+          {error && <p className="text-xs text-red-300 mt-2">{error}</p>}
         </div>
 
         {/* Playback Controls */}
@@ -91,7 +98,7 @@ export default function PremiumPlayer() {
         </a>
 
         {/* Hidden Audio Element */}
-        <audio ref={audioRef} src={track.audioSrc} />
+        <audio ref={audioRef} src={track.audioSrc} onEnded={() => setIsPlaying(false)} />
       </div>
     </div>
   );

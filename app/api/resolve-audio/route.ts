@@ -4,7 +4,7 @@ import { createClient } from '@supabase/supabase-js'
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
   const track_id = searchParams.get('track_id')
-  
+
   if (!track_id) {
     return NextResponse.json({ error: 'track_id required' }, { status: 400 })
   }
@@ -29,7 +29,7 @@ export async function GET(request: Request) {
   const { data: rotation } = await supabase
     .from('featured_rotation')
     .select('current_playlist_id')
-    .eq('domain', '2kleigh.com')
+    .eq('domain', 'gputnammusic.com')
     .single()
 
   if (rotation) {
@@ -43,7 +43,7 @@ export async function GET(request: Request) {
     if (inPlaylist) {
       // Track is featured - allow free play
       const { data: signedUrl } = await supabase.storage
-        .from('audio')
+        .from('tracks')
         .createSignedUrl(`${track_id}.mp3`, 3600)
 
       return NextResponse.json({

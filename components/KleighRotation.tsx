@@ -13,14 +13,15 @@ const HERO_IMAGES = [
 ];
 
 // 2. THE 7 EXCLUSIVE KLEIGH PLAYLISTS
+// Playlists are identified by title (ASCAP single source of truth)
 const KLEIGH_PLAYLISTS = [
-  { title: "KLEIGH: POP ANTHEMS", id: "23705238" }, // Placeholder ID
-  { title: "KLEIGH: BALLADS",     id: "23705238" },
-  { title: "KLEIGH: REMIXES",     id: "23705238" },
-  { title: "KLEIGH: ACOUSTIC",    id: "23705238" },
-  { title: "KLEIGH: INSTRUMENTAL",id: "23705238" },
-  { title: "KLEIGH: LIVE",        id: "23705238" },
-  { title: "KLEIGH: UNRELEASED",  id: "23705238" }
+  { title: "KLEIGH: POP ANTHEMS" },
+  { title: "KLEIGH: BALLADS" },
+  { title: "KLEIGH: REMIXES" },
+  { title: "KLEIGH: ACOUSTIC" },
+  { title: "KLEIGH: INSTRUMENTAL" },
+  { title: "KLEIGH: LIVE" },
+  { title: "KLEIGH: UNRELEASED" }
 ];
 
 // 3. THE INTERVAL: 3 Hours, 33 Minutes, 33 Seconds
@@ -105,17 +106,16 @@ export default function KleighRotation() {
         <div className="container mx-auto px-4 py-12 flex flex-col items-center">
           
           <div className="w-full max-w-5xl">
-            <div className="relative aspect-video md:aspect-[21/9] rounded-3xl overflow-hidden shadow-2xl border border-gray-800 bg-black ring-1 ring-white/10">
-              <iframe 
-                key={currentPlaylist.id} 
-                src={`https://disco.ac/e/p/${currentPlaylist.id}?color=%23ec4899&theme=dark`}
-                width="100%" 
-                height="100%" 
-                frameBorder="0" 
-                className="w-full h-full"
-                allowTransparency={true}
-                allow="encrypted-media"
-              ></iframe>
+            <div className="relative aspect-video md:aspect-[21/9] rounded-3xl overflow-hidden shadow-2xl border border-gray-800 bg-black ring-1 ring-white/10 flex items-center justify-center">
+              {/* GPMC internal player — playlist resolved by title, not a third-party ID */}
+              <div className="text-center px-8">
+                <p className="text-pink-400 text-lg font-bold tracking-widest uppercase mb-2">
+                  {currentPlaylist.title}
+                </p>
+                <p className="text-neutral-500 text-xs tracking-widest">
+                  GPMC Stream Engine — tap a track to begin
+                </p>
+              </div>
             </div>
           </div>
 

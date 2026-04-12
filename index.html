@@ -1,111 +1,217 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Kuala KLEIGH: Living with Love | Australian Music Artist</title>
-  
-  <script src="https://js.stripe.com/v3/"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  
-  <link rel="icon" href="assets/favicon.png">
-  <link rel="stylesheet" href="css/styles.css">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>G Putnam Music | The Flagship</title>
+<meta name="description" content="G Putnam Music: The next generation music platform." />
+<meta property="og:title" content="G Putnam Music" />
+<link rel="icon" type="image/svg+xml" href="/vite.svg" />
+<link rel="stylesheet" href="/assets/index-5f3e2af4.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.43.6/dist/umd/supabase.min.js"></script>
 
-  <style>
-    /* GLOBAL STYLES */
-    body, html { margin: 0; padding: 0; font-family: sans-serif; }
+<style>
+/* --- BRANDING LOCK: AMBER ONLY --- */
+:root {
+  --color-primary: #FFBF00 !important;
+  --color-amber: #FFBF00 !important;
+  --color-bg: #1a1a1a !important;
+  --color-card: #2a2a2a !important;
+  --color-text: #ffffff !important;
+}
+body { background: var(--color-bg); color: var(--color-text); margin: 0; font-family: -apple-system, sans-serif; overflow-x: hidden; }
 
-    /* TITLE SCREEN STYLES */
-    #splash-screen {
-        position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
-        background-color: #000; color: #fff;
-        display: flex; flex-direction: column; justify-content: center; align-items: center;
-        z-index: 99999; transition: opacity 0.8s ease-out, visibility 0.8s;
-    }
-    #splash-screen.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
-    .splash-title { font-family: 'Courier New', monospace; font-size: 4rem; letter-spacing: 8px; margin-bottom: 10px; text-transform: uppercase; text-align: center; }
-    .splash-subtitle { font-family: sans-serif; font-size: 1.2rem; letter-spacing: 4px; color: #888; margin-bottom: 40px; text-transform: uppercase; }
-    .splash-btn { padding: 15px 40px; border: 1px solid #fff; background: transparent; color: #fff; font-family: 'Courier New', monospace; font-size: 1rem; text-transform: uppercase; letter-spacing: 3px; cursor: pointer; transition: all 0.3s; }
-    .splash-btn:hover { background-color: #fff; color: #000; }
-    
-    /* MUSIC SECTION STYLES */
-    .music-container {
-        background: #111; color: #fff; padding: 40px; text-align: center; border-radius: 12px; margin: 20px 0;
-    }
-  </style>
+/* --- THE LIVING MENAGERIE (POP-UP) --- */
+#animal-modal {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 300px;
+    height: 400px;
+    background: #000;
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+    overflow: hidden;
+    z-index: 9999;
+    display: none; /* Hidden by default */
+    border: 2px solid var(--color-primary);
+    animation: slideUp 1s ease-out;
+}
+
+@keyframes slideUp { from { transform: translateY(100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+/* The "Ken Burns" Breathing Animation */
+#animal-image {
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    animation: breathe 20s infinite alternate;
+}
+@keyframes breathe { from { transform: scale(1); } to { transform: scale(1.2); } }
+
+#animal-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+    padding: 20px;
+    text-align: center;
+}
+
+#animal-thanks {
+    font-size: 2rem;
+    color: #FFBF00;
+    font-weight: 800;
+    margin: 0;
+    text-shadow: 0 2px 4px rgba(0,0,0,1);
+    font-family: 'Impact', sans-serif; /* Dynamic "Meme" style font */
+}
+
+#donate-text { color: #fff; font-size: 0.9rem; margin-top: 5px; opacity: 0.9; }
+
+/* Close Button */
+#close-animal {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(0,0,0,0.5);
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+    font-weight: bold;
+    z-index: 10000;
+}
+
+/* STANDARD LAYOUT */
+header { background: linear-gradient(135deg, var(--color-card), rgba(255, 191, 0, 0.05)); padding: 2rem; border-bottom: 2px solid var(--color-primary); }
+#logo { height: 60px; display: inline-block; } 
+.container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+.section { background: var(--color-card); border-radius: 12px; padding: 2rem; margin: 2rem 0; border: 1px solid rgba(255,191,0,0.2); }
+.disco-embed { width: 100%; height: 450px; border: none; margin-bottom: 2rem; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+#brand-title { color: var(--color-primary); }
+</style>
 </head>
 <body>
 
-  <div id="splash-screen">
-      <h1 class="splash-title">ITSKLEIGH</h1>
-      <p class="splash-subtitle">THE NEW ERA</p>
-      <button class="splash-btn" onclick="enterSite()">ENTER SITE</button>
+<div id="root">
+  <div id="animal-modal">
+      <button id="close-animal" onclick="document.getElementById('animal-modal').style.display='none'">X</button>
+      <div id="animal-image"></div>
+      <div id="animal-overlay">
+          <h2 id="animal-thanks">THANKS!</h2>
+          <p id="donate-text">Keeping the music wild & free.</p>
+      </div>
   </div>
 
-  <nav>
-    <div class="container nav-content">
-      <div style="display:flex;align-items:center;gap:12px;">
-        <img src="assets/favicon.png" width="28" height="28" alt="KLEIGH logo">
-        <strong>KLEIGH</strong>
-      </div>
-      <div class="nav-links">
-        <a href="#about">About</a>
-        <a href="#music">Music</a>
-        <a href="#contact">Contact</a>
-      </div>
-    </div>
-  </nav>
-
-  <header class="hero">
-    <div class="container hero-grid">
-      <div class="hero-left">
-        <img class="logo" src="assets/GPM-Logo.jpg" alt="G Putnam Music LLC">
-        <h1>“Kuala KLEIGH - Living with Love”</h1>
-        <div class="tag">Krooning from Down Under!</div>
-      </div>
-      <div class="hero-right">
-        <img src="assets/kleigh_portrait.jpg" alt="KLEIGH portrait" width="240" height="320">
-      </div>
+  <header>
+    <div class="container">
+      <img id="logo" src="/assets/gpm_logo.jpg" alt="GPM Logo" onerror="this.style.display='none';"/>
+      <h1 id="brand-title">G Putnam Music</h1>
     </div>
   </header>
 
-  <main>
-    <section id="about" class="section">
-      <div class="container">
-        <h2>About KLEIGH</h2>
-        <p>KLEIGH was born in Bendigo, Australia... A voice like warm buttery popcorn.</p>
-      </div>
+  <main class="container">
+    <section class="section" id="disco-section" style="display:none;">
+      <h2 style="color: var(--color-primary);">Listen Now</h2>
+      <div id="disco-container"></div>
     </section>
-
-    <section id="music" class="section">
-      <div class="container">
-        <h3>Latest Release</h3>
-        <div class="music-container">
-            <p><strong>STREAMING NOW</strong></p>
-            <p>Listen to the full EPK and Catalogue via DISCO</p>
-            <br>
-            <a href="epk.html" style="background:#4ADE80; color:#000; padding:12px 24px; text-decoration:none; font-weight:bold; border-radius:4px;">LAUNCH PLAYER &rarr;</a>
-        </div>
-      </div>
-    </section>
-
-    <section id="contact" class="section">
-      <div class="container">
-        <h3>Contact</h3>
-        <p>Email: <a href="mailto:info@musicmaykers.com">info@musicmaykers.com</a></p>
-      </div>
+    <section class="section" id="images-section" style="display: none;">
+      <h2>Gallery</h2>
+      <div class="gallery" id="images-gallery"></div>
     </section>
   </main>
+</div>
 
-  <footer>
-    <div class="container">
-      ©2025 musicmaykers, llc | <a href="epk.html">Full EPK →</a>
-    </div>
-  </footer>
+<script type="module">
+const SUPABASE_URL = 'https://lbzpfqarraegkghxwbah.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxienBmcWFycmFlZ2tnaHh3YmFoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg0MTczMjEsImV4cCI6MjA4Mzk5MzMyMX0.Sltnnkij-iIps8IqsYTMoWoHc5bL0gVo9y2_M5DlWTM';
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-  <script src="js/main.js"></script>
-  <script>
-    function enterSite() { document.getElementById('splash-screen').classList.add('hidden'); }
-  </script>
+// --- 🌍 GLOBAL NATURE PROTOCOL V2 ---
+function initNatureProtocol() {
+    const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const lang = navigator.language || navigator.userLanguage; // Detect Language (e.g., 'es-MX', 'ja-JP')
+    
+    let animalData = {};
+
+    // 1. GEO-MATCHING LOGIC
+    if (timeZone.includes('Australia') || timeZone.includes('Sydney')) {
+        animalData = {
+            img: 'https://images.unsplash.com/photo-1529447929663-1d57599600e2?auto=format&fit=crop&w=600&q=80', // Kangaroo
+            msg: "G'DAY! THANKS!"
+        };
+    } else if (timeZone.includes('Asia') || timeZone.includes('Tokyo') || timeZone.includes('Shanghai')) {
+        animalData = {
+            img: 'https://images.unsplash.com/photo-1564349683136-77e08dba1ef7?auto=format&fit=crop&w=600&q=80', // Panda
+            msg: lang.includes('ja') ? "ARIGATO!" : (lang.includes('zh') ? "XIÈ XIÈ!" : "THANK YOU!")
+        };
+    } else if (timeZone.includes('Europe')) {
+        animalData = {
+            img: 'https://images.unsplash.com/photo-1546182990-dffeafbe841d?auto=format&fit=crop&w=600&q=80', // Lion
+            msg: lang.includes('de') ? "DANKE!" : (lang.includes('fr') ? "MERCI!" : "THANKS!")
+        };
+    } else {
+        // AMERICAS / DEFAULT
+        const americaAnimals = [
+            { url: 'https://images.unsplash.com/photo-1504566734188-df3d65b6f48f?auto=format&fit=crop&w=600&q=80', name: 'Bison' },
+            { url: 'https://images.unsplash.com/photo-1557401616-53d9e4629c48?auto=format&fit=crop&w=600&q=80', name: 'Cougar' }, // Mountain Lion
+            { url: 'https://images.unsplash.com/photo-1611003228941-98852ba62227?auto=format&fit=crop&w=600&q=80', name: 'Eagle' }
+        ];
+        const random = americaAnimals[Math.floor(Math.random() * americaAnimals.length)];
+        
+        let message = "THANKS!";
+        if (lang.includes('es')) message = "¡GRACIAS!"; // Spanish
+        if (lang.includes('pt')) message = "OBRIGADO!"; // Portuguese
+        
+        animalData = { img: random.url, msg: message };
+    }
+
+    // 2. RENDER THE POP-UP
+    const modal = document.getElementById('animal-modal');
+    const imageDiv = document.getElementById('animal-image');
+    const textTitle = document.getElementById('animal-thanks');
+
+    imageDiv.style.backgroundImage = `url('${animalData.img}')`;
+    textTitle.textContent = animalData.msg;
+
+    // 3. SHOW IT (After 2 seconds delay for effect)
+    setTimeout(() => {
+        modal.style.display = 'block';
+    }, 2000);
+}
+
+// --- STANDARD LOADERS ---
+async function loadBranding() {
+    initNatureProtocol(); 
+    try {
+        const hostname = window.location.hostname;
+        const searchTerm = hostname.includes('gputnam') ? 'gputnammusic.com' : hostname;
+        const { data } = await supabase.from('branding_settings').select('*').ilike('domain', `%${searchTerm}%`).single();
+        if (data) applyBranding(data);
+    } catch (e) { console.error(e); }
+}
+
+function applyBranding(data) {
+  const labels = data.labels || {};
+  if (labels.disco_links && Array.isArray(labels.disco_links)) {
+    const container = document.getElementById('disco-container');
+    document.getElementById('disco-section').style.display = 'block';
+    container.innerHTML = '';
+    labels.disco_links.forEach(disco => {
+      const iframe = document.createElement('iframe');
+      iframe.className = 'disco-embed';
+      iframe.src = disco.url.split('?')[0]; 
+      iframe.allow = "autoplay *; encrypted-media *; fullscreen *; clipboard-write";
+      container.appendChild(iframe);
+    });
+  }
+}
+loadBranding();
+</script>
 </body>
 </html>
