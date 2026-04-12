@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import DevDiagnostic from "../components/DevDiagnostic";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://k-kut.com"),
@@ -52,6 +53,7 @@ export default function RootLayout({
         />
       </head>
       <body className="bg-kkut-bg text-kkut-text font-sans antialiased">
+        <DevDiagnostic />
         {children}
       </body>
     </html>

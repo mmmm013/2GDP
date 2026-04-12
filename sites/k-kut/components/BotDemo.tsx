@@ -1,6 +1,15 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
+import KutAudioPlayer from "./KutAudioPlayer";
+
+/* ═══════════════════════════════════════════════════════════
+   Path helper — converts a track title to the AUDIO bucket slug.
+   "LOVE RENEWS" → "love-renews"
+   ═══════════════════════════════════════════════════════════ */
+function toSlug(title: string): string {
+  return title.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
+}
 
 /* ═══════════════════════════════════════════════════════════
    K-KUT BOT — SMS / DM chat simulation
@@ -108,6 +117,7 @@ const KUPID_LEVELS: Array<{
   opener: string;
   track: string;
   reply: string;
+  audioPath: string;
 }> = [
   {
     level: "01",
@@ -117,6 +127,7 @@ const KUPID_LEVELS: Array<{
     opener: "I see you.",
     track: "FIND ME — K-kUpId · Interest",
     reply: "wait… how did you know this was my song",
+    audioPath: "kpd/interest-find-me.mp3",
   },
   {
     level: "02",
@@ -126,6 +137,7 @@ const KUPID_LEVELS: Array<{
     opener: "Tonight?",
     track: "ONE NIGHT — K-kUpId · Date",
     reply: "ok yes. absolutely yes.",
+    audioPath: "kpd/date-one-night.mp3",
   },
   {
     level: "03",
@@ -135,6 +147,7 @@ const KUPID_LEVELS: Array<{
     opener: "Always.",
     track: "LOVE RENEWS — K-kUpId · Love",
     reply: "I didn't think anyone could say it better than words.",
+    audioPath: "kpd/love-love-renews.mp3",
   },
   {
     level: "04",
@@ -144,6 +157,7 @@ const KUPID_LEVELS: Array<{
     opener: "You know.",
     track: "BURN — K-kUpId · Sex",
     reply: "🔥🔥🔥",
+    audioPath: "kpd/sex-burn.mp3",
   },
   {
     level: "05",
@@ -153,6 +167,7 @@ const KUPID_LEVELS: Array<{
     opener: "This is the one.",
     track: "FOREVER YOURS — K-kUpId · Forever",
     reply: "Forever it is.",
+    audioPath: "kpd/forever-forever-yours.mp3",
   },
 ];
 
@@ -248,6 +263,13 @@ function KKutBot() {
                   <p className="text-[10px] text-[var(--text-muted)] mt-1">
                     Section: {c.section} · K-KUT
                   </p>
+                  <KutAudioPlayer
+                    invention="KK"
+                    tag={c.section}
+                    audioPath={`k-kut/${toSlug(c.title)}-${c.section}.mp3`}
+                    label={c.title}
+                    color={c.color}
+                  />
                   <div
                     className="mt-2 h-1 rounded-full"
                     style={{ background: `rgba(${c.color},0.5)`, width: "70%" }}
@@ -341,11 +363,18 @@ function MiniKutBot() {
     <div className="flex flex-col h-full">
       {/* Track label */}
       <div className="px-4 pt-4 pb-2 flex items-center justify-between">
-        <div>
+        <div className="flex-1 min-w-0">
           <p className="text-[9px] uppercase tracking-widest text-[var(--accent)]">
             Master Track
           </p>
           <p className="text-sm font-bold text-[var(--text)]">{batch.track}</p>
+          <KutAudioPlayer
+            invention="mK"
+            tag="master"
+            audioPath={`mk/${toSlug(batch.track)}-master.mp3`}
+            label={batch.track}
+            color="251,191,36"
+          />
         </div>
         <span className="text-[9px] uppercase tracking-widest text-[var(--text-muted)] border border-[var(--border)] px-2 py-1 rounded-sm">
           {words.length}/12 mini-KUTs
@@ -520,6 +549,14 @@ function KupidBot() {
                       K-kUpId · {lv.label}
                     </p>
                     <p className="text-xs font-bold text-[var(--text)]">{lv.track}</p>
+                    <KutAudioPlayer
+                      invention="KPD"
+                      tag={lv.label.toLowerCase()}
+                      audioPath={lv.audioPath}
+                      romanceLevel={lv.label.charAt(0) + lv.label.slice(1).toLowerCase()}
+                      label={lv.track}
+                      color={col}
+                    />
                     <div
                       className="mt-2 h-0.5 rounded-full"
                       style={{ background: `rgba(${col},0.5)`, width: "65%" }}
