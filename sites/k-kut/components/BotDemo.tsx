@@ -370,8 +370,8 @@ function MiniKutBot() {
           <p className="text-sm font-bold text-[var(--text)]">{batch.track}</p>
           <KutAudioPlayer
             invention="mK"
-            tag="Ch1"
-            audioPath={`mk/${toSlug(batch.track)}-Ch1.mp3`}
+            tag="master"
+            audioPath={`mk/${toSlug(batch.track)}-master.mp3`}
             label={batch.track}
             color="251,191,36"
           />
@@ -551,7 +551,7 @@ function KupidBot() {
                     <p className="text-xs font-bold text-[var(--text)]">{lv.track}</p>
                     <KutAudioPlayer
                       invention="KPD"
-                      tag="Ch1"
+                      tag={lv.label.toLowerCase()}
                       audioPath={lv.audioPath}
                       romanceLevel={lv.label.charAt(0) + lv.label.slice(1).toLowerCase()}
                       label={lv.track}
