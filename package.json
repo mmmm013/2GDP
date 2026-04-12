@@ -16,6 +16,8 @@
     "audio:e2e:prod": "PLAYWRIGHT_BASE_URL=https://www.gputnammusic.com playwright test tests/audio.e2e.spec.ts"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.39.0",
+    "next": "15.5.15",
     "@simplewebauthn/browser": "^13.3.0",
     "@simplewebauthn/server": "^13.3.0",
     "@supabase/ssr": "^0.8.0",

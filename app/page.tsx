@@ -20,76 +20,52 @@ import T20Grid from '@/components/T20Grid';
 import PromoBar from '@/components/PromoBar';
 import GpmBot from '@/components/GpmBot';
 import GlobalPlayer from '@/components/GlobalPlayer';
+import FeaturedPlaylists from '@/components/FeaturedPlaylists';
+import KutHorizontalScroll from '@/components/KutHorizontalScroll';
+import { getFeaturedKuts, FALLBACK_KUTS } from '@/lib/featuredKuts';
+import type { KutItem } from '@/lib/featuredKuts';
+import { ArrowRight, Music } from 'lucide-react';
 
-// ---------------------------------------------------------------------------
-// Hero image rotation — shuffle-based, one image on screen at a time
-// ---------------------------------------------------------------------------
+/**
+ * Helper to normalize audio URL.
+ */
+function normalizeAudioUrl(input?: string | null): string {
+  if (!input) return '';
+  const trimmed = input.trim();
+  if (!trimmed) return '';
 
-type HeroImage = {
-  src: string;
-  objectPosition: string;
-  alt: string;
-};
+  if (
+    trimmed.startsWith('http://') ||
+    trimmed.startsWith('https://') ||
+    trimmed.startsWith('/')
+  ) {
+    return trimmed;
+  }
 
-const HERO_IMAGES: HeroImage[] = [
-  {
-    src: '/assets/hero.jpg',
-    objectPosition: 'center center',
-    alt: 'G Putnam Music',
-  },
-  {
-    src: '/IMG_7429.JPG',
-    objectPosition: '30% center',
-    alt: 'G Putnam Music live',
-  },
-  {
-    src: '/assets/MC Agnst Stone Wall Knee Bent.jpg',
-    objectPosition: 'center center',
-    alt: 'GPM artist',
-  },
-  {
-    src: '/assets/Smoking 1.jpg',
-    objectPosition: 'center center',
-    alt: 'GPM artist',
-  },
-];
+  return `/${trimmed}`;
+}
 
-const HERO_FADE_DURATION_MS = 400;
-const HERO_INTERVAL_MS = 8000;
+export default function Hero() {
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [audioReady, setAudioReady] = useState(false);
+  const [audioError, setAudioError] = useState(false);
+  const [featuredKuts, setFeaturedKuts] = useState<KutItem[]>(FALLBACK_KUTS);
 
-export default function HomePage() {
-  const [heroIndex, setHeroIndex] = useState(0);
-  const [isFading, setIsFading] = useState(false);
-  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // 1. MUSIC: Points to public/assets/fly-again.mp3
+  const normalizedAudioUrl = normalizeAudioUrl('/assets/fly-again.mp3');
+  const audioSrc = normalizedAudioUrl ?? '';
 
+  // Load featured KUTs from Supabase pipeline
   useEffect(() => {
-    // Build a shuffled list of indices (Fisher–Yates)
-    const indices = Array.from({ length: HERO_IMAGES.length }, (_, i) => i);
-    for (let i = indices.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [indices[i], indices[j]] = [indices[j], indices[i]];
-    }
-
-    let position = 0;
-    setHeroIndex(indices[0]);
-
-    const interval = setInterval(() => {
-      setIsFading(true);
-
-      timeoutRef.current = setTimeout(() => {
-        position = (position + 1) % indices.length;
-        setHeroIndex(indices[position]);
-        setIsFading(false);
-      }, HERO_FADE_DURATION_MS);
-    }, HERO_INTERVAL_MS);
-
-    return () => {
-      clearInterval(interval);
-      if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    };
+    getFeaturedKuts().then((kuts) => {
+      if (kuts.length > 0) setFeaturedKuts(kuts);
+    });
   }, []);
 
-  const hero = HERO_IMAGES[heroIndex];
+  const scrollToMusic = () => {
+    const section = document.getElementById('featured');
+    if (section) section.scrollIntoView({ behavior: 'smooth' });
+  };
 
   return (
     <>
@@ -144,23 +120,49 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* Right: GPM Featured Playlist — non-stop stream */}
-        <div className="flex flex-col justify-center border-l border-[#5C3A1E]/20 bg-[#110D06]">
-          <HomeFP />
+      {/* Hero Content Section */}
+      <section className="relative flex-1 flex flex-col items-center justify-center min-h-[60vh] text-center p-8">
+        <h1 className="text-5xl md:text-7xl font-bold mb-6 tracking-tighter drop-shadow-2xl">
+          G Putnam Music
+        </h1>
+        <p className="text-xl text-neutral-200 max-w-2xl mb-8 drop-shadow-md">
+          The One Stop Song Shop.
+        </p>
+        
+        {/* CTA — Listen Now (Relief conversion anchor) */}
+        <button 
+          onClick={scrollToMusic}
+          className="flex items-center gap-2 px-8 py-4 bg-white text-black rounded-full font-semibold hover:bg-neutral-200 transition-colors shadow-lg"
+        >
+          <Music size={20} />
+          <span>Listen Now</span>
+          <ArrowRight size={20} />
+        </button>
+
+        {/* ── KutStream Inject — Viral Audio Stream ── */}
+        {/* Sits below CTA, above scroll indicator / featured section */}
+        <div className="viral-stream-container py-8 w-full max-w-3xl mx-auto">
+          <h3 className="text-center text-xs tracking-widest uppercase opacity-50 mb-4">
+            The Emotional Virus: Active K&#8209;KUTs
+          </h3>
+          <KutHorizontalScroll
+            items={featuredKuts}
+            density="high"
+            autoStream={true}
+            autoPlay={true}
+            loop={true}
+          />
         </div>
       </section>
 
       {/* Row 3 — Top 20 streaming activities */}
       <T20Grid />
 
-<<<<<<< HEAD
       {/* Row 4 — Footer */}
-=======
       {/* GlobalPlayer: receives play-track events from T20Grid + FPPixBar */}
       <GlobalPlayer />
 
       {/* ROW 4: STO GPM Footer */}
->>>>>>> origin/copilot/fix-audio-playback-issues
       <Footer />
     </>
   );
