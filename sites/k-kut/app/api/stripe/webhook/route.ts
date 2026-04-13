@@ -11,6 +11,7 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
+import type Stripe from "stripe";
 import { getSupabaseAdmin } from "@/lib/supabase";
 import { isPreview, isStripeConfigured, getStripe } from "@/lib/stripe";
 
@@ -63,7 +64,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     );
   }
 
-  let event: import("stripe").default.Event;
+  let event: Stripe.Event;
   try {
     event = stripe.webhooks.constructEvent(body, sig, webhookSecret);
   } catch (err: unknown) {
@@ -79,7 +80,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   try {
     switch (event.type) {
       case "checkout.session.completed": {
-        const session = event.data.object as import("stripe").default.Checkout.Session;
+        const session = event.data.object as Stripe.Checkout.Session;
         await handleCheckoutCompleted(session);
         break;
       }
@@ -103,7 +104,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 // ── Handlers ──────────────────────────────────────────────────────────────
 
 async function handleCheckoutCompleted(
-  session: import("stripe").default.Checkout.Session
+  session: Stripe.Checkout.Session
 ): Promise<void> {
   // Only process Sovereign Pass subscriptions.
   if (session.metadata?.plan !== "sovereign-pass") {
@@ -131,12 +132,17 @@ async function handleCheckoutCompleted(
     return;
   }
 
+  const customerId =
+    typeof session.customer === "string"
+      ? session.customer
+      : session.customer?.id ?? null;
+
   const customerEmail =
     session.customer_email ?? session.customer_details?.email ?? null;
 
   const { error } = await supabase.from("sovereign_subscriptions").upsert(
     {
-      stripe_customer_id: session.customer as string,
+      stripe_customer_id: customerId,
       stripe_subscription_id: subscriptionId,
       stripe_session_id: session.id,
       customer_email: customerEmail,

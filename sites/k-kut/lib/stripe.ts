@@ -8,6 +8,8 @@
  * errors at invocation time rather than silently at boot.
  */
 
+import Stripe from "stripe";
+
 /** True when running in Vercel Preview or local development. */
 export function isPreview(): boolean {
   const env = process.env.VERCEL_ENV;
@@ -29,7 +31,7 @@ export function isStripeConfigured(): boolean {
  * Throws a descriptive error if STRIPE_SECRET_KEY is not set so callers get a
  * clear message instead of a silent failure.
  */
-export function getStripe(): import("stripe").default {
+export function getStripe(): Stripe {
   const key = process.env.STRIPE_SECRET_KEY;
   if (!key) {
     throw new Error(
@@ -37,10 +39,5 @@ export function getStripe(): import("stripe").default {
         "Configure Stripe env vars or skip Stripe-dependent code paths in Preview."
     );
   }
-  // Dynamic import keeps the module tree-shakeable and avoids Stripe
-  // initialisation at import time (which would fail in environments where the
-  // key is absent).
-  const Stripe = require("stripe") as typeof import("stripe").default;
-  // @ts-expect-error – Stripe constructor accepts the key directly
   return new Stripe(key);
 }
