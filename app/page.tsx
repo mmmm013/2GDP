@@ -11,49 +11,20 @@
  *   Row 4 — STO GPM Footer
  */
 
-import { useState, useEffect, useRef } from 'react';
-import Image from 'next/image';
+import { useState, useEffect } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import HomeFP from '@/components/HomeFP';
 import T20Grid from '@/components/T20Grid';
 import PromoBar from '@/components/PromoBar';
 import GpmBot from '@/components/GpmBot';
 import GlobalPlayer from '@/components/GlobalPlayer';
-import FeaturedPlaylists from '@/components/FeaturedPlaylists';
 import KutHorizontalScroll from '@/components/KutHorizontalScroll';
 import { getFeaturedKuts, FALLBACK_KUTS } from '@/lib/featuredKuts';
 import type { KutItem } from '@/lib/featuredKuts';
 import { ArrowRight, Music } from 'lucide-react';
 
-/**
- * Helper to normalize audio URL.
- */
-function normalizeAudioUrl(input?: string | null): string {
-  if (!input) return '';
-  const trimmed = input.trim();
-  if (!trimmed) return '';
-
-  if (
-    trimmed.startsWith('http://') ||
-    trimmed.startsWith('https://') ||
-    trimmed.startsWith('/')
-  ) {
-    return trimmed;
-  }
-
-  return `/${trimmed}`;
-}
-
 export default function Hero() {
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-  const [audioReady, setAudioReady] = useState(false);
-  const [audioError, setAudioError] = useState(false);
   const [featuredKuts, setFeaturedKuts] = useState<KutItem[]>(FALLBACK_KUTS);
-
-  // 1. MUSIC: Points to public/assets/fly-again.mp3
-  const normalizedAudioUrl = normalizeAudioUrl('/assets/fly-again.mp3');
-  const audioSrc = normalizedAudioUrl ?? '';
 
   // Load featured KUTs from Supabase pipeline
   useEffect(() => {
@@ -84,43 +55,7 @@ export default function Hero() {
         />
       </div>
 
-      {/* Row 2 — Hero (left) + Featured Playlist (right) */}
-      <section className="grid w-full min-h-[56vh] grid-cols-1 md:min-h-[64vh] md:grid-cols-2">
-        {/* Left: Rotating hero image */}
-        <div className="relative w-full h-[52vw] min-h-[240px] overflow-hidden md:h-auto">
-          <Image
-            key={hero.src}
-            src={hero.src}
-            alt={hero.alt}
-            fill
-            priority
-            className={`object-cover transition-opacity duration-500 ${
-              isFading ? 'opacity-0' : 'opacity-100'
-            }`}
-            style={{ objectPosition: hero.objectPosition }}
-            sizes="(max-width: 768px) 100vw, 50vw"
-          />
-
-          {/* Amber-tinted gradient overlay */}
-          <div className="absolute inset-0 bg-gradient-to-b from-[#2A1506]/40 via-transparent to-[#1A1207]/85" />
-
-          {/* Brand lockup over hero image */}
-          <div className="absolute bottom-6 left-5 right-5 md:bottom-8 md:left-8 md:right-8">
-            <p className="mb-1.5 text-[11px] font-bold uppercase tracking-[0.35em] text-[#C8A882]/70 md:text-xs">
-              G Putnam Music · The One Stop Song Shop
-            </p>
-            <h1 className="text-2xl font-black leading-none text-white drop-shadow-2xl md:text-4xl">
-              All Original.
-              <br />
-              <span className="text-[#D4A017]">Always Streaming.</span>
-            </h1>
-            <p className="mt-2 max-w-xs text-xs text-[#C8A882]/80 drop-shadow md:text-sm">
-              Activity-based, context-aware music intelligence.
-            </p>
-          </div>
-        </div>
-
-      {/* Hero Content Section */}
+      {/* Row 2 — Hero Content Section */}
       <section className="relative flex-1 flex flex-col items-center justify-center min-h-[60vh] text-center p-8">
         <h1 className="text-5xl md:text-7xl font-bold mb-6 tracking-tighter drop-shadow-2xl">
           G Putnam Music

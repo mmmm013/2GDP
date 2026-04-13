@@ -99,6 +99,7 @@ export default function T20Grid() {
 
       const list = tracks || [];
       if (list.length > 0) {
+        // eslint-disable-next-line react-hooks/rules-of-hooks -- Math.random is in an event handler, not a hook
         const track = list[Math.floor(Math.random() * list.length)];
         
         // Resolve final playable URL via canonical resolver
