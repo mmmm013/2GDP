@@ -39,21 +39,28 @@ for **Production**, **Preview**, and **Development** environments.
 |---|---|---|
 | `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | ✅ Yes | Public — safe in browser |
 | `STRIPE_SECRET_KEY` | ✅ Yes | **Secret** — server-side only |
-| `STRIPE_WEBHOOK_SECRET` | ⚠️ Strongly recommended | Required if webhooks are used for entitlement activation (e.g. "Hold My Heart" pass). Without this, payments may succeed but access will not be granted. |
+| `STRIPE_WEBHOOK_SECRET` | ✅ Yes | Required for `/api/stripe/webhook` — without this, Sovereign Pass payments succeed in Stripe but the entitlement record is never written and access is never granted. |
+| `STRIPE_SOVEREIGN_PRICE_ID` | ✅ Yes | Stripe Price ID for the Sovereign Pass ($24.99/mo). Read by `/api/checkout/sovereign`. |
 
-### Price IDs (recommended)
-
-If the application code reads price IDs from environment variables (rather than
-hardcoding them), add explicit vars such as:
+### Price IDs — other tiers (rolling-out plans, add when live)
 
 ```
-STRIPE_PRICE_ID_199
-STRIPE_PRICE_ID_499
-STRIPE_PRICE_ID_999
-STRIPE_PRICE_ID_2499
+STRIPE_PRICE_ID_199    # mK Single
+STRIPE_PRICE_ID_499    # K-KUT Duo
+STRIPE_PRICE_ID_999    # PIX Stream
 ```
 
-Check `sites/k-kut` API routes for the exact names expected.
+### Stripe Webhook — endpoint setup
+
+1. Go to **Stripe Dashboard → Developers → Webhooks → Add endpoint**.
+2. URL: `https://k-kut.com/api/stripe/webhook`
+3. Select events:
+   - `checkout.session.completed`
+   - `invoice.payment_succeeded`
+   - `customer.subscription.deleted`
+   - `customer.subscription.updated`
+4. Copy the **Signing secret** (`whsec_...`) → set as `STRIPE_WEBHOOK_SECRET` in Vercel.
+5. For Preview environments, create a separate test-mode webhook pointing to your preview URL.
 
 ### Site URL
 
@@ -104,6 +111,23 @@ Work through these checks in order:
 - Anon/public routes rely on Row-Level Security policies allowing anon reads.
 - Server routes (purchases, entitlements) require `SUPABASE_SERVICE_ROLE_KEY`.
 - Check Supabase → Authentication → Policies if data calls return empty arrays.
+
+---
+
+## Database Migrations
+
+Run migrations after every merge to `main`:
+
+```bash
+PROJ=vwlzubxshjjonabpeagd
+supabase db push --project-ref $PROJ
+```
+
+Key tables created by the migration stack:
+- `notify_signups` — email capture for rolling-out plans (`/api/notify`)
+- `sovereign_subscriptions` — Stripe Sovereign Pass entitlement records (`/api/stripe/webhook`)
+- `k_kut_assets` — audio asset registry (core audio pipeline)
+- `audit_log` — fire-and-forget action log for edge functions
 
 ---
 
