@@ -1,9 +1,17 @@
 import type { Metadata } from "next";
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 import DeliveryStage from "@/components/DeliveryStage";
-import BotDemo from "@/components/BotDemo";
+
+const BotDemo = dynamic(() => import("@/components/BotDemo"), {
+  loading: () => (
+    <div className="flex items-center justify-center py-24 text-kkut-muted text-sm tracking-wide">
+      Loading demo…
+    </div>
+  ),
+});
 
 export const metadata: Metadata = {
   title: "Demo",

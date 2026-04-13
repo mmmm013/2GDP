@@ -22,7 +22,7 @@ const config: Config = {
         },
       },
       fontFamily: {
-        sans: ['"Space Grotesk"', '"Inter"', 'system-ui', 'sans-serif'],
+        sans: ['"Space Grotesk Variable"', '"Space Grotesk"', '"Inter"', 'system-ui', 'sans-serif'],
         mono: ['"JetBrains Mono"', '"Fira Code"', 'monospace'],
       },
       boxShadow: {
