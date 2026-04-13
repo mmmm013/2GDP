@@ -1,0 +1,34 @@
+ID: BP-001
+DATE: 2026-04-13
+
+NAME: Existing Asset Monetization
+
+PURPOSE:
+Turn anything you already have into income
+
+INPUTS:
+- audio
+- ideas
+- inventions
+- knowledge
+- contacts
+
+STEPS:
+1. Identify assets already created
+2. Classify:
+   - sellable
+   - licensable
+   - service-based
+3. Choose ONE path:
+   A. Sell (fast cash)
+   B. License (recurring)
+   C. Service (immediate income)
+4. Execute immediately
+
+OUTPUT:
+Cash within days
+
+EXPECTED RESULT (ideally revenue):
+Immediate revenue from existing, undermonetized assets
+
+LINKED LL:

@@ -1,0 +1,11 @@
+IP — ASSET REGISTRY
+Record every IP asset here.
+
+ID:
+DATE:
+NAME:
+TYPE (audio/composition/idea/invention):
+STATUS (sellable/licensable/service-based):
+ASCAP REGISTERED (yes/no):
+ASCAP TRACK ID:
+NOTES:

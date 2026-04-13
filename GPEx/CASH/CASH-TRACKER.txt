@@ -1,0 +1,8 @@
+CASH — INCOME TRACKING
+Record every transaction here.
+
+DATE:
+SOURCE:
+AMOUNT:
+LINKED BP:
+NOTES:
