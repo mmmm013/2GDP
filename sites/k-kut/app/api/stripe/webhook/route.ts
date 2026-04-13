@@ -77,12 +77,15 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
           break;
         }
 
+        const customerEmail =
+          session.customer_email ?? session.customer_details?.email ?? null;
+
         const { error } = await supabase.from("sovereign_subscriptions").upsert(
           {
             stripe_customer_id: session.customer as string,
             stripe_subscription_id: subscriptionId,
             stripe_session_id: session.id,
-            customer_email: session.customer_email ?? session.customer_details?.email ?? null,
+            customer_email: customerEmail,
             status: "active",
           },
           { onConflict: "stripe_subscription_id" }

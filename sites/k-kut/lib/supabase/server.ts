@@ -6,9 +6,11 @@
 import { createClient as createSupabaseClient } from '@supabase/supabase-js';
 
 export function createClient() {
-  return createSupabaseClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    { auth: { persistSession: false } }
-  );
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  if (!url) throw new Error('NEXT_PUBLIC_SUPABASE_URL is not set.');
+  if (!key) throw new Error('NEXT_PUBLIC_SUPABASE_ANON_KEY is not set.');
+
+  return createSupabaseClient(url, key, { auth: { persistSession: false } });
 }
