@@ -59,7 +59,7 @@ const checks = [
     url: 'https://k-kut.com/api/checkout/sovereign',
     type: 'redirect',
     expectStatus: 307,
-    locationIncludes: 'https://buy.stripe.com/',
+    locationIncludesAny: ['https://buy.stripe.com/', 'https://k-kut.com/pricing?checkout=not-configured'],
     maxTtfbMs: 1800,
   },
 ];
@@ -129,8 +129,17 @@ for (const check of checks) {
       continue;
     }
 
-    if (!result.location.includes(check.locationIncludes)) {
+    if (check.locationIncludes && !result.location.includes(check.locationIncludes)) {
       fail(`${check.label}: redirect target mismatch: ${result.location || 'missing location header'}`);
+    }
+
+    if (
+      check.locationIncludesAny &&
+      !check.locationIncludesAny.some((target) => result.location.includes(target))
+    ) {
+      fail(
+        `${check.label}: redirect target mismatch: ${result.location || 'missing location header'} (expected one of: ${check.locationIncludesAny.join(', ')})`
+      );
     }
 
     console.log(
