@@ -26,6 +26,35 @@ function looksLikeUrl(value: string): boolean {
   return /^https?:\/\//i.test(value);
 }
 
+async function isPlayableDirectUrl(url: string): Promise<boolean> {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 5000);
+
+  try {
+    const res = await fetch(url, {
+      method: 'GET',
+      redirect: 'follow',
+      headers: {
+        Range: 'bytes=0-1',
+        'user-agent':
+          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+      },
+      signal: controller.signal,
+    });
+
+    if (!(res.status === 200 || res.status === 206)) return false;
+
+    const contentType = (res.headers.get('content-type') || '').toLowerCase();
+    if (!contentType) return true;
+    if (contentType.includes('application/json') || contentType.includes('text/html')) return false;
+    return contentType.startsWith('audio/') || contentType.includes('octet-stream');
+  } catch {
+    return false;
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
 async function findTrack(trackId: string): Promise<TrackRow | null> {
   const isUuid = UUID_RX.test(trackId);
   const asNumber = Number(trackId);
@@ -87,13 +116,17 @@ async function resolveStreamUrl(trackId: string): Promise<string | null> {
 
   for (const candidate of candidates) {
     if (looksLikeUrl(candidate) && !candidate.includes('/storage/v1/object/')) {
-      return candidate;
+      const ok = await isPlayableDirectUrl(candidate);
+      if (ok) return candidate;
+      continue;
     }
 
     // Some catalogs store full-track audio in a public bucket (for example
     // site-catalog). In those cases the URL is already directly streamable.
     if (looksLikeUrl(candidate) && candidate.includes('/storage/v1/object/public/')) {
-      return candidate;
+      const ok = await isPlayableDirectUrl(candidate);
+      if (ok) return candidate;
+      continue;
     }
 
     const signed = await signTrackPath(candidate);
