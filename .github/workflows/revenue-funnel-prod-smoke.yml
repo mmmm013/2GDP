@@ -30,7 +30,9 @@ jobs:
         run: npx playwright install --with-deps chromium
 
       - name: Run production revenue smoke
-        run: npm run perf:prod
+        run: |
+          node scripts/perf-http-prod.mjs
+          PLAYWRIGHT_BASE_URL=https://www.gputnammusic.com npx playwright test tests/revenue-funnel.perf.spec.ts
 
       - name: Upload Playwright artifacts
         if: failure()
