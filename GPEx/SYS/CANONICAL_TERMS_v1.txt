@@ -1,0 +1,16 @@
+CANONICAL TERMS — VERSION 1
+LOCKED. DO NOT MODIFY WITHOUT VERSIONING.
+
+BP    = Best Practice
+LL    = Lessons Learned
+DO    = Current Execution (active task only)
+IP    = Intellectual Property
+FP    = Functional Process
+GPMD  = General Process Model Data (structured knowledge layer)
+GPMx  = General Process Model execution (action layer)
+ASCAP = American Society of Composers, Authors and Publishers (royalty collection)
+MSP   = Managed Service Provider
+BIC   = Best In Class
+SYS   = System-level rules and governance
+
+RULE: If a term is used, it MUST match this file.

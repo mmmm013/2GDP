@@ -95,8 +95,6 @@ export async function POST(request: Request) {
   try {
     if (target === 'asset') {
       // ── k_kut_assets ─────────────────────────────────────────────────────
-<<<<<<< HEAD
-=======
 
       // GAP-1: For a QC pass, verify the storage file actually exists before
       // committing the status change. A missing file would create a ghost-pass
@@ -143,7 +141,6 @@ export async function POST(request: Request) {
         }
       }
 
->>>>>>> origin/copilot/fix-audio-playback-issues
       const updatePayload: Record<string, unknown> = {
         audio_qc_status: result,
         audio_qc_at:     new Date().toISOString(),
@@ -161,11 +158,6 @@ export async function POST(request: Request) {
 
       if (error) {
         console.error('[audio-qc] k_kut_assets update error:', error)
-<<<<<<< HEAD
-        // DB trigger fires on activation attempts, not on QC recording itself.
-        // If there's a DB error here it's unexpected.
-=======
->>>>>>> origin/copilot/fix-audio-playback-issues
         return NextResponse.json(
           { error: 'Failed to record QC result', detail: error.message },
           { status: 500 }
@@ -182,10 +174,6 @@ export async function POST(request: Request) {
         is_free: data.is_free,
         audio_qc_at: data.audio_qc_at,
         activation_status: data.status,
-<<<<<<< HEAD
-        // Remind caller what Failure=FREE means
-=======
->>>>>>> origin/copilot/fix-audio-playback-issues
         ...(result === 'fail'
           ? { policy: 'Failure=FREE: is_free has been set to true. This item is now free for all users.' }
           : { policy: 'PASS recorded. Item may now be activated (status → active).' }),

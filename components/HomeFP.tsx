@@ -19,12 +19,9 @@
 import { useState, useEffect, useRef, useCallback, type ChangeEvent } from 'react';
 import { Play, Pause, SkipBack, SkipForward, Radio } from 'lucide-react';
 import { createClient } from '@supabase/supabase-js';
-<<<<<<< HEAD
 import { safePlay } from '@/lib/audio/safePlay';
 import { AUDIO_UI_MESSAGES } from '@/lib/audio/messages';
-=======
 import { resolveAudioUrl } from '@/lib/audio/resolveAudioUrl';
->>>>>>> origin/copilot/fix-audio-playback-issues
 
 // ---------------------------------------------------------------------------
 // TYPES
@@ -191,12 +188,7 @@ export default function HomeFP() {
           }
             setIsPlaying(true);
             setAutoplayBlocked(false);
-<<<<<<< HEAD
           });
-=======
-          })
-          .catch(() => setAutoplayBlocked(true));
->>>>>>> origin/copilot/fix-audio-playback-issues
       }
     }
   }, [isLoading, tracks.length]);
@@ -246,7 +238,6 @@ export default function HomeFP() {
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
-<<<<<<< HEAD
     if (isPlaying) {
       safePlay(audio, 'HomeFP-toggle', { track: tracks[queueIndex]?.title, url: tracks[queueIndex]?.url }).then((result) => {
         if (!result.ok) {
@@ -258,11 +249,6 @@ export default function HomeFP() {
       audio.pause();
     }
   }, [isPlaying, queueIndex, tracks]);
-=======
-    if (isPlaying) audio.play().catch(() => setIsPlaying(false));
-    else audio.pause();
-  }, [isPlaying, queueIndex]);
->>>>>>> origin/copilot/fix-audio-playback-issues
 
   useEffect(() => {
     if (isPlaying) {

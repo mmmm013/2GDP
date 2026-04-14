@@ -1,0 +1,26 @@
+ID: BP-003
+DATE: 2026-04-13
+
+NAME: Royalty Capture (ASCAP/IP)
+
+PURPOSE:
+Capture missed revenue from existing IP
+
+INPUTS:
+- audio works
+- compositions
+- recordings
+
+STEPS:
+1. List all works
+2. Verify registration status
+3. Register missing works
+4. Track usage
+
+OUTPUT:
+Recurring revenue stream
+
+EXPECTED RESULT (ideally revenue):
+Ongoing passive royalty income from registered works
+
+LINKED LL:

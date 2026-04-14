@@ -12,7 +12,7 @@ export default function SponsorButton() {
         Become a <span className="text-yellow-400">KUB 🐨</span>
       </h3>
       <p className="text-neutral-400 mb-6 text-center max-w-md px-4">
-        KUBs are KLEIGH's koala crew — unlock exclusive high-energy tracks, support the vocalist directly, and get your "KUB" badge.
+        KUBs are KLEIGH&apos;s koala crew — unlock exclusive high-energy tracks, support the vocalist directly, and get your &quot;KUB&quot; badge.
       </p>
 
       <a 

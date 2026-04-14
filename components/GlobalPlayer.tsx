@@ -159,7 +159,7 @@ export default function GlobalPlayer() {
           case 1: errMsg = 'Playback cancelled'; break;
           case 2: errMsg = 'Network error - check connection'; break;
           case 3: errMsg = 'Audio decode error'; break;
-          case 4: errMsg = AUDIO_UI_MESSAGES.trackUnavailable; break;
+          case 4: errMsg = AUDIO_UI_MESSAGES.fileNotFound; break;
           default: errMsg = 'Playback error';
         }
         setError(errMsg);

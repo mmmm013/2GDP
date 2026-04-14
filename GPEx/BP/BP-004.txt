@@ -1,0 +1,26 @@
+ID: BP-004
+DATE: 2026-04-13
+
+NAME: Rapid Offer Deployment
+
+PURPOSE:
+Create something sellable in 24 hours
+
+INPUTS:
+- ONE problem you know well
+- ONE solution
+- price point ($50–$500 low barrier)
+
+STEPS:
+1. Pick ONE problem you know well
+2. Define ONE solution
+3. Set price (low barrier: $50–$500)
+4. Offer directly to real people
+
+OUTPUT:
+Cash fast
+
+EXPECTED RESULT (ideally revenue):
+Paid transaction within 24 hours
+
+LINKED LL:

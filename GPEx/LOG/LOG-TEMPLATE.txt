@@ -1,0 +1,11 @@
+LOG — TEMPLATE
+Use this template for every session log entry.
+
+DATE:
+
+SESSION SUMMARY:
+DECISIONS MADE:
+TERMS USED:
+ASSETS CREATED:
+LINKED LL:
+LINKED BP:

@@ -1,9 +1,7 @@
 'use client';
 import { useState, useRef, useEffect , type ChangeEvent } from 'react';
 import { Play, Pause, AlertCircle, SkipBack, SkipForward, Volume2, VolumeX } from 'lucide-react';
-<<<<<<< HEAD
 import { resolveAudioUrl } from '@/lib/audio/resolveAudioUrl';
-=======
 import { safePlay } from '@/lib/audio/safePlay';
 import { AUDIO_UI_MESSAGES } from '@/lib/audio/messages';
 
@@ -16,7 +14,6 @@ if (typeof window !== 'undefined') {
     _pendingPlayTrack = e as CustomEvent;
   }, { capture: true });
 }
->>>>>>> origin/copilot/fix-audio-playback-issues
 
 export default function AudioPlayer() {
   const [isPlaying, setIsPlaying] = useState(false);
@@ -83,7 +80,6 @@ export default function AudioPlayer() {
       end: endMs ? endMs / 1000 : null
     });
 
-<<<<<<< HEAD
     const source = trackData?.public_url || trackData?.url || trackData?.audio_url || '';
     if (!source) {
       setError('No playable source found for this track.');
@@ -91,10 +87,8 @@ export default function AudioPlayer() {
       setIsPlaying(false);
       return;
     }
-=======
     // GAP-2: Store active track data so onerror can re-fetch the signed URL.
     activeTrackDataRef.current = trackData;
->>>>>>> origin/copilot/fix-audio-playback-issues
 
     if (audioRef.current) {
       audioRef.current.src = resolveAudioUrl(source);
@@ -216,22 +210,14 @@ export default function AudioPlayer() {
     audio.addEventListener('loadedmetadata', handleLoadedMetadata);
     audio.addEventListener('timeupdate', handleTimeUpdate);
     audio.addEventListener('ended', handleEnded);
-<<<<<<< HEAD
-    audio.addEventListener('error', handleError);
-=======
     // GAP-2: Wire onerror to signed-URL refresh handler
     audio.addEventListener('error', handleAudioError);
->>>>>>> origin/copilot/fix-audio-playback-issues
 
     return () => {
       audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
       audio.removeEventListener('timeupdate', handleTimeUpdate);
       audio.removeEventListener('ended', handleEnded);
-<<<<<<< HEAD
-      audio.removeEventListener('error', handleError);
-=======
       audio.removeEventListener('error', handleAudioError);
->>>>>>> origin/copilot/fix-audio-playback-issues
     };
   }, [currentIndex, queue, boundaries]);
 
@@ -246,18 +232,12 @@ export default function AudioPlayer() {
       audioRef.current.pause();
       setIsPlaying(false);
     } else {
-<<<<<<< HEAD
-      audioRef.current.play().then(() => setIsPlaying(true)).catch(() => {
-        setIsPlaying(false);
-        setError('Playback blocked or unavailable.');
-=======
       safePlay(audioRef.current, 'AudioPlayer-togglePlay').then((result) => {
         if (result.ok) {
           setIsPlaying(true);
         } else if (result.error?.name === 'NotAllowedError') {
           setError(AUDIO_UI_MESSAGES.playbackBlocked);
         }
->>>>>>> origin/copilot/fix-audio-playback-issues
       });
     }
   };
