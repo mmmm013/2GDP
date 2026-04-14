@@ -1,0 +1,43 @@
+name: Revenue Funnel Prod Smoke
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '17 13 * * *'
+
+concurrency:
+  group: revenue-funnel-prod-smoke
+  cancel-in-progress: false
+
+jobs:
+  revenue-funnel-prod-smoke:
+    name: Check live revenue funnel
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Run production revenue smoke
+        run: npm run perf:prod
+
+      - name: Upload Playwright artifacts
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: revenue-funnel-prod-smoke-artifacts
+          path: |
+            playwright-report/
+            test-results/
+          if-no-files-found: ignore
