@@ -5,20 +5,20 @@ import Link from 'next/link';
 // Promos rotate — each has a message, a CTA, and a destination
 const PROMOS = [
   {
-    id: 'kk-create',
+    id: 'kk-buy',
     bg: 'bg-amber-500',
     text: 'text-black',
-<<<<<<< HEAD
-    label: '⚡ K-KUT QUICKSTART — All KKs are pre-made. Pick your Sweet Spot and launch instantly.',
-    cta: 'OPEN PRE-MADE KK →',
-    href: '/kkut/create',
-=======
-    // NOTE: K-KUT language is product/inventory language; this bar is sponsor-focused.
-    // Keep it sponsor-centric (KUB) because /join is where sponsors join.
-    label: '⚡ FOUNDER SPECIAL — First 50 KUBs get permanent ELDER status for the price of JOEY. Limited.',
-    cta: 'CLAIM IT →',
-    href: '/join',
->>>>>>> origin/copilot/fix-audio-playback-issues
+    label: '⚡ PRE-MADE K-KUT ACCESS IS LIVE — One tap to secure Sovereign Pass and start sending feelings now.',
+    cta: 'BUY KK NOW →',
+    href: '/api/checkout-attribution?utm_source=promobar&utm_medium=site&utm_campaign=cash_sprint_apr2026&utm_content=kk_buy',
+  },
+  {
+    id: 'kub-founder',
+    bg: 'bg-[#3a1f0a]',
+    text: 'text-[#f5d7b1]',
+    label: '⚡ CASH SPRINT — First 50 KUBs get permanent ELDER status for the price of JOEY. Checkout is live now.',
+    cta: 'CLAIM IT NOW →',
+    href: '/api/checkout-attribution?utm_source=promobar&utm_medium=site&utm_campaign=cash_sprint_apr2026&utm_content=founder_claim',
   },
   {
     id: 'mk-play',
@@ -45,8 +45,6 @@ const PROMOS = [
     href: '/gift',
   },
   {
-<<<<<<< HEAD
-=======
     id: 'kleigh',
     bg: 'bg-purple-900',
     text: 'text-purple-200',
@@ -55,7 +53,6 @@ const PROMOS = [
     href: 'https://2kleigh.com',
   },
   {
->>>>>>> origin/copilot/fix-audio-playback-issues
     id: 'heroes',
     bg: 'bg-[#1a1a1a]',
     text: 'text-amber-300',
@@ -78,7 +75,7 @@ export default function PromoBar() {
         setIdx((i) => (i + 1) % PROMOS.length);
         setVisible(true);
       }, 400);
-    }, 7000);
+    }, 5000);
     return () => clearInterval(iv);
   }, [dismissed]);
 

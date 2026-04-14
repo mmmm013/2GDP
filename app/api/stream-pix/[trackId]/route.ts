@@ -1,0 +1,134 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { supabaseAdmin } from '@/lib/supabaseAdmin';
+
+export const dynamic = 'force-dynamic';
+
+const SIGNED_URL_TTL = 3600;
+const UUID_RX =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+type TrackRow = {
+  id?: number | string;
+  track_id?: string;
+  url?: string | null;
+  file_path?: string | null;
+  [key: string]: unknown;
+};
+
+function normalizeStoragePath(input: string): string {
+  return input
+    .replace(/^https?:\/\/[^/]+\/storage\/v1\/object\/(public|sign)\/[a-zA-Z0-9_-]+\//, '')
+    .replace(/^\/+/, '')
+    .replace(/^tracks\//, '');
+}
+
+function looksLikeUrl(value: string): boolean {
+  return /^https?:\/\//i.test(value);
+}
+
+async function findTrack(trackId: string): Promise<TrackRow | null> {
+  const isUuid = UUID_RX.test(trackId);
+  const asNumber = Number(trackId);
+  const isNumeric = Number.isFinite(asNumber);
+
+  const candidates: Array<Promise<TrackRow | null>> = [];
+
+  // Main catalog table lookups
+  if (isUuid || isNumeric) {
+    candidates.push(
+      supabaseAdmin
+        .from('tracks')
+        .select('*')
+        .eq('id', isNumeric ? asNumber : trackId)
+        .maybeSingle()
+        .then(({ data }) => (data as TrackRow | null) ?? null)
+    );
+  }
+
+  candidates.push(
+    supabaseAdmin
+      .from('tracks')
+      .select('*')
+      .eq('track_id', trackId)
+      .maybeSingle()
+      .then(({ data }) => (data as TrackRow | null) ?? null)
+  );
+
+  // NOTE: KUT audio (K-KUT / mK / KPD / SWSP) lives in k_kut_assets and is
+  // NEVER served through this route. KUTs are pre-made, immutable, and always
+  // accessed via k_kut_codes → k_kut_assets.storage_path → signed URL.
+  // This route is for full PIX (tracks table) only.
+
+  const resolved = await Promise.all(candidates);
+  return resolved.find(Boolean) ?? null;
+}
+
+async function signTrackPath(path: string): Promise<string | null> {
+  const normalized = normalizeStoragePath(path);
+  if (!normalized) return null;
+
+  const { data, error } = await supabaseAdmin.storage
+    .from('tracks')
+    .createSignedUrl(normalized, SIGNED_URL_TTL);
+
+  if (error || !data?.signedUrl) return null;
+  return data.signedUrl;
+}
+
+async function resolveStreamUrl(trackId: string): Promise<string | null> {
+  const row = await findTrack(trackId);
+  if (!row) return null;
+
+  const filePath =
+    typeof row.file_path === 'string'
+      ? row.file_path
+      : (typeof row.storage_path === 'string' ? row.storage_path : null);
+  const candidates = [filePath, row.url].filter(Boolean) as string[];
+
+  for (const candidate of candidates) {
+    if (looksLikeUrl(candidate) && !candidate.includes('/storage/v1/object/')) {
+      return candidate;
+    }
+
+    // Some catalogs store full-track audio in a public bucket (for example
+    // site-catalog). In those cases the URL is already directly streamable.
+    if (looksLikeUrl(candidate) && candidate.includes('/storage/v1/object/public/')) {
+      return candidate;
+    }
+
+    const signed = await signTrackPath(candidate);
+    if (signed) return signed;
+  }
+
+  // Last resort: attempt track-id.mp3 naming convention in tracks bucket.
+  const fallbackSigned = await signTrackPath(`${trackId}.mp3`);
+  return fallbackSigned;
+}
+
+async function handle(trackId: string) {
+  if (!trackId) {
+    return NextResponse.json({ error: 'Track ID is required' }, { status: 400 });
+  }
+
+  try {
+    const url = await resolveStreamUrl(trackId);
+    if (!url) {
+      return NextResponse.json({ error: 'Track not found or not streamable' }, { status: 404 });
+    }
+
+    return NextResponse.json({ url, signedUrl: url });
+  } catch (err) {
+    console.error('[stream-pix] unexpected error', err);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
+}
+
+export async function GET(_req: NextRequest, context: { params: Promise<{ trackId: string }> }) {
+  const { trackId } = await context.params;
+  return handle(trackId);
+}
+
+export async function POST(_req: NextRequest, context: { params: Promise<{ trackId: string }> }) {
+  const { trackId } = await context.params;
+  return handle(trackId);
+}

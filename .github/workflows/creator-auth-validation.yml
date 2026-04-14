@@ -1,0 +1,46 @@
+name: Creator Auth Validation
+
+on:
+  workflow_dispatch:
+
+jobs:
+  validate:
+    name: Validate creator auth across envs
+    runs-on: ubuntu-latest
+    env:
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      VERCEL_SCOPE: ${{ secrets.VERCEL_SCOPE != '' && secrets.VERCEL_SCOPE || 'g-putnam-music' }}
+      VERCEL_PROJECT: ${{ secrets.VERCEL_PROJECT != '' && secrets.VERCEL_PROJECT || 'gputnam-music-final-site' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Ensure Vercel token exists
+        run: |
+          if [ -z "${VERCEL_TOKEN}" ]; then
+            echo "::error::Missing VERCEL_TOKEN secret."
+            echo "Add GitHub secret VERCEL_TOKEN with access to team/project env vars."
+            exit 1
+          fi
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Vercel CLI
+        run: npm i -g vercel@latest
+
+      - name: Run creator auth validation (dev + preview + prod)
+        run: npm run creator:auth:validate:all
+
+      - name: Upload validation reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: creator-auth-validation-reports
+          path: |
+            handoff/creator-auth-validation-*.md
+            handoff/creator-credential-parity-*.md
+          if-no-files-found: error

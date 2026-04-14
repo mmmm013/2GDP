@@ -47,6 +47,22 @@ CREATE TABLE IF NOT EXISTS public.pix_pck (
   updated_at  timestamptz NOT NULL DEFAULT now()
 );
 
+-- If pix_pck already existed with a different schema (schema drift),
+-- add the columns this migration requires before creating indexes.
+ALTER TABLE public.pix_pck
+  ADD COLUMN IF NOT EXISTS title      text        NOT NULL DEFAULT '',
+  ADD COLUMN IF NOT EXISTS pck_type   text        NOT NULL DEFAULT 'LT',
+  ADD COLUMN IF NOT EXISTS org_id     uuid,
+  ADD COLUMN IF NOT EXISTS is_active  boolean     NOT NULL DEFAULT true,
+  ADD COLUMN IF NOT EXISTS updated_at timestamptz NOT NULL DEFAULT now();
+
+ALTER TABLE public.pix_pck
+  DROP CONSTRAINT IF EXISTS pix_pck_pck_type_check;
+
+ALTER TABLE public.pix_pck
+  ADD CONSTRAINT pix_pck_pck_type_check
+    CHECK (pck_type IN ('LT', 'EP'));
+
 CREATE INDEX IF NOT EXISTS idx_pix_pck_org_id
   ON public.pix_pck (org_id);
 

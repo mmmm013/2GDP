@@ -1,22 +1,21 @@
 'use client';
-import { useState, useRef, useEffect , type ChangeEvent } from 'react';
+
+import { useState, useRef, useEffect, type ChangeEvent } from 'react';
 import { Play, Pause, AlertCircle, SkipBack, SkipForward, Volume2, VolumeX } from 'lucide-react';
-<<<<<<< HEAD
 import { resolveAudioUrl } from '@/lib/audio/resolveAudioUrl';
-=======
 import { safePlay } from '@/lib/audio/safePlay';
 import { AUDIO_UI_MESSAGES } from '@/lib/audio/messages';
 
-// GAP-3: Module-level buffer for play-track events that fire before mount.
-// SSR/hydration gap means the component may not be listening yet when the
-// first event fires; we capture it here and drain it on mount.
-let _pendingPlayTrack: CustomEvent | null = null;
+let pendingPlayTrack: CustomEvent | null = null;
 if (typeof window !== 'undefined') {
-  window.addEventListener('play-track', (e) => {
-    _pendingPlayTrack = e as CustomEvent;
-  }, { capture: true });
+  window.addEventListener(
+    'play-track',
+    (e) => {
+      pendingPlayTrack = e as CustomEvent;
+    },
+    { capture: true }
+  );
 }
->>>>>>> origin/copilot/fix-audio-playback-issues
 
 export default function AudioPlayer() {
   const [isPlaying, setIsPlaying] = useState(false);
@@ -32,100 +31,56 @@ export default function AudioPlayer() {
   const [boundaries, setBoundaries] = useState<{ start: number; end: number | null }>({ start: 0, end: null });
 
   const audioRef = useRef<HTMLAudioElement>(null);
-  // GAP-2: Track the active track data so we can re-fetch its signed URL on expiry.
   const activeTrackDataRef = useRef<any>(null);
+  const urlRefreshAttemptedRef = useRef(false);
 
-  // Listen for play-track events from FeaturedPlaylists and T20
-  useEffect(() => {
-    const handlePlayTrack = (event: any) => {
-      const trackData = event.detail;
-      console.log('[AUDIO PLAYER] Received play-track event:', trackData);
-
-      // If it's a playlist, set the queue
-      if (trackData.playlist && Array.isArray(trackData.playlist)) {
-        setQueue(trackData.playlist);
-        setCurrentIndex(trackData.index || 0);
-        const track = trackData.playlist[trackData.index || 0];
-        loadAndPlayTrack(track);
-      } else {
-        // Single track - add to queue
-        setQueue([trackData]);
-        setCurrentIndex(0);
-        loadAndPlayTrack(trackData);
-      }
-    };
-
-    window.addEventListener('play-track', handlePlayTrack);
-
-    // GAP-3: Drain any event that fired before this component mounted.
-    if (_pendingPlayTrack) {
-      handlePlayTrack(_pendingPlayTrack);
-      _pendingPlayTrack = null;
-    }
-
-    return () => {
-      window.removeEventListener('play-track', handlePlayTrack);
-    };
-  }, []);
-
-  const loadAndPlayTrack = (trackData: any) => {
+  const loadAndPlayTrack = async (trackData: any) => {
     setTrack({
       title: trackData.title,
-      vocalist: trackData.vocalist
+      vocalist: trackData.vocalist,
     });
 
-    // Handle excerpt boundaries for KKs and mKs
     const startMs = trackData.meta?.start_ms ?? trackData.start_ms ?? 0;
     const endMs = trackData.meta?.end_ms ?? trackData.end_ms ?? null;
 
     setBoundaries({
       start: startMs / 1000,
-      end: endMs ? endMs / 1000 : null
+      end: endMs ? endMs / 1000 : null,
     });
 
-<<<<<<< HEAD
     const source = trackData?.public_url || trackData?.url || trackData?.audio_url || '';
     if (!source) {
-      setError('No playable source found for this track.');
+      setError(AUDIO_UI_MESSAGES.noSource);
       setIsBuffering(false);
       setIsPlaying(false);
       return;
     }
-=======
-    // GAP-2: Store active track data so onerror can re-fetch the signed URL.
+
     activeTrackDataRef.current = trackData;
->>>>>>> origin/copilot/fix-audio-playback-issues
+    urlRefreshAttemptedRef.current = false;
 
-    if (audioRef.current) {
-      audioRef.current.src = resolveAudioUrl(source);
-      audioRef.current.load();
+    const audio = audioRef.current;
+    if (!audio) return;
 
-      // Set initial position to start boundary
-      audioRef.current.currentTime = startMs / 1000;
+    audio.src = resolveAudioUrl(source);
+    audio.load();
+    audio.currentTime = startMs / 1000;
 
-      setIsBuffering(true);
-      // GAP-6: Use safePlay so NotAllowedError surfaces the correct UI message.
-      safePlay(audioRef.current, 'AudioPlayer-loadAndPlay', { title: trackData.title }).then((result) => {
-        if (result.ok) {
-          setIsPlaying(true);
-          setError('');
-          setIsBuffering(false);
-        } else {
-          setIsBuffering(false);
-          if (result.error?.name === 'NotAllowedError') {
-            setError(AUDIO_UI_MESSAGES.playbackBlocked);
-          } else {
-            setError(AUDIO_UI_MESSAGES.playbackError);
-          }
-          console.error('[AUDIO PLAYER] Playback failed:', result.error);
-        }
-      });
+    setIsBuffering(true);
+    const result = await safePlay(audio, 'AudioPlayer-loadAndPlay', { title: trackData.title });
+    if (result.ok) {
+      setIsPlaying(true);
+      setError('');
+    } else {
+      setIsPlaying(false);
+      if (result.error?.name === 'NotAllowedError') {
+        setError(AUDIO_UI_MESSAGES.playbackBlocked);
+      } else {
+        setError(AUDIO_UI_MESSAGES.playbackError);
+      }
     }
+    setIsBuffering(false);
   };
-
-  // GAP-2: Re-fetch a fresh signed URL when audio errors (covers expired 5-min TTL).
-  // Only retries once per track load to avoid infinite loops on genuine 404s.
-  const urlRefreshAttemptedRef = useRef(false);
 
   const handleAudioError = async () => {
     const trackData = activeTrackDataRef.current;
@@ -138,63 +93,73 @@ export default function AudioPlayer() {
 
     try {
       urlRefreshAttemptedRef.current = true;
-      console.log('[AUDIO PLAYER] Signed URL expired — refreshing via', trackData.refreshUrl);
       const res = await fetch(trackData.refreshUrl, { method: 'POST' });
       if (!res.ok) throw new Error(`Refresh ${res.status}`);
       const json = await res.json();
       const newUrl: string = json.url ?? json.signedUrl;
       if (!newUrl) throw new Error('No URL in refresh response');
 
-      // Update the buffered track reference with the new URL
       activeTrackDataRef.current = { ...trackData, url: newUrl };
-      if (audioRef.current) {
-        audioRef.current.src = newUrl;
-        audioRef.current.load();
-        audioRef.current.currentTime = boundaries.start;
-        setIsBuffering(true);
-        safePlay(audioRef.current, 'AudioPlayer-urlRefresh').then((result) => {
-          if (result.ok) {
-            setIsPlaying(true);
-            setError('');
-          } else {
-            setError(result.error?.name === 'NotAllowedError'
-              ? AUDIO_UI_MESSAGES.playbackBlocked
-              : AUDIO_UI_MESSAGES.playbackError);
-          }
-          setIsBuffering(false);
-        });
+      if (!audioRef.current) return;
+
+      audioRef.current.src = newUrl;
+      audioRef.current.load();
+      audioRef.current.currentTime = boundaries.start;
+      setIsBuffering(true);
+      const result = await safePlay(audioRef.current, 'AudioPlayer-urlRefresh');
+      if (result.ok) {
+        setIsPlaying(true);
+        setError('');
+      } else if (result.error?.name === 'NotAllowedError') {
+        setError(AUDIO_UI_MESSAGES.playbackBlocked);
+      } else {
+        setError(AUDIO_UI_MESSAGES.playbackError);
       }
-    } catch (err) {
-      console.error('[AUDIO PLAYER] URL refresh failed:', err);
+    } catch {
       setError(AUDIO_UI_MESSAGES.fileNotFound);
       setIsPlaying(false);
+    } finally {
       setIsBuffering(false);
     }
   };
 
-  // Listen for audio metadata and time updates
+  useEffect(() => {
+    const handlePlayTrack = (event: any) => {
+      const trackData = event.detail;
+      if (trackData.playlist && Array.isArray(trackData.playlist)) {
+        setQueue(trackData.playlist);
+        setCurrentIndex(trackData.index || 0);
+        loadAndPlayTrack(trackData.playlist[trackData.index || 0]);
+      } else {
+        setQueue([trackData]);
+        setCurrentIndex(0);
+        loadAndPlayTrack(trackData);
+      }
+    };
+
+    window.addEventListener('play-track', handlePlayTrack);
+    if (pendingPlayTrack) {
+      handlePlayTrack(pendingPlayTrack);
+      pendingPlayTrack = null;
+    }
+
+    return () => window.removeEventListener('play-track', handlePlayTrack);
+  }, []);
+
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
 
-    const handleLoadedMetadata = () => {
-      setDuration(audio.duration);
-    };
+    const handleLoadedMetadata = () => setDuration(audio.duration);
 
     const handleTimeUpdate = () => {
       setCurrentTime(audio.currentTime);
-
-      // ENFORCE EXCERPT BOUNDARIES
       if (boundaries.end !== null && audio.currentTime >= boundaries.end) {
         audio.pause();
         audio.currentTime = boundaries.start;
         setIsPlaying(false);
-
-        if (currentIndex < queue.length - 1) {
-          playNext();
-        }
+        if (currentIndex < queue.length - 1) playNext();
       }
-
       if (audio.currentTime < boundaries.start) {
         audio.currentTime = boundaries.start;
       }
@@ -202,63 +167,38 @@ export default function AudioPlayer() {
 
     const handleEnded = () => {
       setIsPlaying(false);
-      if (currentIndex < queue.length - 1) {
-        playNext();
-      }
-    };
-
-    const handleError = () => {
-      setError('Track unavailable right now.');
-      setIsBuffering(false);
-      setIsPlaying(false);
+      if (currentIndex < queue.length - 1) playNext();
     };
 
     audio.addEventListener('loadedmetadata', handleLoadedMetadata);
     audio.addEventListener('timeupdate', handleTimeUpdate);
     audio.addEventListener('ended', handleEnded);
-<<<<<<< HEAD
-    audio.addEventListener('error', handleError);
-=======
-    // GAP-2: Wire onerror to signed-URL refresh handler
     audio.addEventListener('error', handleAudioError);
->>>>>>> origin/copilot/fix-audio-playback-issues
 
     return () => {
       audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
       audio.removeEventListener('timeupdate', handleTimeUpdate);
       audio.removeEventListener('ended', handleEnded);
-<<<<<<< HEAD
-      audio.removeEventListener('error', handleError);
-=======
       audio.removeEventListener('error', handleAudioError);
->>>>>>> origin/copilot/fix-audio-playback-issues
     };
   }, [currentIndex, queue, boundaries]);
 
-  // Reset URL-refresh flag whenever we load a new track
-  useEffect(() => {
-    urlRefreshAttemptedRef.current = false;
-  }, [activeTrackDataRef.current?.url]);
-
-  const togglePlay = () => {
+  const togglePlay = async () => {
     if (!audioRef.current) return;
     if (isPlaying) {
       audioRef.current.pause();
       setIsPlaying(false);
+      return;
+    }
+
+    const result = await safePlay(audioRef.current, 'AudioPlayer-togglePlay');
+    if (result.ok) {
+      setIsPlaying(true);
+      setError('');
+    } else if (result.error?.name === 'NotAllowedError') {
+      setError(AUDIO_UI_MESSAGES.playbackBlocked);
     } else {
-<<<<<<< HEAD
-      audioRef.current.play().then(() => setIsPlaying(true)).catch(() => {
-        setIsPlaying(false);
-        setError('Playback blocked or unavailable.');
-=======
-      safePlay(audioRef.current, 'AudioPlayer-togglePlay').then((result) => {
-        if (result.ok) {
-          setIsPlaying(true);
-        } else if (result.error?.name === 'NotAllowedError') {
-          setError(AUDIO_UI_MESSAGES.playbackBlocked);
-        }
->>>>>>> origin/copilot/fix-audio-playback-issues
-      });
+      setError(AUDIO_UI_MESSAGES.playbackError);
     }
   };
 
@@ -282,27 +222,26 @@ export default function AudioPlayer() {
   };
 
   const handleSeek = (e: ChangeEvent<HTMLInputElement>) => {
-    const newTime = parseFloat(e.target.value);
-    let clampedTime = newTime;
-    if (clampedTime < boundaries.start) clampedTime = boundaries.start;
-    if (boundaries.end !== null && clampedTime > boundaries.end) clampedTime = boundaries.end;
+    let next = parseFloat(e.target.value);
+    if (next < boundaries.start) next = boundaries.start;
+    if (boundaries.end !== null && next > boundaries.end) next = boundaries.end;
 
-    setCurrentTime(clampedTime);
-    if (audioRef.current) audioRef.current.currentTime = clampedTime;
+    setCurrentTime(next);
+    if (audioRef.current) audioRef.current.currentTime = next;
   };
 
   const handleVolumeChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const newVolume = parseFloat(e.target.value);
-    setVolume(newVolume);
-    if (audioRef.current) audioRef.current.volume = newVolume;
-    setIsMuted(newVolume === 0);
+    const next = parseFloat(e.target.value);
+    setVolume(next);
+    if (audioRef.current) audioRef.current.volume = next;
+    setIsMuted(next === 0);
   };
 
   const formatTime = (seconds: number) => {
     if (!seconds || isNaN(seconds)) return '0:00';
-    const relativeSeconds = Math.max(0, seconds - boundaries.start);
-    const mins = Math.floor(relativeSeconds / 60);
-    const secs = Math.floor(relativeSeconds % 60);
+    const relative = Math.max(0, seconds - boundaries.start);
+    const mins = Math.floor(relative / 60);
+    const secs = Math.floor(relative % 60);
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
@@ -320,6 +259,7 @@ export default function AudioPlayer() {
             <SkipForward size={20} fill="currentColor" />
           </button>
         </div>
+
         <div className="flex-1">
           <div className="text-xs font-bold text-[#FFD54F] uppercase truncate">{track.title}</div>
           {error && (
@@ -341,8 +281,29 @@ export default function AudioPlayer() {
             />
             <span className="text-[10px] opacity-70 w-8">{formatTime(boundaries.end || duration)}</span>
           </div>
+          {isBuffering && <div className="text-[10px] text-[#FFD54F] mt-1">Buffering...</div>}
+        </div>
+
+        <div className="hidden md:flex items-center gap-2 w-28">
+          <button
+            onClick={() => {
+              if (!audioRef.current) return;
+              if (isMuted) {
+                audioRef.current.volume = volume || 1;
+                setIsMuted(false);
+              } else {
+                audioRef.current.volume = 0;
+                setIsMuted(true);
+              }
+            }}
+            className="text-[#FFD54F]"
+          >
+            {isMuted ? <VolumeX size={16} /> : <Volume2 size={16} />}
+          </button>
+          <input type="range" min="0" max="1" step="0.01" value={isMuted ? 0 : volume} onChange={handleVolumeChange} className="flex-1 h-1" />
         </div>
       </div>
+
       <audio ref={audioRef} preload="metadata" />
     </div>
   );
