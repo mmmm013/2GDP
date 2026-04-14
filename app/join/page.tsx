@@ -9,6 +9,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import Link from 'next/link';
 import PromoBar from '@/components/PromoBar';
+import CashSprintBanner from '@/components/CashSprintBanner';
 
 // FOUNDER SPECIAL: first N slots
 const FOUNDER_TOTAL = 50;
@@ -23,6 +24,13 @@ function useFounderCount() {
 }
 
 const FLASH_SPECIALS = [
+  {
+    emoji: '⚡',
+    title: 'K-KUT Sovereign Pass',
+    desc: 'Pre-made K-KUT access is live. Tap once and complete checkout instantly.',
+    href: '/api/checkout-attribution?utm_source=join_flash&utm_medium=site&utm_campaign=cash_sprint_apr2026&utm_content=sovereign_pass',
+    cta: 'BUY NOW'
+  },
   { 
     emoji: '🎷', 
     title: 'MSJ Jazz Pack', 
@@ -55,37 +63,26 @@ const FLASH_SPECIALS = [
 
 export default function JoinPage() {
   const [loading, setLoading] = useState<string | null>(null);
-  const [error, setError] = useState('');
   const founderClaimed = useFounderCount();
   const remaining = FOUNDER_TOTAL - founderClaimed;
-  const [flash] = useState(() => FLASH_SPECIALS[Math.floor(Math.random() * FLASH_SPECIALS.length)]);
+  const [flash, setFlash] = useState(FLASH_SPECIALS[0]);
+  const CHECKOUT_URL = '/api/checkout-attribution?utm_source=join_page&utm_medium=site&utm_campaign=cash_sprint_apr2026&utm_content=tier_cta';
+
+  useEffect(() => {
+    setFlash(FLASH_SPECIALS[Math.floor(Math.random() * FLASH_SPECIALS.length)]);
+  }, []);
 
   const handleJoin = async (tier: string) => {
     setLoading(tier);
-    setError('');
-    try {
-      const res = await fetch('/api/create-subscription', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ tier }),
-      });
-      const data = await res.json();
-      if (data.url) {
-        window.location.href = data.url;
-      } else {
-        setError(data.error || 'Something went wrong');
-      }
-    } catch {
-      setError('Failed to start checkout');
-    } finally {
-      setLoading(null);
-    }
+    // Cash sprint: every tier action lands on the live sovereign checkout.
+    window.location.href = CHECKOUT_URL;
   };
 
   return (
     <main className="min-h-screen w-full bg-[#1A1A1A] text-white selection:bg-[#FFD54F] selection:text-black">
       <PromoBar />
       <Header />
+      <CashSprintBanner endIso="2026-04-15T23:59:59Z" source="join_countdown" />
 
       {/* Hero Section */}
       <section className="relative pt-20 pb-16 px-6">
@@ -97,6 +94,22 @@ export default function JoinPage() {
           <p className="text-xl md:text-2xl font-medium opacity-80 max-w-2xl mx-auto">
             Partner with us to keep the music flowing. We value every Sponsor.
           </p>
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+            <a
+              href={CHECKOUT_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-[#FFD54F] text-black px-8 py-3 font-black text-sm uppercase tracking-widest hover:bg-white transition-colors"
+            >
+              Buy K-KUT Now
+            </a>
+            <Link
+              href="/gift"
+              className="border-2 border-white px-8 py-3 font-black text-sm uppercase tracking-widest hover:bg-white hover:text-black transition-colors"
+            >
+              Send A Gift
+            </Link>
+          </div>
         </div>
       </section>
 
@@ -137,64 +150,10 @@ export default function JoinPage() {
         </div>
       </section>
 
-<<<<<<< HEAD
-      <div className="container mx-auto px-4 mt-10 text-center max-w-3xl">
-        <div className="inline-block p-6 rounded-full bg-[#3E2723] mb-6 shadow-xl">
-          <Users size={48} className="text-[#FFD54F]" strokeWidth={2} />
-        </div>
-        <h1 className="text-5xl md:text-7xl font-black text-[#3E2723] mb-3 tracking-tight drop-shadow-sm leading-none">
-          Join the<br/>Pride.
-        </h1>
-        <p className="text-lg font-bold text-[#3E2723] opacity-80 mb-2 uppercase tracking-widest">
-          Partner with us to keep the music flowing.
-        </p>
-        <p className="text-sm font-semibold text-[#3E2723]/60 mb-8 max-w-md mx-auto">
-          We want volume. We value every single K-KUT. Pick your level — all tiers get real access, real benefits.
-        </p>
-      </div>
-
-      {error && (
-        <div className="container mx-auto px-4 max-w-5xl mb-4">
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded text-center font-bold">{error}</div>
-        </div>
-      )}
-
-      <div className="container mx-auto px-4 pb-12 max-w-5xl">
-        <div className="grid md:grid-cols-2 gap-12 items-start">
-          <div className="bg-[#FFF8E1] border-2 border-[#3E2723] rounded-3xl p-8 shadow-[8px_8px_0px_0px_rgba(62,39,35,1)]">
-            <h2 className="text-2xl font-black uppercase tracking-tight mb-6 flex items-center gap-2"><Compass size={24} /> The Course</h2>
-            <div className="space-y-4 text-base font-bold text-[#3E2723]/80 leading-relaxed">
-              <p>K-KUTs are the engine of G Putnam Music. You aren&apos;t just a fan — you are a partner.</p>
-              <p>Your contribution keeps the <strong>Singalongs</strong> free for pediatric wards and the <strong>Kleigh</strong> stream running for fans worldwide.</p>
-              <p><span className="text-[#E65100]">100% of proceeds</span> fuel artist support &amp; platform development.</p>
-              <p className="text-xs opacity-50 italic">We watch process. Money cares for itself when the process is right.</p>
-            </div>
-
-            <div className="mt-6 pt-6 border-t-2 border-[#3E2723]/10 space-y-3">
-              <h3 className="font-black text-sm uppercase">Every K-KUT Gets:</h3>
-              <div className="flex items-center gap-3 font-bold text-sm"><Check size={18} className="text-[#E65100]" /> Access to URU Story Engine</div>
-              <div className="flex items-center gap-3 font-bold text-sm"><Check size={18} className="text-[#E65100]" /> Unlimited Plays (No Limits)</div>
-              <div className="flex items-center gap-3 font-bold text-sm"><Check size={18} className="text-[#E65100]" /> Verified &quot;Sponsor&quot; Rank</div>
-              <div className="flex items-center gap-3 font-bold text-sm"><Check size={18} className="text-[#E65100]" /> Monthly Flash Special Offers</div>
-            </div>
-
-            {/* ONE-TIME GIFT SHORTCUT */}
-            <div className="mt-6 pt-6 border-t-2 border-[#3E2723]/10">
-              <p className="text-xs font-black uppercase tracking-widest opacity-60 mb-3">Not ready to subscribe?</p>
-              <Link href="/gift" className="block w-full text-center bg-[#E65100] text-white py-3 rounded-xl font-black uppercase tracking-wider hover:bg-amber-400 transition-colors shadow-lg">
-                ❤️ One-Time Heart-Tap Gift
-              </Link>
-            </div>
-          </div>
-
-          <div className="space-y-4">
-=======
       {/* Tiers Grid */}
       <section className="py-20 px-6">
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            
->>>>>>> origin/copilot/fix-audio-playback-issues
             {/* JOEY */}
             <TierCard 
               name="JOEY"

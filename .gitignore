@@ -13,9 +13,11 @@ tsconfig.tsbuildinfo
 
 # Vercel
 .vercel
+.npm-cache
 
 # Private keys / certificates — NEVER commit these
 *.p8
 *.pem
 *.key
 *.tsbuildinfo
+.env*.local

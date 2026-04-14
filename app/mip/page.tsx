@@ -1,15 +1,24 @@
 'use client';
 
-<<<<<<< HEAD
-import { useState, useRef, useEffect } from 'react';
-import { Shield, Zap, Mic, Lock, Download, Play, Pause, FileText, CheckCircle, Copy } from 'lucide-react';
-=======
-import { useState, useRef, useEffect , type FormEvent } from 'react';
-import { Shield, Zap, Mic, Lock, Download, Play, Pause, FileText, ToggleLeft, ToggleRight, CheckCircle, Copy } from 'lucide-react';
->>>>>>> origin/copilot/fix-audio-playback-issues
+import { useState, useRef, useEffect, type FormEvent } from 'react';
+import {
+  Shield,
+  Zap,
+  Mic,
+  Lock,
+  Download,
+  Play,
+  Pause,
+  FileText,
+  ToggleLeft,
+  ToggleRight,
+  CheckCircle,
+  Copy,
+} from 'lucide-react';
 import { supabase } from '@/lib/supabaseClient';
 import BraveEaglePromo from '@/components/BraveEaglePromo';
 import { resolveAudioUrl } from '@/lib/audio/resolveAudioUrl';
+import { safePlayWithRetry } from '@/lib/audio/safePlay';
 
 export default function MipPage() {
   const [accessGranted, setAccessGranted] = useState(false);

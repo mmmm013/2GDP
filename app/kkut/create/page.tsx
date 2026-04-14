@@ -6,9 +6,7 @@ import { Share2, Copy, Check, Music, Radio, Heart, Sparkles, Zap } from 'lucide-
 import Header from '@/components/Header';
 import { supabase } from '@/lib/supabaseClient';
 import GpmBot from '@/components/GpmBot';
-<<<<<<< HEAD
 import KFamilyVisualStrip from '@/components/KFamilyVisualStrip';
-=======
 import {
   SECTION_ORDER,
   SECTION_LABELS,
@@ -17,7 +15,6 @@ import {
   validateSections,
   sectionRange,
 } from '@/lib/kkut-sections';
->>>>>>> origin/copilot/fix-audio-playback-issues
 
 interface CatalogItem {
   id: string;
@@ -105,7 +102,6 @@ export default function KKKCreatorPage() {
       setMkutId(mId);
       setGeneratedKUT(`${window.location.origin}/mkut/${mId}`);
       setShortCode('');
-<<<<<<< HEAD
     } else {
       // K-KUT: short 6-char code stored in Supabase for gateway resolution
       const code = generateShortCode();
@@ -119,9 +115,7 @@ export default function KKKCreatorPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ code, destination, item_type: type, item_id: id }),
       }).catch(() => { /* creator still works if offline */ });
-=======
       return;
->>>>>>> origin/copilot/fix-audio-playback-issues
     }
 
     // K-KUT mode — validate and encode sections for STI type

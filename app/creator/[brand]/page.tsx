@@ -75,6 +75,9 @@ export default function CreatorPortalPage() {
 
   const [authed,  setAuthed]  = useState(false);
   const [authMsg, setAuthMsg] = useState('');
+  const [classicUserId, setClassicUserId] = useState('');
+  const [classicPassword, setClassicPassword] = useState('');
+  const [classicBusy, setClassicBusy] = useState(false);
   const [assets,  setAssets]  = useState<Asset[]>([]);
   const [activeScope, setActiveScope] = useState<CreatorScope | 'ALL'>('ALL');
   const [activeTab, setActiveTab]     = useState<'HERB_BLOG' | 'GPM_FP_PLAYLIST'>('HERB_BLOG');
@@ -123,6 +126,43 @@ export default function CreatorPortalPage() {
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);
       setAuthMsg(`❌ ${msg}`);
+    }
+  }
+
+  async function handlePasswordLogin() {
+    if (!creator) return;
+    if (!classicUserId.trim() || !classicPassword) {
+      setAuthMsg('Please enter user ID and password.');
+      return;
+    }
+
+    setClassicBusy(true);
+    setAuthMsg('Verifying credentials…');
+
+    try {
+      const res = await fetch('/api/creator/password-auth', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          brand: creator.brand,
+          userId: classicUserId.trim(),
+          password: classicPassword,
+        }),
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error ?? 'Classic login failed');
+      }
+
+      setAuthed(true);
+      setClassicPassword('');
+      setAuthMsg('');
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      setAuthMsg(`❌ ${msg}`);
+    } finally {
+      setClassicBusy(false);
     }
   }
 
@@ -253,7 +293,7 @@ export default function CreatorPortalPage() {
                   <span>You&apos;re in! Write posts in <strong className="text-[#a8cc7f]">🌱 Herb Blog</strong> or upload your curated playlist.</span>
                 </li>
               </ol>
-              <p className="mt-3 text-xs text-white/30">Session stays active 4 hours. No password — ever.</p>
+              <p className="mt-3 text-xs text-white/30">Session stays active 4 hours. Biometric is preferred, with classic login available if enabled.</p>
             </div>
           )}
 
@@ -263,6 +303,45 @@ export default function CreatorPortalPage() {
           >
             🔐 Biometric Login
           </button>
+
+          <div className="my-4 flex items-center gap-3">
+            <div className="h-px flex-1 bg-white/10" />
+            <span className="text-[0.65rem] uppercase tracking-[0.2em] text-white/35">or</span>
+            <div className="h-px flex-1 bg-white/10" />
+          </div>
+
+          <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3 text-left">
+            <p className="text-[0.65rem] uppercase tracking-[0.2em] text-white/40 mb-2">Classic Login</p>
+            <input
+              type="text"
+              value={classicUserId}
+              onChange={(e) => setClassicUserId(e.target.value)}
+              placeholder="User ID"
+              autoComplete="username"
+              className="w-full rounded-md bg-black/20 border border-white/10 px-3 py-2 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-[#FFD54F]/50 mb-2"
+            />
+            <input
+              type="password"
+              value={classicPassword}
+              onChange={(e) => setClassicPassword(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  void handlePasswordLogin();
+                }
+              }}
+              placeholder="Password"
+              autoComplete="current-password"
+              className="w-full rounded-md bg-black/20 border border-white/10 px-3 py-2 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-[#FFD54F]/50 mb-2"
+            />
+            <button
+              onClick={() => { void handlePasswordLogin(); }}
+              disabled={classicBusy}
+              className="w-full py-2 rounded-md font-bold tracking-wider text-xs bg-white/10 text-white hover:bg-white/20 disabled:opacity-50"
+            >
+              {classicBusy ? 'Authenticating…' : 'Use User ID + Password'}
+            </button>
+          </div>
 
           {authMsg && (
             <p className="mt-4 text-sm text-white/50">{authMsg}</p>
@@ -295,7 +374,7 @@ export default function CreatorPortalPage() {
 
     return (
       <main className="min-h-screen bg-[#1a1207] text-white">
-        <PortalHeader creator={creator} onLogout={() => { setAuthed(false); router.push('/creator/pixie'); }} />
+        <PortalHeader creator={creator} onLogout={() => { setAuthed(false); router.push('/flagship.go'); }} />
 
         {/* GD-BOT: creator journey guide */}
         <div className="max-w-3xl mx-auto px-4 pt-4 flex justify-end">
@@ -469,7 +548,7 @@ function PortalHeader({ creator, onLogout }: { creator: Creator; onLogout: () =>
       <div className="flex items-center gap-4">
         <Link href="/herb-blog" className="text-white/30 text-xs hover:text-white/60">Public Page</Link>
         <button onClick={onLogout} className="text-white/30 text-xs hover:text-white/60">Log out</button>
-        <Link href="/" className="text-white/20 text-xs hover:text-white/40">← GPM</Link>
+        <Link href="/flagship.go" className="text-white/20 text-xs hover:text-white/40">← GPM</Link>
       </div>
     </div>
   );

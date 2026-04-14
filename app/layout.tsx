@@ -6,6 +6,7 @@ import FPPixBar from '@/components/FPPixBar';
 export const metadata: Metadata = {
   title: 'G Putnam Music',
   description: 'Dream The Stream',
+  metadataBase: new URL('https://www.gputnammusic.com'),
   icons: {
     icon: '/gpm_logo.jpg',
     apple: '/gpm_logo.jpg',

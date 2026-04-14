@@ -130,7 +130,7 @@ function CreatorEnrollForm() {
         )}
 
         <div className="mt-8">
-          <Link href="/" className="text-white/20 text-xs hover:text-white/40">← Back to Flagship</Link>
+          <Link href="/flagship.go" className="text-white/20 text-xs hover:text-white/40">← Back to Flagship</Link>
         </div>
       </div>
     );
@@ -206,7 +206,7 @@ function CreatorEnrollForm() {
       )}
 
       <div className="mt-8 text-center">
-        <Link href="/" className="text-white/20 text-xs hover:text-white/40">← Back to Flagship</Link>
+        <Link href="/flagship.go" className="text-white/20 text-xs hover:text-white/40">← Back to Flagship</Link>
       </div>
     </div>
   );

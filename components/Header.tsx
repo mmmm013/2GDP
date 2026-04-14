@@ -63,6 +63,7 @@ export default function Header() {
   const menuTT = asMenuLabel(templateSlots.menu_item_tells_tale, 'tt', 'TT');
   const menuMsj = asText(templateSlots.menu_item_msj, 'MSJ');
   const menuJoin = asText(templateSlots.menu_item_sponsorships, 'JOIN');
+  const checkoutHref = '/api/checkout-attribution?utm_source=header&utm_medium=site&utm_campaign=cash_sprint_apr2026&utm_content=buy_kk_now';
 
   return (
     <nav className="w-full bg-[#2A1506] shadow-lg border-b border-[#5C3A1E]/40 relative z-50">
@@ -98,6 +99,14 @@ export default function Header() {
 
         {/* RIGHT: Desktop Menu */}
         <div className="hidden md:flex items-center gap-5">
+          <a
+            href={checkoutHref}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm bg-[#FFD54F] text-[#2A1506] px-4 py-1.5 rounded-full font-bold text-center hover:bg-[#FFE082] transition-colors tracking-wide"
+          >
+            BUY KK NOW
+          </a>
           <Link href="/mip" className="text-sm text-[#FFD54F] hover:text-[#FFE082] font-bold tracking-wide transition-colors">{menuMip1}</Link>
           <Link href="/heroes" className="text-sm text-[#C4A882] hover:text-[#C8A882] font-medium tracking-wide transition-colors">{menuHeroes}</Link>
           <Link href="/uru" className="text-sm text-[#C4A882] hover:text-[#C8A882] font-medium tracking-wide transition-colors">{menuUru}</Link>
@@ -131,6 +140,15 @@ export default function Header() {
           <Link href="/commercial" onClick={() => setMenuOpen(false)} className="text-sm text-[#C4A882] hover:text-[#C8A882] font-medium tracking-wide min-h-[44px] flex items-center">GPMCC</Link>
           <a href="https://2kleigh.com" target="_blank" rel="noopener noreferrer" onClick={() => setMenuOpen(false)} className="text-sm text-[#C4A882] hover:text-[#C8A882] font-medium tracking-wide min-h-[44px] flex items-center">KLEIGH</a>
           <Link href="/join" onClick={() => setMenuOpen(false)} className="text-sm bg-[#C8A882] text-[#2A1506] px-4 py-3 rounded-full font-bold text-center hover:bg-[#D07CC8] transition-colors tracking-wide mt-2">{menuJoin}</Link>
+          <a
+            href={checkoutHref}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={() => setMenuOpen(false)}
+            className="text-sm bg-[#FFD54F] text-[#2A1506] px-4 py-3 rounded-full font-bold text-center hover:bg-[#FFE082] transition-colors tracking-wide"
+          >
+            BUY KK NOW
+          </a>
         </div>
       )}
     </nav>

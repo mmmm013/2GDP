@@ -30,6 +30,12 @@
 ALTER TABLE public.k_kut_assets
   DROP CONSTRAINT IF EXISTS k_kut_assets_structure_tag_check;
 
+-- Normalize legacy tags before enforcing canonical taxonomy.
+-- Live data currently uses 'Verse' in older rows.
+UPDATE public.k_kut_assets
+SET structure_tag = 'V1'
+WHERE structure_tag = 'Verse';
+
 -- Re-add with the full canonical taxonomy
 ALTER TABLE public.k_kut_assets
   ADD CONSTRAINT k_kut_assets_structure_tag_check
@@ -80,14 +86,7 @@ ALTER TABLE public.k_kut_codes
   ADD CONSTRAINT k_kut_codes_sections_tags_check
     CHECK (
       sections IS NULL
-      OR (
-        -- Every element must be a valid section tag
-        NOT EXISTS (
-          SELECT 1
-          FROM unnest(sections) AS s(tag)
-          WHERE s.tag NOT IN ('Intro','V1','Pre1','Ch1','V2','Pre2','Ch2','BR','Ch3','Outro')
-        )
-      )
+      OR sections <@ ARRAY['Intro','V1','Pre1','Ch1','V2','Pre2','Ch2','BR','Ch3','Outro']::text[]
     );
 
 -- ============================================================
