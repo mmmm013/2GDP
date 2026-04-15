@@ -1,6 +1,6 @@
 name: Creator Auth Validation
 
-on:
+'on':
   workflow_dispatch:
 
 jobs:
@@ -9,8 +9,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-      VERCEL_SCOPE: ${{ secrets.VERCEL_SCOPE != '' && secrets.VERCEL_SCOPE || 'g-putnam-music' }}
-      VERCEL_PROJECT: ${{ secrets.VERCEL_PROJECT != '' && secrets.VERCEL_PROJECT || 'gputnam-music-final-site' }}
+      VERCEL_SCOPE: g-putnam-music
+      VERCEL_PROJECT: gputnam-music-final-site
     steps:
       - uses: actions/checkout@v4
 

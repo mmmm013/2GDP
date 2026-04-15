@@ -1,6 +1,6 @@
 name: Deploy Hygiene
 
-on:
+'on':
   pull_request:
   push:
     branches: [main]
