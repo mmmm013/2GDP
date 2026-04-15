@@ -138,7 +138,34 @@ async function resolveStreamUrl(trackId: string): Promise<string | null> {
   return fallbackSigned;
 }
 
-async function handle(trackId: string) {
+type ResolveAudioResult = {
+  url?: string;
+  signedUrl?: string;
+  access?: string;
+  message?: string;
+};
+
+async function resolveViaFeaturedRoute(trackId: string, origin: string): Promise<ResolveAudioResult | null> {
+  try {
+    const url = `${origin}/api/resolve-audio?track_id=${encodeURIComponent(trackId)}`;
+    const res = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'user-agent':
+          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+      },
+      cache: 'no-store',
+    });
+
+    const body = (await res.json().catch(() => null)) as ResolveAudioResult | null;
+    if (!body) return null;
+    return body;
+  } catch {
+    return null;
+  }
+}
+
+async function handle(trackId: string, origin: string) {
   if (!trackId) {
     return NextResponse.json({ error: 'Track ID is required' }, { status: 400 });
   }
@@ -146,6 +173,26 @@ async function handle(trackId: string) {
   try {
     const url = await resolveStreamUrl(trackId);
     if (!url) {
+      const fallback = await resolveViaFeaturedRoute(trackId, origin);
+      if (fallback?.url) {
+        return NextResponse.json({
+          url: fallback.url,
+          signedUrl: fallback.signedUrl ?? fallback.url,
+          access: fallback.access ?? 'free',
+          source: 'resolve-audio-fallback',
+        });
+      }
+
+      if (fallback?.access === 'purchase_required') {
+        return NextResponse.json(
+          {
+            error: fallback.message ?? 'Track requires purchase or is not currently featured',
+            access: 'purchase_required',
+          },
+          { status: 403 }
+        );
+      }
+
       return NextResponse.json({ error: 'Track not found or not streamable' }, { status: 404 });
     }
 
@@ -158,10 +205,10 @@ async function handle(trackId: string) {
 
 export async function GET(_req: NextRequest, context: { params: Promise<{ trackId: string }> }) {
   const { trackId } = await context.params;
-  return handle(trackId);
+  return handle(trackId, _req.nextUrl.origin);
 }
 
 export async function POST(_req: NextRequest, context: { params: Promise<{ trackId: string }> }) {
   const { trackId } = await context.params;
-  return handle(trackId);
+  return handle(trackId, _req.nextUrl.origin);
 }
