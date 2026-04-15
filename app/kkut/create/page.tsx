@@ -61,14 +61,99 @@ export default function KKKCreatorPage() {
   const [itemsLoading, setItemsLoading] = useState(true);
 
   useEffect(() => {
-    Promise.all([
-      supabase.from('gpm_tracks').select('id, title, artist').order('title'),
-      supabase.from('playlists').select('id, name').eq('is_featured', true).order('name'),
-    ]).then(([{ data: tData }, { data: pData }]) => {
-      setTracks((tData ?? []).map((t: any) => ({ id: t.id, title: t.title, type: 'STI' as const, artist: t.artist })));
-      setPlaylists((pData ?? []).map((p: any) => ({ id: p.id, title: p.name, type: 'FP' as const })));
-      setItemsLoading(false);
-    });
+    let isMounted = true;
+
+    const loadCatalog = async () => {
+      try {
+        let resolvedTracks: any[] = [];
+        let resolvedPlaylists: any[] = [];
+
+        // Primary track source (legacy table).
+        const trackPrimary = await supabase
+          .from('gpm_tracks')
+          .select('id, title, artist')
+          .order('title');
+
+        if (!trackPrimary.error && trackPrimary.data?.length) {
+          resolvedTracks = trackPrimary.data;
+        } else {
+          // Fallback track source (current catalog table).
+          const trackFallback = await supabase
+            .from('tracks')
+            .select('id, track_id, title, artist')
+            .order('title');
+
+          if (!trackFallback.error && trackFallback.data?.length) {
+            resolvedTracks = trackFallback.data.map((row: any) => ({
+              id: row.track_id ?? String(row.id),
+              title: row.title,
+              artist: row.artist,
+            }));
+          }
+        }
+
+        // Primary playlist source (featured flag).
+        const playlistPrimary = await supabase
+          .from('playlists')
+          .select('id, name')
+          .eq('is_featured', true)
+          .order('name');
+
+        if (!playlistPrimary.error && playlistPrimary.data?.length) {
+          resolvedPlaylists = playlistPrimary.data;
+        } else {
+          // Fallback when schema differs (no is_featured column).
+          const playlistFallback = await supabase
+            .from('playlists')
+            .select('id, name')
+            .order('name');
+
+          if (!playlistFallback.error && playlistFallback.data?.length) {
+            resolvedPlaylists = playlistFallback.data;
+          } else {
+            // Last-resort fallback to configured featured playlist metadata.
+            const playlistConfig = await supabase
+              .from('featured_playlists_config')
+              .select('id, display_name')
+              .order('display_name');
+
+            if (!playlistConfig.error && playlistConfig.data?.length) {
+              resolvedPlaylists = playlistConfig.data.map((row: any) => ({
+                id: row.id,
+                name: row.display_name,
+              }));
+            }
+          }
+        }
+
+        if (!isMounted) return;
+
+        setTracks(
+          resolvedTracks.map((t: any) => ({
+            id: String(t.id),
+            title: t.title,
+            type: 'STI' as const,
+            artist: t.artist,
+          }))
+        );
+
+        setPlaylists(
+          resolvedPlaylists.map((p: any) => ({
+            id: String(p.id),
+            title: p.name,
+            type: 'FP' as const,
+          }))
+        );
+      } finally {
+        if (isMounted) setItemsLoading(false);
+      }
+    };
+
+    loadCatalog();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   // Derive the selected section range for K-KUT STI
