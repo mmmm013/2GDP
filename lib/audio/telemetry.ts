@@ -1,5 +1,5 @@
 export type AudioTelemetryEvent = {
-  event: 'audio_play_ok' | 'audio_play_failed' | 'audio_error';
+  event: 'audio_play_ok' | 'audio_play_failed' | 'audio_error' | 'page_view';
   source: string;
   message?: string;
   track?: string;

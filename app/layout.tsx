@@ -2,6 +2,7 @@ import './globals.css';
 import type { Metadata, Viewport } from 'next';
 import { Analytics } from '@vercel/analytics/react';
 import FPPixBar from '@/components/FPPixBar';
+import TrafficBeacon from '@/components/TrafficBeacon';
 
 export const metadata: Metadata = {
   title: 'G Putnam Music',
@@ -44,6 +45,7 @@ export default function RootLayout({
         <main className="relative w-full overflow-x-hidden">
           {children}
         </main>
+        <TrafficBeacon />
         <FPPixBar />
         <Analytics />
       </body>
