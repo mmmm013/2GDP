@@ -133,9 +133,19 @@ async function resolveStreamUrl(trackId: string): Promise<string | null> {
     if (signed) return signed;
   }
 
-  // Last resort: attempt track-id.mp3 naming convention in tracks bucket.
-  const fallbackSigned = await signTrackPath(`${trackId}.mp3`);
-  return fallbackSigned;
+  // Last resort: try known naming conventions in the private `tracks` bucket.
+  // Current catalog convention is mostly `gpm-pix-{track_id}.mp3`.
+  const fallbackNames = [`gpm-pix-${trackId}.mp3`, `track_${trackId}.mp3`, `${trackId}.mp3`];
+
+  for (const name of fallbackNames) {
+    const signed = await signTrackPath(name);
+    if (!signed) continue;
+
+    const ok = await isPlayableDirectUrl(signed);
+    if (ok) return signed;
+  }
+
+  return null;
 }
 
 type ResolveAudioResult = {
