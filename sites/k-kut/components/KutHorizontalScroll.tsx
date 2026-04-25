@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback } from 'react';
 import type { KutItem } from '@/lib/featuredKuts';
+import type { KkutPlayDetail } from '@/components/KutAudioPlayer';
 
 interface KutHorizontalScrollProps {
   items: KutItem[];
@@ -46,8 +47,10 @@ const INVENTION_COLORS: Record<KutItem['type'], { active: string; passive: strin
  *   mini-KUT (mK) → violet — short exact audio hook; ASCAP-tied per PIX-PCK (LOOP 8)
  *   K-kUpId (KPD) → rose  — romance-level exact audio excerpt (Interest→Forever)
  *
- * Renders a horizontally-scrollable chip rail, auto-streams, and shows
- * a per-invention Heart-Tap waveform visualizer.
+ * Renders a horizontally-scrollable chip rail. On chip click, dispatches a
+ * `kkut-play` CustomEvent so the global KutAudioPlayer takes exclusive control
+ * of audio. Waveform animation syncs via `kkut-playing` / `kkut-paused` /
+ * `kkut-ended` events emitted back by KutAudioPlayer.
  */
 export default function KutHorizontalScroll({
   items,
@@ -56,11 +59,9 @@ export default function KutHorizontalScroll({
   autoPlay = false,
   loop = false,
 }: KutHorizontalScrollProps) {
-  const audioRef = useRef<HTMLAudioElement | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [blocked, setBlocked] = useState(false);
   const [bars, setBars] = useState<number[]>([3, 5, 8, 4, 6, 3, 7, 4]);
   const animTimeoutRef = useRef<number | null>(null);
 
@@ -86,28 +87,19 @@ export default function KutHorizontalScroll({
     };
   }, [isPlaying, animateBars]);
 
-  // ── Load track ─────────────────────────────────────────────────────────────
-  const loadTrack = useCallback(
-    (idx: number, andPlay: boolean) => {
-      const item = items[idx];
-      if (!item) return;
-      const audio = audioRef.current;
-      if (!audio) return;
-
-      if (item.url) {
-        audio.src = item.url;
-        audio.load();
-      }
-
-      if (andPlay && item.url) {
-        audio
-          .play()
-          .then(() => { setIsPlaying(true); setBlocked(false); })
-          .catch(() => { setIsPlaying(false); setBlocked(true); });
-      }
-    },
-    [items]
-  );
+  // ── Dispatch play event to global KutAudioPlayer ───────────────────────────
+  const dispatchPlay = useCallback((idx: number) => {
+    const item = items[idx];
+    if (!item?.url) return;
+    const detail: KkutPlayDetail = {
+      url:          item.url,
+      title:        item.title,
+      artist:       item.artist,
+      type:         item.type,
+      romanceLevel: item.romance_level,
+    };
+    window.dispatchEvent(new CustomEvent('kkut-play', { detail }));
+  }, [items]);
 
   // ── Scroll chip into view ──────────────────────────────────────────────────
   const scrollToChip = useCallback((idx: number) => {
@@ -117,55 +109,77 @@ export default function KutHorizontalScroll({
     if (chip) chip.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
   }, []);
 
-  // ── Auto-play on mount ─────────────────────────────────────────────────────
+  // ── Trigger auto-play when items first load or autoPlay prop changes ────────
   useEffect(() => {
-    if (items.length === 0) return;
-    loadTrack(0, autoPlay);
-  }, [items.length, autoPlay, loadTrack]);
+    if (items.length === 0 || !autoPlay) return;
+    dispatchPlay(0);
+  // Re-run when the items array gains entries or the autoPlay prop is toggled.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [items.length, autoPlay]);
 
-  // ── Auto-advance ───────────────────────────────────────────────────────────
+  // ── Auto-advance helper ────────────────────────────────────────────────────
   const advanceToNext = useCallback(() => {
     if (!autoStream) return;
     setActiveIndex((prev) => {
       const next = prev + 1;
       if (next >= items.length) {
-        if (loop) { scrollToChip(0); loadTrack(0, true); return 0; }
+        if (loop) { scrollToChip(0); dispatchPlay(0); return 0; }
         return prev;
       }
       scrollToChip(next);
-      loadTrack(next, true);
+      dispatchPlay(next);
       return next;
     });
-  }, [autoStream, items.length, loop, loadTrack, scrollToChip]);
+  }, [autoStream, items.length, loop, dispatchPlay, scrollToChip]);
 
-  // ── Wire audio events ──────────────────────────────────────────────────────
+  // ── Sync visual state from global KutAudioPlayer events ───────────────────
   useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
-    const onEnded = () => { setIsPlaying(false); advanceToNext(); };
-    const onPlay = () => setIsPlaying(true);
-    const onPause = () => setIsPlaying(false);
-    audio.addEventListener('ended', onEnded);
-    audio.addEventListener('play', onPlay);
-    audio.addEventListener('pause', onPause);
-    return () => {
-      audio.removeEventListener('ended', onEnded);
-      audio.removeEventListener('play', onPlay);
-      audio.removeEventListener('pause', onPause);
+    const onPlaying = (e: Event) => {
+      const { url } = (e as CustomEvent<{ url: string }>).detail;
+      const currentItem = items[activeIndex];
+      setIsPlaying(!!currentItem?.url && currentItem.url === url);
     };
-  }, [advanceToNext]);
+    const onPaused = (e: Event) => {
+      const { url } = (e as CustomEvent<{ url: string }>).detail;
+      const currentItem = items[activeIndex];
+      if (currentItem?.url === url) setIsPlaying(false);
+    };
+    const onEnded = (e: Event) => {
+      const { url } = (e as CustomEvent<{ url: string }>).detail;
+      const currentItem = items[activeIndex];
+      if (currentItem?.url === url) {
+        setIsPlaying(false);
+        advanceToNext();
+      }
+    };
+
+    window.addEventListener('kkut-playing', onPlaying);
+    window.addEventListener('kkut-paused',  onPaused);
+    window.addEventListener('kkut-ended',   onEnded);
+    return () => {
+      window.removeEventListener('kkut-playing', onPlaying);
+      window.removeEventListener('kkut-paused',  onPaused);
+      window.removeEventListener('kkut-ended',   onEnded);
+    };
+  }, [items, activeIndex, advanceToNext]);
 
   // ── Chip click ─────────────────────────────────────────────────────────────
   const handleChipClick = (idx: number) => {
-    const audio = audioRef.current;
-    if (!audio) return;
     if (idx === activeIndex) {
-      if (isPlaying) { audio.pause(); }
-      else if (activeItem?.url) { audio.play().then(() => setIsPlaying(true)).catch(() => setBlocked(true)); }
+      // Toggle: if this chip's track is playing, pause via the global player;
+      // if paused, resume by re-dispatching kkut-play for the same track.
+      if (isPlaying) {
+        // Dispatch a kkut-pause signal — KutAudioPlayer handles its own toggle
+        // via the Play button; for the chip we just re-dispatch so the player
+        // can react. Actually send a custom pause event.
+        window.dispatchEvent(new CustomEvent('kkut-pause-request'));
+      } else {
+        dispatchPlay(idx);
+      }
       return;
     }
     setActiveIndex(idx);
-    loadTrack(idx, true);
+    dispatchPlay(idx);
     scrollToChip(idx);
   };
 
@@ -222,7 +236,7 @@ export default function KutHorizontalScroll({
           <div
             className="flex items-end gap-[2px] h-4 cursor-pointer"
             onClick={() => handleChipClick(activeIndex)}
-            aria-label={isPlaying ? 'Pause' : blocked ? 'Tap to play' : 'Play'}
+            aria-label={isPlaying ? 'Pause' : 'Play'}
             role="button"
             tabIndex={0}
             onKeyDown={(e) => e.key === 'Enter' && handleChipClick(activeIndex)}
@@ -249,16 +263,9 @@ export default function KutHorizontalScroll({
             </p>
             <p className="text-[9px] text-white/40 truncate">{activeItem.artist}</p>
           </div>
-
-          {blocked && (
-            <span className="text-[9px] uppercase tracking-widest text-white/40 shrink-0">
-              tap to play
-            </span>
-          )}
         </div>
       )}
-
-      <audio ref={audioRef} preload="metadata" />
     </div>
   );
 }
+

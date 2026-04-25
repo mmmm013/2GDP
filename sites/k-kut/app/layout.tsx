@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import KutAudioPlayer from "@/components/KutAudioPlayer";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://k-kut.com"),
@@ -51,8 +52,9 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body className="bg-kkut-bg text-kkut-text font-sans antialiased">
+      <body className="bg-kkut-bg text-kkut-text font-sans antialiased pb-safe">
         {children}
+        <KutAudioPlayer />
       </body>
     </html>
   );
