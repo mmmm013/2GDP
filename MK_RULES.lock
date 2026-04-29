@@ -24,5 +24,19 @@ VOCAL_SOUND RULE:
 - Vocal sounds are first-class mKs.
 - Examples: oh, ah, mm, yeah, breath, laugh, cry, grit, whisper.
 
+mK INVENTORY SILO RULE:
+- mKs accumulate vertically and dramatically.
+- mKs are organized by content silo first.
+- Same-content mKs are allowed and expected.
+- Same content must be distinguished by available attributes:
+  vocalist initials, composer initials, gender/voice type, BPM, style, source PIX, novelty, emotional use, and quality rank.
+- 4PE-BIZ-MSC stores TOP mKs.
+- Novelty mKs are stored separately even when content matches.
+
+NAMING RULE:
+- mK naming uses CONTENT ONLY plus either:
+  1) vocalist initials OR
+  2) composer initials
+
 LOCKED ORDER:
 PIX → K-KUTs → mini-KUTs → K-UPIDs
