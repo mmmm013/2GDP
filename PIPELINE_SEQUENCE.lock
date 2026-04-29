@@ -11,3 +11,10 @@ RULES:
 - No direct PIX → mK
 - All derivatives must preserve duration integrity
 - Supabase storage URLs only for audio
+
+mK SPECIAL CAPTURE RULE:
+- held_word is a first-class mini-KUT type.
+- Capture line-ending words held long in vocal performance.
+- Capture stretched/emphasized sung words such as L-----O-----V-----E.
+- held_word mKs are meaning-driven, not timing-driven.
+- Timing may support verification/reporting only; it does not define the mK.
