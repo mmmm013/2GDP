@@ -1,0 +1,13 @@
+PIPELINE ORDER (DO NOT CHANGE)
+
+1) PIX (source of truth)
+2) K-KUTs / KKs (derived from PIX only)
+3) mini-KUTs / mKs (derived from K-KUTs only)
+4) K-UPIDs / KPDs (product layer from K-KUTs)
+
+RULES:
+- No mKs without K-KUTs
+- No KPDs without K-KUTs
+- No direct PIX → mK
+- All derivatives must preserve duration integrity
+- Supabase storage URLs only for audio
