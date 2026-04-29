@@ -40,3 +40,10 @@ NAMING RULE:
 
 LOCKED ORDER:
 PIX → K-KUTs → mini-KUTs → K-UPIDs
+
+mK SATELLITE SILO RULE:
+- Lead-in Words & Sounds is a dedicated satellite silo.
+- It captures vocal lead-ins, pickup words, emotional starts, and pre-phrase sounds.
+- Examples: yeah, yes, no, oh, well, so, baby, darling, love, dear, now, when, mmm, ah, breath.
+- Lead-ins may be words or vocal sounds.
+- Lead-ins are stored separately from core lyric/meaning mKs when their function is entrance, setup, emotional ignition, or vocal pickup.
