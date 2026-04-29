@@ -20,3 +20,14 @@ CANONICAL NAMING RULE:
   DMAIC + VOC-driven improvement.
 
 - No silent mutation, normalization, or substitution is allowed.
+
+PIX PROCESSING ORDER RULE:
+- Process small controlled batches until all PIX are complete.
+- Process order:
+  1) INO-PIX
+  2) IN-PIX
+  3) LT-PIX
+- Within each type, process simplest to most complex.
+- If a lyric, structure, rights, audio, or classification challenge appears:
+  alert admin, mark needs_admin_dispensation, and set aside.
+- Do not force-fit difficult PIX into the standard path.
