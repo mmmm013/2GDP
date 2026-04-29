@@ -1,0 +1,28 @@
+mini-KUT / mK RULES LOCK
+
+mKs derive from PIX music, lyric, or both.
+mKs are meaning captures, not timing products.
+
+VALID mK TYPES:
+- word
+- lyric phrase
+- held_word
+- vocal_sound
+- exclamation
+
+WORD RULE:
+- Capture meaningful words only.
+- Do NOT capture articles or prepositions as word mKs.
+- Articles/prepositions may be captured only if they function as vocal_sound or sound/emotional elements.
+
+HELD_WORD RULE:
+- Capture line-ending or emotionally sustained words.
+- Example: L-----O-----V-----E.
+- held_word is meaning/performance capture, not timing logic.
+
+VOCAL_SOUND RULE:
+- Vocal sounds are first-class mKs.
+- Examples: oh, ah, mm, yeah, breath, laugh, cry, grit, whisper.
+
+LOCKED ORDER:
+PIX → K-KUTs → mini-KUTs → K-UPIDs
