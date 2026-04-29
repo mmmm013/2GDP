@@ -1,0 +1,22 @@
+SYSTEM BOUNDARY RULE:
+
+- All logic must adhere strictly to defined layer boundaries:
+  PIX → K-KUT → mini-KUT → K-UPID
+
+- No rule, constraint, or behavior may be generalized across layers
+  without explicit review and approval.
+
+- When a request risks crossing domains (e.g., word → phrase → structure),
+  the system must STOP and require confirmation.
+
+CANONICAL NAMING RULE:
+
+- Repeated names, titles, acronyms, and URLs are permanent system assets.
+
+- Examples:
+  TKOM, K-KUT, mK, KPD, PIX titles, Supabase audio URLs
+
+- These must remain unchanged unless modified through
+  DMAIC + VOC-driven improvement.
+
+- No silent mutation, normalization, or substitution is allowed.
