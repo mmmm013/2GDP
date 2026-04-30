@@ -1,0 +1,41 @@
+
+DOMAIN STRATEGY RULE:
+
+CORE PRINCIPLE:
+- All domains are entry points into one unified GPMx system.
+- Domains must not fragment data, logic, or inventory.
+- Domains differ by audience and intent, not by backend system.
+
+PRIMARY DOMAINS:
+- k-kut.com = HUG experience (send, receive, forward; non-downloadable).
+- gputnammusic.com = PIX retail (downloadable songs and catalog).
+- mmmm-songs.com = SUPE / licensing / professional access (moments, hooks, phrases, sections).
+
+FUTURE DOMAINS:
+- Must map to a clear user intent (e.g., gifting, discovery, pro search, artist brand).
+- Must route into existing system flows (HUG, PIX, 4PE).
+- Must not introduce duplicate systems or parallel databases.
+
+AI / BOT PRINCIPLE:
+- AI/BOTs assist discovery, packaging, routing, and delivery.
+- AI/BOTs do not replace the original human vocal asset.
+- All final audio remains real, verified, and source-controlled.
+
+USER EXPERIENCE GOAL:
+- “Listening heaven”: immediate emotional match, clarity, beauty, and ease.
+- No internal jargon exposed (no mK, KPD, etc. in UI).
+- Language must be simple: moments, hooks, phrases, sections.
+
+CROSS-DOMAIN FLOW:
+- HUG → (needs download) → gputnammusic.com
+- HUG → (needs professional use) → mmmm-songs.com
+- SUPE → (wants to send) → k-kut.com
+
+CONTROL RULE:
+- Any new domain must declare:
+  1) user type
+  2) intent
+  3) entry action
+  4) exit routing
+- If unclear, do not launch domain.
+
