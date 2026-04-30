@@ -9,39 +9,34 @@ const supabase = createClient(
 export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
-    const q = (searchParams.get("q") || "").toLowerCase();
+    const q = (searchParams.get("q") || "").toLowerCase().trim();
 
     const { data, error } = await supabase
-      .schema("app") // ✅ FIXED SCHEMA
-      .from("mks")
-      .select(
-        "id,title,phrase,phrase_type,source_title,keenness_score,emotion_level,search_tags,audio_url,status"
-      )
-      .or(
-        `phrase.ilike.%${q}%,title.ilike.%${q}%,search_tags.ilike.%${q}%`
-      )
-      .in("status", ["approved", "needs_review"])
-      .order("keenness_score", { ascending: false })
-      .limit(5);
+      .from("k_kuts")
+      .select("*")
+      .or(`title.ilike.%${q}%,description.ilike.%${q}%`)
+      .limit(10);
 
     if (error) {
-      console.error("Supabase error:", error);
-      return NextResponse.json(
-        { error: error.message },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: error.message }, { status: 500 });
     }
+
+    // normalize to "moment" shape
+    const moments = (data || []).map((k: any) => ({
+      id: k.id,
+      phrase: k.title,
+      source_title: k.title,
+      keenness_score: k.keenness_score || 0,
+      emotion_level: k.emotion_level || "",
+      audio_url: k.audio_url || ""
+    }));
 
     return NextResponse.json({
       query: q,
-      count: data?.length || 0,
-      moments: data || []
+      count: moments.length,
+      moments
     });
-  } catch (err: any) {
-    console.error("API crash:", err);
-    return NextResponse.json(
-      { error: "Server error" },
-      { status: 500 }
-    );
+  } catch {
+    return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }
