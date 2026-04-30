@@ -1,59 +1,101 @@
 "use client";
 
+import Link from "next/link";
+
 export default function SupePage() {
   return (
-    <div style={{ padding: 40, maxWidth: 900, margin: "0 auto", lineHeight: 1.6 }}>
-      
-      <h1 style={{ fontSize: 36, marginBottom: 20 }}>
-        Find the exact moment you need.
-      </h1>
+    <main className="min-h-screen bg-[#1A120B] text-[#F5E6C8]">
+      <header className="border-b border-[#D4A017]/20 px-6 py-4 flex justify-between">
+        <div className="font-bold text-[#D4A017]">SUPE Specialties</div>
+        <nav className="flex gap-6 text-sm">
+          <Link href="/" className="hover:text-[#D4A017]">Home</Link>
+          <Link href="/find" className="hover:text-[#D4A017]">Browse</Link>
+        </nav>
+      </header>
 
-      <p style={{ fontSize: 18, marginBottom: 30 }}>
-        Vocal hooks, phrases, emotional moments, and song sections—ready for film, TV, ads, and branded content.
-      </p>
+      <section className="mx-auto max-w-4xl px-6 py-16">
+        <p className="text-sm uppercase tracking-[0.3em] text-[#C8A882]">
+          Powered by 4PE PROMOTER
+        </p>
 
-      <hr style={{ margin: "30px 0" }} />
+        <h1 className="mt-4 text-4xl font-bold">
+          Placement-ready music moments.
+        </h1>
 
-      <h2>Browse Moments</h2>
-      <p>
-        Discover precise emotional moments: lead-ins, hooks, phrases, and sections.
-      </p>
+        <p className="mt-4 text-[#E8CFA8] max-w-2xl">
+          Find, preview, and request real-audio placement moments for film,
+          television, advertising, and branded content.
+        </p>
 
-      <h2 style={{ marginTop: 30 }}>Request a Package</h2>
-      <p>
-        Tell us what you need:
-        <br />
-        “warm romantic lead-in”
-        <br />
-        “nostalgic couple moment”
-        <br />
-        “intimate vocal phrase”
-      </p>
-
-      <h2 style={{ marginTop: 30 }}>Use in a Production</h2>
-      <p>
-        Film, TV, advertising, brand, or digital use.
-      </p>
-
-      <div style={{ marginTop: 40 }}>
-        <a href="mailto:hello@gputnammusic.com">
-          <button style={{ padding: "12px 24px", fontSize: 16 }}>
-            Start a Request
+        <div className="mt-10 flex flex-col sm:flex-row gap-4">
+          <button className="px-6 py-3 bg-[#D4A017] text-black font-semibold rounded">
+            Start Monthly Access
           </button>
-        </a>
-      </div>
+          <button className="px-6 py-3 border border-[#D4A017]/40 rounded">
+            Request Placement Review
+          </button>
+        </div>
+      </section>
 
-      <hr style={{ margin: "40px 0" }} />
+      <section className="mx-auto max-w-4xl px-6 pb-16">
+        <h2 className="text-2xl font-bold mb-6">How it works</h2>
 
-      <p style={{ fontSize: 14, opacity: 0.7 }}>
-        Powered by GPM 4PE music operations.
-      </p>
+        <div className="grid gap-4">
+          {[
+            "Define your scene or placement need",
+            "Search real-audio placement moments",
+            "Preview and shortlist options",
+            "Request placement or custom moment",
+          ].map((step, i) => (
+            <div
+              key={i}
+              className="p-4 border border-[#D4A017]/20 rounded bg-[#24180F]"
+            >
+              <span className="text-[#D4A017] font-bold mr-2">{i + 1}.</span>
+              {step}
+            </div>
+          ))}
+        </div>
+      </section>
 
-      <div style={{ marginTop: 20 }}>
-        <a href="https://k-kut.com">Send as a HUG</a> |{" "}
-        <a href="https://gputnammusic.com">Download full songs</a>
-      </div>
+      <section className="mx-auto max-w-4xl px-6 pb-16">
+        <h2 className="text-2xl font-bold mb-6">Access</h2>
 
-    </div>
+        <div className="grid gap-4 sm:grid-cols-3">
+          <div className="p-5 border border-[#D4A017]/20 rounded bg-[#24180F]">
+            <h3 className="font-bold mb-2">Monthly</h3>
+            <p className="text-sm text-[#C8A882]">
+              Full access. Cancel anytime, effective end of month.
+            </p>
+          </div>
+
+          <div className="p-5 border border-[#D4A017]/20 rounded bg-[#24180F]">
+            <h3 className="font-bold mb-2">Trial</h3>
+            <p className="text-sm text-[#C8A882]">
+              30-day trial. Use fully for 14 days before billing begins.
+            </p>
+          </div>
+
+          <div className="p-5 border border-[#D4A017]/20 rounded bg-[#24180F]">
+            <h3 className="font-bold mb-2">Enterprise</h3>
+            <p className="text-sm text-[#C8A882]">
+              Licensing or full acquisition available under premium terms.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-4xl px-6 pb-20">
+        <h2 className="text-2xl font-bold mb-4">Security</h2>
+        <p className="text-[#C8A882] max-w-2xl">
+          4PE operates strictly at the process and infrastructure level. No
+          financial data is accessed, processed, or stored.
+        </p>
+      </section>
+
+      <footer className="border-t border-[#D4A017]/20 px-6 py-6 text-sm text-[#C8A882] text-center">
+        SUPE Specialties — Powered by 4PE PROMOTER
+      </footer>
+    </main>
   );
 }
