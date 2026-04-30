@@ -1,391 +1,1044 @@
-'use client';
+"use client";
+
+import { useEffect, useMemo, useRef, useState } from "react";
 
 /**
- * K-KUT — Landing Page Wizard
+ * ── Audio prereqs for the preview player ────────────────────────────────────
+ * SB_TRACKS is the public base URL for the Supabase "tracks" bucket.
  *
- * One-step-at-a-time guided experience.
- * Active step is fully visible and interactive.
- * Adjacent steps are visible but dimmed — all others hidden.
- * BOT guides the user with action-oriented instructions.
+ * REQUIRED (Supabase Storage):
+ *   1. Bucket "tracks" must be set to PUBLIC in the Supabase dashboard.
+ *      (Storage → tracks → bucket settings → Make public)
+ *   2. Each previewUrl below must match an actual file path in the bucket.
+ *      Current expected paths (all at bucket root):
+ *        kleigh--solace.mp3, perfect-day.mp3, wanna-know-you.mp3,
+ *        jump.mp3, kleigh--waterfall.mp3, kleigh--nightfall.mp3
+ *   3. NEXT_PUBLIC_SUPABASE_URL must be set in Vercel env vars.
+ *      (Vercel → Project → Settings → Environment Variables)
  *
- * Steps:
- *   1. Browse a feeling  → select feeling tile → up to 5 themed LT-PIX surfaces
- *   2. Select your path  → K-KUT (audio section) or mini-KUT (text phrase)
- *   3. Pick your messenger (revealed only when Step 3 is active)
- *   4. Choose the channel → SMS · DM · Social · Email
+ * To verify: open one URL in a browser tab:
+ *   ${SUPABASE_URL}/storage/v1/object/public/tracks/kleigh--solace.mp3
+ * ─────────────────────────────────────────────────────────────────────────────
  */
+// Base URL for Supabase Storage public track files (NEXT_PUBLIC_ vars are inlined at build time)
+const SB_TRACKS = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/tracks`;
 
-import { useState } from 'react';
-import Link from 'next/link';
+type Purpose =
+  | "send"
+  | "express"
+  | "feel"
+  | "explore"
+  | "";
 
-// ── Step definitions ─────────────────────────────────────────────────────────
-const STEPS = [
-  { num: 1, label: 'Browse a feeling' },
-  { num: 2, label: 'Select your path' },
-  { num: 3, label: 'Pick your messenger' },
-  { num: 4, label: 'Choose the channel' },
-] as const;
+type FormatType = "mk" | "kkut";
 
-type StepNum = 1 | 2 | 3 | 4;
+type SentimentKey =
+  | "love"
+  | "apology"
+  | "gratitude"
+  | "energy"
+  | "hurt"
+  | "hope"
+  | "peace";
 
-// ── Step 1 — Feeling tiles ───────────────────────────────────────────────────
-const FEELINGS = ['Hype', 'Heart', 'Romance', 'Apology', 'Gratitude'] as const;
-type Feeling = (typeof FEELINGS)[number];
-
-// Up to 5 LT-PIXs per feeling. BOT recommends Br→Final Chorus as #1.
-const PIX_LIBRARY: Record<Feeling, { id: string; title: string; sections: string; bot?: boolean }[]> = {
-  Hype: [
-    { id: 'h1', title: 'On Fire', sections: 'BR → Ch3', bot: true },
-    { id: 'h2', title: 'Rising Up', sections: 'Intro → V1 → Ch1' },
-    { id: 'h3', title: 'Stadium', sections: 'Ch2 → BR' },
-    { id: 'h4', title: 'War Cry', sections: 'V2 → Pre2 → Ch2' },
-    { id: 'h5', title: 'Last Stand', sections: 'Ch3 → Outro' },
-  ],
-  Heart: [
-    { id: 'ht1', title: 'Wide Open', sections: 'BR → Ch3', bot: true },
-    { id: 'ht2', title: 'First Glance', sections: 'Intro → V1 → Ch1' },
-    { id: 'ht3', title: 'Tender', sections: 'V1 → Pre1 → Ch1' },
-    { id: 'ht4', title: 'Still Here', sections: 'V2 → Pre2 → Ch2' },
-    { id: 'ht5', title: 'Forever Yours', sections: 'Ch3 → Outro' },
-  ],
-  Romance: [
-    { id: 'r1', title: 'Electric', sections: 'BR → Ch3', bot: true },
-    { id: 'r2', title: 'First Move', sections: 'Intro → V1 → Ch1' },
-    { id: 'r3', title: 'Close', sections: 'Ch2 → BR' },
-    { id: 'r4', title: 'Slow Burn', sections: 'V2 → Pre2 → Ch2' },
-    { id: 'r5', title: 'Inevitable', sections: 'Ch3 → Outro' },
-  ],
-  Apology: [
-    { id: 'a1', title: 'I Meant It', sections: 'BR → Ch3', bot: true },
-    { id: 'a2', title: 'Said Too Much', sections: 'V1 → Pre1 → Ch1' },
-    { id: 'a3', title: 'Come Back', sections: 'Ch2 → BR' },
-    { id: 'a4', title: 'I Was Wrong', sections: 'V2 → Pre2 → Ch2' },
-    { id: 'a5', title: 'Forgive Me', sections: 'Ch3 → Outro' },
-  ],
-  Gratitude: [
-    { id: 'g1', title: 'Thank You', sections: 'BR → Ch3', bot: true },
-    { id: 'g2', title: 'You Changed Me', sections: 'Intro → V1 → Ch1' },
-    { id: 'g3', title: 'Because of You', sections: 'Ch1 → V2 → Ch2' },
-    { id: 'g4', title: 'Enough', sections: 'V2 → Pre2 → Ch2' },
-    { id: 'g5', title: 'Full Circle', sections: 'Ch3 → Outro' },
-  ],
+type PreviewItem = {
+  id: string;
+  title: string;
+  artist: string;
+  sentiment: SentimentKey;
+  purposeTags: Purpose[];
+  format: FormatType;
+  durationLabel: string;
+  confidenceHint: string;
+  description: string;
+  previewUrl: string;
+  messengerFit: string[];
+  isPromoSafe: boolean; // mKs only for promos
 };
 
-// ── Step 3 — Messengers (hidden until Step 3 is active) ─────────────────────
-const MESSENGERS = [
-  { id: 'devil', emoji: '😈', label: 'Devil' },
-  { id: 'cupid', emoji: '💘', label: 'Cupid' },
-  { id: 'angel', emoji: '😇', label: 'Angel' },
-  { id: 'nurse', emoji: '👩‍⚕️', label: 'Nurse' },
-  { id: 'romeo', emoji: '🌹', label: 'Romeo' },
-  { id: 'puppy', emoji: '🐶', label: 'Puppy' },
-  { id: 'cat',   emoji: '🐱', label: 'Cat' },
-  { id: 'ghost', emoji: '👻', label: 'Ghost' },
-] as const;
+const previewCatalog: PreviewItem[] = [
+  {
+    id: "mk-love-renews-01",
+    title: "Love Renews",
+    artist: "KLEIGH",
+    sentiment: "love",
+    purposeTags: ["send", "express", "feel"],
+    format: "mk",
+    durationLabel: "0:18",
+    confidenceHint: "warm, romantic, hopeful",
+    description: "A gentle first taste for love-led sharing.",
+    previewUrl: `${SB_TRACKS}/kleigh--solace.mp3`,
+    messengerFit: ["text", "DM", "email"],
+    isPromoSafe: true,
+  },
+  {
+    id: "mk-heart-tap-01",
+    title: "Heart Tap",
+    artist: "KLEIGH",
+    sentiment: "love",
+    purposeTags: ["send", "express", "explore"],
+    format: "mk",
+    durationLabel: "0:16",
+    confidenceHint: "playful, direct, modern",
+    description: "A bright emotional hook with instant clarity.",
+    previewUrl: `${SB_TRACKS}/perfect-day.mp3`,
+    messengerFit: ["text", "story", "share link"],
+    isPromoSafe: true,
+  },
+  {
+    id: "mk-thank-you-01",
+    title: "Steady Thanks",
+    artist: "G Putnam Music",
+    sentiment: "gratitude",
+    purposeTags: ["send", "express"],
+    format: "mk",
+    durationLabel: "0:20",
+    confidenceHint: "sincere, grounded, mature",
+    description: "Short, respectful gratitude that feels real.",
+    previewUrl: `${SB_TRACKS}/wanna-know-you.mp3`,
+    messengerFit: ["text", "email", "gift"],
+    isPromoSafe: true,
+  },
+  {
+    id: "mk-apology-01",
+    title: "Open Hands",
+    artist: "G Putnam Music",
+    sentiment: "apology",
+    purposeTags: ["send", "express"],
+    format: "mk",
+    durationLabel: "0:19",
+    confidenceHint: "humble, clear, restorative",
+    description: "For when words alone are not enough.",
+    previewUrl: `${SB_TRACKS}/jump.mp3`,
+    messengerFit: ["text", "private link", "email"],
+    isPromoSafe: true,
+  },
+  {
+    id: "mk-energy-01",
+    title: "High Energy",
+    artist: "G Putnam Music",
+    sentiment: "energy",
+    purposeTags: ["feel", "explore", "send"],
+    format: "mk",
+    durationLabel: "0:17",
+    confidenceHint: "bold, high-drive, fun",
+    description: "A strong pulse for hype, momentum, or celebration.",
+    previewUrl: `${SB_TRACKS}/kleigh--waterfall.mp3`,
+    messengerFit: ["story", "group text", "link"],
+    isPromoSafe: true,
+  },
+  {
+    id: "mk-hurt-01",
+    title: "Wounded & Willing",
+    artist: "G Putnam Music",
+    sentiment: "hurt",
+    purposeTags: ["express", "feel", "send"],
+    format: "mk",
+    durationLabel: "0:21",
+    confidenceHint: "hurt, honest, still open",
+    description: "Pain with dignity and emotional truth.",
+    previewUrl: `${SB_TRACKS}/kleigh--nightfall.mp3`,
+    messengerFit: ["private link", "email", "text"],
+    isPromoSafe: true,
+  },
+  {
+    id: "mk-peace-01",
+    title: "Melancholy Blues",
+    artist: "G Putnam Music",
+    sentiment: "peace",
+    purposeTags: ["feel", "explore"],
+    format: "mk",
+    durationLabel: "0:19",
+    confidenceHint: "soft, reflective, calming",
+    description: "A quiet, inward emotional place.",
+    previewUrl: `${SB_TRACKS}/kleigh--solace.mp3`,
+    messengerFit: ["self-use", "private link"],
+    isPromoSafe: true,
+  },
+  {
+    id: "kkut-love-01",
+    title: "K-KUT · Love Renews",
+    artist: "KLEIGH",
+    sentiment: "love",
+    purposeTags: ["send", "express", "feel"],
+    format: "kkut",
+    durationLabel: "0:43",
+    confidenceHint: "the fullest romantic section",
+    description: "Longer exact-audio K-KUT for a fully delivered feeling.",
+    previewUrl: `${SB_TRACKS}/perfect-day.mp3`,
+    messengerFit: ["private link", "gift"],
+    isPromoSafe: false,
+  },
+  {
+    id: "kkut-apology-01",
+    title: "K-KUT · Open Hands",
+    artist: "G Putnam Music",
+    sentiment: "apology",
+    purposeTags: ["send", "express"],
+    format: "kkut",
+    durationLabel: "0:46",
+    confidenceHint: "heavier sincerity, more emotional room",
+    description: "A longer exact-audio section for meaningful repair.",
+    previewUrl: `${SB_TRACKS}/jump.mp3`,
+    messengerFit: ["private link", "email"],
+    isPromoSafe: false,
+  },
+  {
+    id: "kkut-gratitude-01",
+    title: "K-KUT · Steady Thanks",
+    artist: "G Putnam Music",
+    sentiment: "gratitude",
+    purposeTags: ["send", "express"],
+    format: "kkut",
+    durationLabel: "0:44",
+    confidenceHint: "sincere, grounded, full delivery",
+    description: "Longer gratitude K-KUT when thanks deserves more than a taste.",
+    previewUrl: `${SB_TRACKS}/wanna-know-you.mp3`,
+    messengerFit: ["private link", "email", "gift"],
+    isPromoSafe: false,
+  },
+  {
+    id: "kkut-energy-01",
+    title: "K-KUT · High Energy",
+    artist: "G Putnam Music",
+    sentiment: "energy",
+    purposeTags: ["feel", "explore", "send"],
+    format: "kkut",
+    durationLabel: "0:45",
+    confidenceHint: "full hype, bold, high-drive",
+    description: "The complete energy section — for peak momentum and celebration.",
+    previewUrl: `${SB_TRACKS}/kleigh--waterfall.mp3`,
+    messengerFit: ["private link", "story", "gift"],
+    isPromoSafe: false,
+  },
+  {
+    id: "kkut-hope-01",
+    title: "K-KUT · Hope",
+    artist: "G Putnam Music",
+    sentiment: "hope",
+    purposeTags: ["feel", "send", "express"],
+    format: "kkut",
+    durationLabel: "0:44",
+    confidenceHint: "forward motion, emotional lift",
+    description: "A longer K-KUT when you need the full feeling of possibility.",
+    previewUrl: `${SB_TRACKS}/kleigh--solace.mp3`,
+    messengerFit: ["private link", "gift", "email"],
+    isPromoSafe: false,
+  },
+  {
+    id: "kkut-hurt-01",
+    title: "K-KUT · Wounded & Willing",
+    artist: "G Putnam Music",
+    sentiment: "hurt",
+    purposeTags: ["feel", "express", "send"],
+    format: "kkut",
+    durationLabel: "0:48",
+    confidenceHint: "deep honesty, serious feeling",
+    description: "A longer K-KUT when the user needs something real.",
+    previewUrl: `${SB_TRACKS}/kleigh--nightfall.mp3`,
+    messengerFit: ["private link", "gift"],
+    isPromoSafe: false,
+  },
+  {
+    id: "kkut-peace-01",
+    title: "K-KUT · Melancholy Blues",
+    artist: "G Putnam Music",
+    sentiment: "peace",
+    purposeTags: ["feel", "explore", "send"],
+    format: "kkut",
+    durationLabel: "0:44",
+    confidenceHint: "quiet, inward, full stillness",
+    description: "The complete peaceful section — for reflection and inward calm.",
+    previewUrl: `${SB_TRACKS}/kleigh--solace.mp3`,
+    messengerFit: ["private link", "self-use", "gift"],
+    isPromoSafe: false,
+  },
+];
 
-// ── Step 4 — Channels ────────────────────────────────────────────────────────
-const CHANNELS = [
-  { id: 'sms',    label: 'SMS',    desc: 'Direct to their phone' },
-  { id: 'dm',     label: 'DM',     desc: 'Slide into the moment' },
-  { id: 'social', label: 'Social', desc: 'Make it public' },
-  { id: 'email',  label: 'Email',  desc: 'Deliver with ceremony' },
-] as const;
-
-// ── BOT guidance per step ────────────────────────────────────────────────────
-const BOT_GUIDE: Record<StepNum, string> = {
-  1: 'TAP a feeling tile below. Your matching tracks will appear.',
-  2: 'CHOOSE your format — a section of audio (K-KUT) or a text phrase (mini-KUT).',
-  3: 'PICK the messenger who carries this moment. Each one enters differently.',
-  4: 'SELECT how it arrives. Three panels open. The delivery is new every time.',
+const sentimentMeta: Record<
+  SentimentKey,
+  { label: string; blurb: string; bbLine: string }
+> = {
+  love: {
+    label: "Love",
+    blurb: "For romance, care, closeness, and heart-led connection.",
+    bbLine: "BB hears love here. Let’s start with warmth and sincerity.",
+  },
+  apology: {
+    label: "Apology",
+    blurb: "For repair, accountability, humility, and healing.",
+    bbLine: "BB hears repair here. Let’s be direct, careful, and human.",
+  },
+  gratitude: {
+    label: "Gratitude",
+    blurb: "For thanks, honor, appreciation, and respect.",
+    bbLine: "BB hears appreciation here. Let’s make it real, not generic.",
+  },
+  energy: {
+    label: "Energy",
+    blurb: "For celebration, hype, momentum, and spark.",
+    bbLine: "BB hears lift and motion. Let’s make it vivid and fun.",
+  },
+  hurt: {
+    label: "Hurt",
+    blurb: "For pain, honesty, longing, and emotional truth.",
+    bbLine: "BB hears hurt. Let’s be gentle, accurate, and brave.",
+  },
+  hope: {
+    label: "Hope",
+    blurb: "For forward motion, lift, and emotional light.",
+    bbLine: "BB hears hope. Let’s build toward possibility.",
+  },
+  peace: {
+    label: "Peace",
+    blurb: "For reflection, quiet, and inward calm.",
+    bbLine: "BB hears stillness. Let’s keep this grounded and clear.",
+  },
 };
 
-// ── Helpers ──────────────────────────────────────────────────────────────────
-function pad(n: number) {
-  return String(n).padStart(2, '0');
-}
+const purposeMeta: Record<
+  Exclude<Purpose, "">,
+  { label: string; blurb: string }
+> = {
+  send: {
+    label: "Send to someone",
+    blurb: "You want to deliver a feeling to another human.",
+  },
+  express: {
+    label: "Express something I can’t say",
+    blurb: "You know the feeling but words are failing you.",
+  },
+  feel: {
+    label: "Just feel something",
+    blurb: "You’re here for the experience itself.",
+  },
+  explore: {
+    label: "Explore",
+    blurb: "You want BB to help you discover what fits.",
+  },
+};
 
-export default function HomePage() {
-  const [step, setStep]               = useState<StepNum>(1);
-  const [feeling, setFeeling]         = useState<Feeling | null>(null);
-  const [pix, setPix]                 = useState<string | null>(null);
-  const [path, setPath]               = useState<'kkut' | 'mkut' | null>(null);
-  const [messenger, setMessenger]     = useState<string | null>(null);
-  const [channel, setChannel]         = useState<string | null>(null);
-  const [done, setDone]               = useState(false);
+export default function KKutPage() {
+  const [sentiment, setSentiment] = useState<SentimentKey | null>(null);
+  const [purpose, setPurpose] = useState<Purpose>("");
+  const [selectedFormat, setSelectedFormat] = useState<FormatType | null>(null);
+  const [selectedMessenger, setSelectedMessenger] = useState<string | null>(null);
+  const [selectedItem, setSelectedItem] = useState<PreviewItem | null>(null);
+  const [pageIndex, setPageIndex] = useState(0);
+  const [firstFreeMode, setFirstFreeMode] = useState(false);
+  const [promiseChecked, setPromiseChecked] = useState(false);
+  const [userEmail, setUserEmail] = useState("");
+  const [audioNow, setAudioNow] = useState<string | null>(null);
 
-  // ── can the user advance from the current step? ──────────────────────────
-  const canAdvance: Record<StepNum, boolean> = {
-    1: feeling !== null && pix !== null,
-    2: path !== null,
-    3: messenger !== null,
-    4: channel !== null,
-  };
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  function advance() {
-    if (step < 4) {
-      setStep((s) => (s + 1) as StepNum);
+  useEffect(() => {
+    if (!audioRef.current) return;
+    if (!audioNow) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+      return;
+    }
+    audioRef.current.src = audioNow;
+    void audioRef.current.play().catch(() => {});
+  }, [audioNow]);
+
+  const mkPromos = useMemo(() => {
+    if (!sentiment) return [];
+    return previewCatalog.filter(
+      (item) => item.sentiment === sentiment && item.format === "mk" && item.isPromoSafe
+    );
+  }, [sentiment]);
+
+  const recommendationPool = useMemo(() => {
+    if (!sentiment || !purpose) return [];
+    let pool = previewCatalog.filter(
+      (item) =>
+        item.sentiment === sentiment &&
+        item.purposeTags.includes(purpose)
+    );
+
+    if (selectedFormat) {
+      pool = pool.filter((item) => item.format === selectedFormat);
+    }
+
+    if (selectedMessenger) {
+      pool = pool.filter((item) => item.messengerFit.includes(selectedMessenger));
+    }
+
+    const sorted = [...pool].sort((a, b) => {
+      const aDur = parseDuration(a.durationLabel);
+      const bDur = parseDuration(b.durationLabel);
+      return bDur - aDur; // longest duration first
+    });
+
+    return sorted;
+  }, [sentiment, purpose, selectedFormat, selectedMessenger]);
+
+  const groupedFive = useMemo(() => {
+    const start = pageIndex * 5;
+    return recommendationPool.slice(start, start + 5);
+  }, [recommendationPool, pageIndex]);
+
+  const hasMore = useMemo(() => {
+    return (pageIndex + 1) * 5 < recommendationPool.length;
+  }, [pageIndex, recommendationPool.length]);
+
+  const bbIntro = useMemo(() => {
+    if (!sentiment) {
+      return "BB is ready. Start with a feeling and hear mini-KUT examples first.";
+    }
+    if (!purpose) {
+      return `${sentimentMeta[sentiment].bbLine} What are you trying to do with this feeling?`;
+    }
+    if (!selectedFormat) {
+      return "You’ve got a feeling and a purpose. Now choose your path: K-KUT or mini-KUT.";
+    }
+    if (!selectedMessenger) {
+      return "Who is carrying this feeling: text, email, private link, story, or gift?";
+    }
+    if (!selectedItem) {
+      return "Here are five narrowed options. I put the longest-fitting duration first.";
+    }
+    return "Now let’s make sure you feel confident before purchase.";
+  }, [purpose, selectedFormat, selectedItem, selectedMessenger, sentiment]);
+
+  function resetAfterSentiment(nextSentiment: SentimentKey) {
+    setSentiment(nextSentiment);
+    setPurpose("");
+    setSelectedFormat(null);
+    setSelectedMessenger(null);
+    setSelectedItem(null);
+    setPageIndex(0);
+    setFirstFreeMode(false);
+    setPromiseChecked(false);
+    setUserEmail("");
+  }
+
+  function choosePurpose(nextPurpose: Purpose) {
+    setPurpose(nextPurpose);
+    setSelectedFormat(null);
+    setSelectedMessenger(null);
+    setSelectedItem(null);
+    setPageIndex(0);
+    setFirstFreeMode(false);
+  }
+
+  function chooseFormat(nextFormat: FormatType) {
+    setSelectedFormat(nextFormat);
+    setSelectedMessenger(null);
+    setSelectedItem(null);
+    setPageIndex(0);
+    setFirstFreeMode(false);
+  }
+
+  function chooseMessenger(messenger: string) {
+    setSelectedMessenger(messenger);
+    setSelectedItem(null);
+    setPageIndex(0);
+    setFirstFreeMode(false);
+  }
+
+  function chooseItem(item: PreviewItem) {
+    setSelectedItem(item);
+    setFirstFreeMode(false);
+    setAudioNow(item.previewUrl);
+  }
+
+  function nextFive() {
+    if (hasMore) setPageIndex((p) => p + 1);
+  }
+
+  function useFirstFree() {
+    setFirstFreeMode(true);
+  }
+
+  function startCheckout() {
+    if (!selectedItem) return;
+    // Route directly to the K-KUT or mini-KUT playback page.
+    // K-KUT catalog slugs (e.g. kkut-love-01) play directly from Storage.
+    // Mini-KUT catalog slugs go to the mkut page (edge function path).
+    if (selectedItem.format === "kkut") {
+      window.location.href = `/k/${selectedItem.id}`;
     } else {
-      setDone(true);
+      window.location.href = `/mkut/${selectedItem.id}`;
     }
   }
 
-  // ── Completion screen ─────────────────────────────────────────────────────
-  if (done) {
-    return (
-      <div className="min-h-screen flex flex-col">
-        <header className="flex items-center justify-between px-6 py-4 border-b border-white/10">
-          <h1 className="text-xl font-bold text-[#00bcd4]">K-KUT</h1>
-          <button
-            onClick={() => { setStep(1); setFeeling(null); setPix(null); setPath(null); setMessenger(null); setChannel(null); setDone(false); }}
-            className="text-sm text-[#C8A882] hover:text-white transition-colors"
-          >
-            Start over
-          </button>
-        </header>
-        <main className="flex-1 flex flex-col items-center justify-center text-center px-6 gap-6">
-          <p className="text-xs uppercase tracking-[0.3em] text-[#00bcd4]">Your feeling is ready</p>
-          <h2 className="text-4xl font-extrabold text-white">One delivered feeling.</h2>
-          <div className="rounded-2xl border border-white/10 bg-[#111] p-6 max-w-sm w-full text-left flex flex-col gap-3 text-sm text-[#C8A882]">
-            <div><span className="text-white/40 mr-2">Feeling</span>{feeling}</div>
-            <div><span className="text-white/40 mr-2">Track</span>{PIX_LIBRARY[feeling!].find(p => p.id === pix)?.title} · {PIX_LIBRARY[feeling!].find(p => p.id === pix)?.sections}</div>
-            <div><span className="text-white/40 mr-2">Path</span>{path === 'kkut' ? 'K-KUT (audio section)' : 'mini-KUT (text phrase)'}</div>
-            <div><span className="text-white/40 mr-2">Messenger</span>{MESSENGERS.find(m => m.id === messenger)?.emoji} {MESSENGERS.find(m => m.id === messenger)?.label}</div>
-            <div><span className="text-white/40 mr-2">Channel</span>{CHANNELS.find(c => c.id === channel)?.label}</div>
-          </div>
-          <a
-            href="https://gputnammusic.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="px-8 py-3 bg-[#00bcd4] text-[#0a0a0a] font-bold rounded-full hover:opacity-80 transition-opacity"
-          >
-            Get Your K-KUT →
-          </a>
-        </main>
-        <footer className="border-t border-white/10 px-6 py-4 text-center text-xs text-[#C8A882]">
-          K-KUT · <a href="https://gputnammusic.com" className="hover:text-[#00bcd4]">G Putnam Music</a>
-        </footer>
-      </div>
+  function submitFirstFree() {
+    if (!selectedItem || !promiseChecked || !userEmail.trim()) return;
+    alert(
+      `First one free recorded for ${selectedItem.title}. Follow up cadence: 3 touches in 3 weeks to ${userEmail}.`
     );
+    if (selectedItem.format === "kkut") {
+      window.location.href = `/k/${selectedItem.id}`;
+    } else {
+      window.location.href = `/mkut/${selectedItem.id}`;
+    }
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#0a0a0a]">
+    <main className="min-h-screen bg-[#120d08] text-[#f7f0e4]">
+      <audio ref={audioRef} hidden />
 
-      {/* ── Header ── */}
-      <header className="flex items-center justify-between px-6 py-4 border-b border-white/10">
-        <h1 className="text-xl font-bold text-[#00bcd4]">K-KUT</h1>
-        <nav className="flex gap-4 text-sm text-[#C8A882]">
-          <Link href="/invention" className="hover:text-[#00bcd4] transition-colors">Inventions</Link>
-        </nav>
-      </header>
+      <section className="border-b border-[#3d2a19] bg-[radial-gradient(circle_at_top,#2c1a10_0%,#120d08_55%)]">
+        <div className="mx-auto max-w-6xl px-6 py-10 md:px-10 md:py-16">
+          <div className="mb-4 inline-flex rounded-full border border-[#7c4b25] bg-[#2d1b11] px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-[#f3b06b]">
+            Inventions First · K-KUT · mini-KUT · K-UpId
+          </div>
 
-      {/* ── Hero label ── */}
-      <div className="text-center pt-10 pb-6 px-6">
-        <p className="text-xs uppercase tracking-[0.3em] text-[#C8A882] mb-2">K-KUT</p>
-        <h2 className="text-3xl sm:text-4xl font-extrabold text-white">Four steps. One delivered feeling.</h2>
-      </div>
+          <h1 className="max-w-5xl text-4xl font-black leading-tight text-[#fff3e2] md:text-6xl">
+            Three Never-Before-Done Feeling Inventions
+          </h1>
 
-      {/* ── Wizard rail ── */}
-      <main className="flex-1 px-4 sm:px-6 max-w-xl mx-auto w-full pb-16 flex flex-col gap-2">
+          <p className="mt-5 max-w-4xl text-lg leading-8 text-[#dbc5ad] md:text-2xl">
+            Not songs. Not playlists. Not browsing a giant library. BB helps a user
+            hear, narrow, trust, and choose the right feeling-delivery invention.
+          </p>
 
-        {STEPS.map(({ num, label }) => {
-          const isActive   = num === step;
-          const isPrev     = num === step - 1;
-          const isNext     = num === step + 1;
-          const isVisible  = isActive || isPrev || isNext;
+          <div className="mt-8 grid gap-4 md:grid-cols-3">
+            <div className="rounded-2xl border border-[#5b3920] bg-[#1b130d] p-5">
+              <div className="text-xs uppercase tracking-[0.18em] text-[#c7925a]">
+                Invention 01
+              </div>
+              <div className="mt-2 text-2xl font-bold text-[#fff3e2]">K-KUT</div>
+              <p className="mt-2 text-sm leading-7 text-[#d3bea7]">
+                Longer exact-audio section. Best when the user wants a more complete
+                emotional delivery.
+              </p>
+            </div>
 
-          if (!isVisible) return null;
+            <div className="rounded-2xl border border-[#5b3920] bg-[#1b130d] p-5">
+              <div className="text-xs uppercase tracking-[0.18em] text-[#c7925a]">
+                Invention 02
+              </div>
+              <div className="mt-2 text-2xl font-bold text-[#fff3e2]">mini-KUT</div>
+              <p className="mt-2 text-sm leading-7 text-[#d3bea7]">
+                Short mK tastes for promo, sampling, and first contact. Promo rule:
+                mKs only unless admin forces a one-time overlay.
+              </p>
+            </div>
 
-          return (
-            <div
-              key={num}
-              className={`transition-all duration-300 rounded-2xl border ${
-                isActive
-                  ? 'border-[#00bcd4]/60 bg-[#0d1f22]'
-                  : 'border-white/5 bg-transparent'
-              }`}
+            <div className="rounded-2xl border border-[#5b3920] bg-[#1b130d] p-5">
+              <div className="text-xs uppercase tracking-[0.18em] text-[#c7925a]">
+                Invention 03
+              </div>
+              <div className="mt-2 text-2xl font-bold text-[#fff3e2]">K-UpId</div>
+              <p className="mt-2 text-sm leading-7 text-[#d3bea7]">
+                Identity and messenger layer. The shareable companion that makes the
+                delivered feeling easy to send and remember.
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-8 rounded-3xl border border-[#7d5230] bg-[#1a120d]/90 p-5 md:p-7">
+            <div className="mb-2 text-sm font-semibold uppercase tracking-[0.25em] text-[#f0b16a]">
+              BB · Omnipotent Feeling Guide
+            </div>
+            <div className="text-xl font-semibold text-[#fff1dd] md:text-2xl">
+              {bbIntro}
+            </div>
+            <p className="mt-3 max-w-4xl text-sm leading-7 text-[#d1bca3] md:text-base">
+              BB keeps this simple for a dull user: hear mKs first, establish
+              sentiment and purpose, narrow to five options, confirm confidence,
+              then guide purchase.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-6xl px-6 py-10 md:px-10">
+        <div className="grid gap-8 lg:grid-cols-[1.15fr_0.85fr]">
+          <div className="space-y-6">
+            <StepCard
+              number="01"
+              title="Hear mini-KUT tastes first"
+              active
+              complete={!!sentiment}
             >
-              {/* Step header — always visible when the slot is shown */}
-              <div className={`flex items-center gap-4 px-5 pt-5 ${isActive ? 'pb-2' : 'pb-5'}`}>
-                <span
-                  className={`text-4xl font-extrabold tabular-nums leading-none transition-colors ${
-                    isActive ? 'text-[#00bcd4]' : 'text-white/15'
-                  }`}
-                >
-                  {pad(num)}
-                </span>
-                <span
-                  className={`font-bold text-lg transition-colors ${
-                    isActive ? 'text-white' : 'text-white/20'
-                  }`}
-                >
-                  {label}
-                </span>
-                {/* completed checkmark for previous step */}
-                {isPrev && (
-                  <span className="ml-auto text-[#00bcd4]/40 text-sm">✓</span>
-                )}
+              <div className="rounded-2xl border border-[#4b301d] bg-[#18110c] p-4 text-[#e8d7c1]">
+                Tap a feeling. BB starts with mKs only. That is the promo rule.
               </div>
 
-              {/* Active step body ──────────────────────────────────────────── */}
-              {isActive && (
-                <div className="px-5 pb-5 flex flex-col gap-5">
-
-                  {/* BOT guidance */}
-                  <div className="flex items-start gap-2 rounded-xl bg-[#00bcd4]/8 border border-[#00bcd4]/20 px-4 py-3">
-                    <span className="text-[#00bcd4] text-lg mt-0.5">🤖</span>
-                    <p className="text-sm text-[#00bcd4] font-medium leading-snug">{BOT_GUIDE[step]}</p>
-                  </div>
-
-                  {/* ── Step 1: Feeling tiles + PIX ───────────────────────── */}
-                  {step === 1 && (
-                    <div className="flex flex-col gap-4">
-                      <div className="flex flex-wrap gap-2">
-                        {FEELINGS.map((f) => (
-                          <button
-                            key={f}
-                            onClick={() => { setFeeling(f); setPix(null); }}
-                            className={`px-4 py-2 rounded-full text-sm font-semibold border transition-all ${
-                              feeling === f
-                                ? 'border-[#00bcd4] bg-[#00bcd4]/20 text-[#00bcd4]'
-                                : 'border-white/15 text-white/50 hover:border-white/30 hover:text-white/70'
-                            }`}
-                          >
-                            {f}
-                          </button>
-                        ))}
-                      </div>
-
-                      {/* PIX list for selected feeling */}
-                      {feeling && (
-                        <div className="flex flex-col gap-2">
-                          <p className="text-xs uppercase tracking-widest text-[#C8A882] mb-1">
-                            {PIX_LIBRARY[feeling].length} matches for {feeling}
-                          </p>
-                          {PIX_LIBRARY[feeling].map((p) => (
-                            <button
-                              key={p.id}
-                              onClick={() => setPix(p.id)}
-                              className={`text-left rounded-xl border px-4 py-3 transition-all ${
-                                pix === p.id
-                                  ? 'border-[#00bcd4]/60 bg-[#00bcd4]/10'
-                                  : 'border-white/10 bg-[#111] hover:border-white/20'
-                              }`}
-                            >
-                              <div className="flex items-center justify-between gap-2">
-                                <div>
-                                  <p className={`font-semibold text-sm ${pix === p.id ? 'text-[#00bcd4]' : 'text-white'}`}>
-                                    {p.title}
-                                  </p>
-                                  <p className="text-xs text-[#C8A882] mt-0.5 font-mono">{p.sections}</p>
-                                </div>
-                                {p.bot && (
-                                  <span className="text-xs px-2 py-0.5 rounded-full border border-[#00bcd4]/30 text-[#00bcd4] whitespace-nowrap">
-                                    🤖 #1 pick
-                                  </span>
-                                )}
-                              </div>
-                            </button>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  )}
-
-                  {/* ── Step 2: Path selection ─────────────────────────────── */}
-                  {step === 2 && (
-                    <div className="flex flex-col gap-3">
-                      {[
-                        { id: 'kkut' as const, label: 'K-KUT', sub: 'Own a section of audio — exact, legal, permanent.' },
-                        { id: 'mkut' as const, label: 'mini-KUT', sub: 'Own a word, phrase, or hook — text only, freed from the track.' },
-                      ].map(({ id, label, sub }) => (
-                        <button
-                          key={id}
-                          onClick={() => setPath(id)}
-                          className={`text-left rounded-xl border px-5 py-4 transition-all ${
-                            path === id
-                              ? 'border-[#00bcd4]/60 bg-[#00bcd4]/10'
-                              : 'border-white/10 bg-[#111] hover:border-white/20'
-                          }`}
-                        >
-                          <p className={`font-bold mb-1 ${path === id ? 'text-[#00bcd4]' : 'text-white'}`}>{label}</p>
-                          <p className="text-xs text-[#C8A882]">{sub}</p>
-                        </button>
-                      ))}
-                    </div>
-                  )}
-
-                  {/* ── Step 3: Messenger (only visible now) ──────────────── */}
-                  {step === 3 && (
-                    <div className="grid grid-cols-4 gap-2">
-                      {MESSENGERS.map(({ id, emoji, label }) => (
-                        <button
-                          key={id}
-                          onClick={() => setMessenger(id)}
-                          className={`flex flex-col items-center gap-1 rounded-xl border py-3 transition-all ${
-                            messenger === id
-                              ? 'border-[#00bcd4]/60 bg-[#00bcd4]/10'
-                              : 'border-white/10 bg-[#111] hover:border-white/20'
-                          }`}
-                        >
-                          <span className="text-2xl">{emoji}</span>
-                          <span className={`text-xs font-semibold ${messenger === id ? 'text-[#00bcd4]' : 'text-white/60'}`}>
-                            {label}
-                          </span>
-                        </button>
-                      ))}
-                    </div>
-                  )}
-
-                  {/* ── Step 4: Channel ───────────────────────────────────── */}
-                  {step === 4 && (
-                    <div className="grid grid-cols-2 gap-3">
-                      {CHANNELS.map(({ id, label, desc }) => (
-                        <button
-                          key={id}
-                          onClick={() => setChannel(id)}
-                          className={`text-left rounded-xl border px-4 py-4 transition-all ${
-                            channel === id
-                              ? 'border-[#00bcd4]/60 bg-[#00bcd4]/10'
-                              : 'border-white/10 bg-[#111] hover:border-white/20'
-                          }`}
-                        >
-                          <p className={`font-bold text-sm mb-1 ${channel === id ? 'text-[#00bcd4]' : 'text-white'}`}>
-                            {label}
-                          </p>
-                          <p className="text-xs text-[#C8A882]">{desc}</p>
-                        </button>
-                      ))}
-                    </div>
-                  )}
-
-                  {/* Advance button */}
+              <div className="mt-4 flex flex-wrap gap-3">
+                {(
+                  Object.keys(sentimentMeta) as SentimentKey[]
+                ).map((key) => (
                   <button
-                    onClick={advance}
-                    disabled={!canAdvance[step]}
-                    className={`w-full py-3 rounded-full font-bold text-sm transition-all ${
-                      canAdvance[step]
-                        ? 'bg-[#00bcd4] text-[#0a0a0a] hover:opacity-80'
-                        : 'bg-white/5 text-white/20 cursor-not-allowed'
+                    key={key}
+                    onClick={() => resetAfterSentiment(key)}
+                    className={`rounded-full border px-4 py-3 text-sm font-semibold transition ${
+                      sentiment === key
+                        ? "border-[#e1aa6e] bg-[#3a2415] text-[#fff1dd]"
+                        : "border-[#4e3420] bg-[#18110c] text-[#d8c3ab] hover:border-[#7b542f]"
                     }`}
                   >
-                    {step < 4 ? `Next: ${STEPS[step].label} →` : 'Get My Delivery →'}
+                    {sentimentMeta[key].label}
                   </button>
+                ))}
+              </div>
 
+              {sentiment && (
+                <div className="mt-6 rounded-2xl border border-[#5d3a20] bg-[#20150e] p-5">
+                  <div className="text-lg font-bold text-[#fff1de]">
+                    {sentimentMeta[sentiment].label}
+                  </div>
+                  <p className="mt-2 text-sm leading-7 text-[#d8c4ad]">
+                    {sentimentMeta[sentiment].blurb}
+                  </p>
+
+                  <div className="mt-5 grid gap-4 md:grid-cols-2">
+                    {mkPromos.map((item) => (
+                      <PreviewCard
+                        key={item.id}
+                        item={item}
+                        selected={selectedItem?.id === item.id}
+                        onListen={() => {
+                          setAudioNow(item.previewUrl);
+                          setSelectedItem(item);
+                        }}
+                        onChoose={() => setSelectedItem(item)}
+                      />
+                    ))}
+                  </div>
                 </div>
               )}
+            </StepCard>
+
+            <StepCard
+              number="02"
+              title="Establish sentiment purpose"
+              active={!!sentiment}
+              complete={!!purpose}
+            >
+              <div className="grid gap-3 md:grid-cols-2">
+                {(Object.keys(purposeMeta) as Exclude<Purpose, "">[]).map((key) => (
+                  <button
+                    key={key}
+                    onClick={() => choosePurpose(key)}
+                    className={`rounded-2xl border p-4 text-left transition ${
+                      purpose === key
+                        ? "border-[#dba46f] bg-[#352215]"
+                        : "border-[#4e3420] bg-[#18110c] hover:border-[#7b542f]"
+                    }`}
+                  >
+                    <div className="text-lg font-bold text-[#fff1dd]">
+                      {purposeMeta[key].label}
+                    </div>
+                    <div className="mt-2 text-sm leading-6 text-[#d5bfa7]">
+                      {purposeMeta[key].blurb}
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </StepCard>
+
+            <StepCard
+              number="03"
+              title="Choose format and messenger"
+              active={!!purpose}
+              complete={!!selectedFormat && !!selectedMessenger}
+            >
+              <div className="rounded-2xl border border-[#4f3420] bg-[#18110c] p-4">
+                <div className="text-sm font-semibold uppercase tracking-[0.18em] text-[#e4ab73]">
+                  Format
+                </div>
+                <div className="mt-4 grid gap-3 md:grid-cols-2">
+                  <button
+                    onClick={() => chooseFormat("kkut")}
+                    className={`rounded-2xl border p-5 text-left transition ${
+                      selectedFormat === "kkut"
+                        ? "border-[#dfaa73] bg-[#352215]"
+                        : "border-[#4e3420] bg-[#120d08] hover:border-[#7b542f]"
+                    }`}
+                  >
+                    <div className="text-2xl font-bold text-[#fff2de]">K-KUT</div>
+                    <p className="mt-2 text-sm leading-6 text-[#d7c1aa]">
+                      Longer exact audio. Use the fullest duration that matches the
+                      identified sentiment.
+                    </p>
+                  </button>
+
+                  <button
+                    onClick={() => chooseFormat("mk")}
+                    className={`rounded-2xl border p-5 text-left transition ${
+                      selectedFormat === "mk"
+                        ? "border-[#dfaa73] bg-[#352215]"
+                        : "border-[#4e3420] bg-[#120d08] hover:border-[#7b542f]"
+                    }`}
+                  >
+                    <div className="text-2xl font-bold text-[#fff2de]">mini-KUT</div>
+                    <p className="mt-2 text-sm leading-6 text-[#d7c1aa]">
+                      Short taste / hook / phrase option. Ideal for promo, low-friction
+                      tryout, and first pass confidence.
+                    </p>
+                  </button>
+                </div>
+              </div>
+
+              {selectedFormat && (
+                <div className="rounded-2xl border border-[#4f3420] bg-[#18110c] p-4">
+                  <div className="text-sm font-semibold uppercase tracking-[0.18em] text-[#e4ab73]">
+                    Messenger fit
+                  </div>
+                  <div className="mt-4 flex flex-wrap gap-3">
+                    {["text", "DM", "email", "private link", "story", "gift", "self-use"].map(
+                      (messenger) => (
+                        <button
+                          key={messenger}
+                          onClick={() => chooseMessenger(messenger)}
+                          className={`rounded-full border px-4 py-3 text-sm font-semibold transition ${
+                            selectedMessenger === messenger
+                              ? "border-[#e0a86d] bg-[#382315] text-[#fff2de]"
+                              : "border-[#4e3420] bg-[#120d08] text-[#dcc8b0] hover:border-[#7b542f]"
+                          }`}
+                        >
+                          {messenger}
+                        </button>
+                      )
+                    )}
+                  </div>
+                </div>
+              )}
+            </StepCard>
+
+            <StepCard
+              number="04"
+              title="Five at a time. Narrow with BB."
+              active={!!selectedMessenger}
+              complete={!!selectedItem}
+            >
+              {!selectedMessenger ? (
+                <p className="text-sm leading-7 text-[#d7c2ab]">
+                  BB will show five options at a time once format and messenger are set.
+                </p>
+              ) : groupedFive.length === 0 ? (
+                <p className="text-sm leading-7 text-[#d7c2ab]">
+                  No exact matches yet. BB recommends changing messenger or switching
+                  format to keep the flow moving.
+                </p>
+              ) : (
+                <>
+                  <div className="grid gap-4">
+                    {groupedFive.map((item) => (
+                      <div
+                        key={item.id}
+                        className={`rounded-2xl border p-5 transition ${
+                          selectedItem?.id === item.id
+                            ? "border-[#e1ad73] bg-[#342114]"
+                            : "border-[#4f3420] bg-[#17100b]"
+                        }`}
+                      >
+                        <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                          <div>
+                            <div className="text-xl font-bold text-[#fff2de]">
+                              {item.title}
+                            </div>
+                            <div className="mt-1 text-sm text-[#cfae86]">
+                              {item.artist} · {item.durationLabel} · {item.format === "mk" ? "mini-KUT" : "K-KUT"}
+                            </div>
+                            <p className="mt-3 max-w-2xl text-sm leading-7 text-[#dbc7b0]">
+                              {item.description}
+                            </p>
+                            <div className="mt-3 text-sm font-semibold text-[#f1b26d]">
+                              BB read: {item.confidenceHint}
+                            </div>
+                          </div>
+
+                          <div className="flex shrink-0 flex-col gap-3">
+                            <button
+                              onClick={() => setAudioNow(item.previewUrl)}
+                              className="rounded-full bg-[#f0b16a] px-5 py-3 font-bold text-[#2c1709] hover:bg-[#ffd3a5]"
+                            >
+                              Hear Sample
+                            </button>
+                            <button
+                              onClick={() => chooseItem(item)}
+                              className="rounded-full border border-[#c98e57] px-5 py-3 font-bold text-[#fff2de] hover:bg-[#2c1b10]"
+                            >
+                              Choose This One
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="mt-5 flex flex-wrap gap-3">
+                    {hasMore && (
+                      <button
+                        onClick={nextFive}
+                        className="rounded-full border border-[#c88c54] px-5 py-3 font-semibold text-[#fff0db] hover:bg-[#2b1a10]"
+                      >
+                        Show 5 More
+                      </button>
+                    )}
+                    <button
+                      onClick={() => {
+                        setSelectedMessenger(null);
+                        setSelectedItem(null);
+                        setPageIndex(0);
+                      }}
+                      className="rounded-full border border-[#5a3b22] px-5 py-3 font-semibold text-[#d7c3ab] hover:bg-[#1b120c]"
+                    >
+                      Not Quite
+                    </button>
+                  </div>
+                </>
+              )}
+            </StepCard>
+
+            <StepCard
+              number="05"
+              title="Confidence, free-first path, and purchase"
+              active={!!selectedItem}
+            >
+              {!selectedItem ? (
+                <p className="text-sm leading-7 text-[#d7c2ab]">
+                  Once the user has a likely match, BB helps confirm confidence before purchase.
+                </p>
+              ) : (
+                <div className="space-y-5">
+                  <div className="rounded-2xl border border-[#4f3420] bg-[#17100b] p-5">
+                    <div className="text-sm uppercase tracking-[0.18em] text-[#e2ab74]">
+                      BB confidence check
+                    </div>
+                    <h3 className="mt-2 text-2xl font-bold text-[#fff2de]">
+                      Is this perfect for the user?
+                    </h3>
+                    <p className="mt-2 max-w-3xl text-sm leading-7 text-[#d8c3ac]">
+                      {selectedItem.title} is currently your strongest fit. You can hear it again,
+                      choose another five, or continue.
+                    </p>
+
+                    <div className="mt-5 flex flex-wrap gap-3">
+                      <button
+                        onClick={() => setAudioNow(selectedItem.previewUrl)}
+                        className="rounded-full bg-[#f0b16a] px-5 py-3 font-bold text-[#2d1809]"
+                      >
+                        Hear It Again
+                      </button>
+                      <button
+                        onClick={() => setPageIndex((p) => p + 1)}
+                        className="rounded-full border border-[#c88f59] px-5 py-3 font-bold text-[#fff2de]"
+                      >
+                        Show 5 More
+                      </button>
+                      <button
+                        onClick={useFirstFree}
+                        className="rounded-full border border-[#c88f59] px-5 py-3 font-bold text-[#fff2de]"
+                      >
+                        First One Free
+                      </button>
+                      <button
+                        onClick={startCheckout}
+                        className="rounded-full bg-[#f56d5e] px-5 py-3 font-bold text-white hover:bg-[#ff8578]"
+                      >
+                        Guide to Purchase
+                      </button>
+                    </div>
+                  </div>
+
+                  {firstFreeMode && (
+                    <div className="rounded-2xl border border-[#7b4a24] bg-[#21140d] p-5">
+                      <div className="text-lg font-bold text-[#fff2de]">
+                        First one free, if they promise to come back
+                      </div>
+                      <p className="mt-2 max-w-3xl text-sm leading-7 text-[#d8c4ad]">
+                        If a user is leery, BB can offer the first one free, but only with a promise
+                        to return. Then follow up 3 times in 3 weeks.
+                      </p>
+
+                      <div className="mt-4">
+                        <label className="block text-sm font-semibold text-[#f3b06e]">
+                          Email for follow-up
+                        </label>
+                        <input
+                          value={userEmail}
+                          onChange={(e) => setUserEmail(e.target.value)}
+                          type="email"
+                          placeholder="user@email.com"
+                          className="mt-2 w-full rounded-xl border border-[#6c4625] bg-[#120d08] px-4 py-3 text-[#fff2de] outline-none"
+                        />
+                      </div>
+
+                      <label className="mt-4 flex items-start gap-3 text-sm leading-6 text-[#d8c3ab]">
+                        <input
+                          type="checkbox"
+                          checked={promiseChecked}
+                          onChange={(e) => setPromiseChecked(e.target.checked)}
+                          className="mt-1"
+                        />
+                        They promise to come back, and BB may follow up 3 times across 3 weeks.
+                      </label>
+
+                      <button
+                        onClick={submitFirstFree}
+                        disabled={!promiseChecked || !userEmail.trim()}
+                        className="mt-5 rounded-full bg-[#f0b16a] px-5 py-3 font-bold text-[#2d1809] disabled:cursor-not-allowed disabled:opacity-40"
+                      >
+                        Confirm First-Free Path
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+            </StepCard>
+          </div>
+
+          <aside className="space-y-6">
+            <div className="rounded-3xl border border-[#5a3920] bg-[#18110c] p-6">
+              <div className="text-sm uppercase tracking-[0.18em] text-[#e8b174]">
+                For the user
+              </div>
+              <h2 className="mt-2 text-2xl font-bold text-[#fff2de]">
+                Simple, friendly, narrow, clear
+              </h2>
+              <ul className="mt-4 space-y-3 text-sm leading-7 text-[#d7c2aa]">
+                <li>1. Hear mini-KUT tastes first.</li>
+                <li>2. Establish sentiment and purpose.</li>
+                <li>3. Show options in groups of 5.</li>
+                <li>4. Narrow gently, like a friend.</li>
+                <li>5. Confirm confidence before purchase.</li>
+                <li>6. Offer first-free only for leery users with follow-up commitment.</li>
+              </ul>
             </div>
-          );
-        })}
 
-      </main>
+            <div className="rounded-3xl border border-[#5a3920] bg-[#18110c] p-6">
+              <div className="text-sm uppercase tracking-[0.18em] text-[#e8b174]">
+                What the user is getting
+              </div>
+              <div className="mt-4 space-y-4 text-sm leading-7 text-[#d7c2aa]">
+                <div className="rounded-2xl border border-[#4c321d] bg-[#130d09] p-4">
+                  <div className="font-bold text-[#fff2de]">K-KUT</div>
+                  <div>Delivered feeling through longer exact audio.</div>
+                </div>
+                <div className="rounded-2xl border border-[#4c321d] bg-[#130d09] p-4">
+                  <div className="font-bold text-[#fff2de]">mini-KUT</div>
+                  <div>Taste, phrase, hook, or emotional entry point.</div>
+                </div>
+                <div className="rounded-2xl border border-[#4c321d] bg-[#130d09] p-4">
+                  <div className="font-bold text-[#fff2de]">K-UpId</div>
+                  <div>Messenger identity layer that helps delivery travel well.</div>
+                </div>
+              </div>
+            </div>
 
-      {/* ── Footer ── */}
-      <footer className="border-t border-white/10 px-6 py-4 text-center text-xs text-[#C8A882]">
-        K-KUT · <a href="https://gputnammusic.com" className="hover:text-[#00bcd4] transition-colors">G Putnam Music</a> ·{' '}
-        <Link href="/invention" className="hover:text-[#00bcd4] transition-colors">Inventions</Link>
-      </footer>
+            <div className="rounded-3xl border border-[#8f4f2b] bg-[#25160f] p-6">
+              <div className="text-sm uppercase tracking-[0.18em] text-[#ffb06e]">
+                Admin overlay rule
+              </div>
+              <div className="mt-3 text-xl font-bold text-[#fff2de]">
+                Promo uses mini-KUTs only
+              </div>
+              <p className="mt-3 text-sm leading-7 text-[#e0c7ad]">
+                Unless an admin explicitly scripts a one-time overlay, promo surfaces must use mini-KUTs only.
+              </p>
+            </div>
+          </aside>
+        </div>
+      </section>
+    </main>
+  );
+}
 
+function StepCard({
+  number,
+  title,
+  children,
+  active = false,
+  complete = false,
+}: {
+  number: string;
+  title: string;
+  children: React.ReactNode;
+  active?: boolean;
+  complete?: boolean;
+}) {
+  return (
+    <section
+      className={`rounded-3xl border p-6 md:p-8 ${
+        active
+          ? "border-[#7d5230] bg-[#1a120d]"
+          : "border-[#352416] bg-[#120d08]"
+      }`}
+    >
+      <div className="mb-5 flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <div
+            className={`text-5xl font-black ${
+              active ? "text-[#f0b16a]" : "text-[#4d3624]"
+            }`}
+          >
+            {number}
+          </div>
+          <div>
+            <div className="text-2xl font-bold text-[#fff2de]">{title}</div>
+            {complete && (
+              <div className="mt-1 text-sm font-semibold text-[#f1b16c]">
+                complete
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+      {children}
+    </section>
+  );
+}
+
+function PreviewCard({
+  item,
+  selected,
+  onListen,
+  onChoose,
+}: {
+  item: PreviewItem;
+  selected: boolean;
+  onListen: () => void;
+  onChoose: () => void;
+}) {
+  return (
+    <div
+      className={`rounded-2xl border p-4 ${
+        selected
+          ? "border-[#e2ad73] bg-[#362214]"
+          : "border-[#4d331e] bg-[#17100b]"
+      }`}
+    >
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <div className="text-lg font-bold text-[#fff2de]">{item.title}</div>
+          <div className="mt-1 text-sm text-[#d7b189]">
+            {item.artist} · {item.durationLabel}
+          </div>
+        </div>
+        <div className="rounded-full border border-[#6d4827] px-3 py-1 text-xs font-bold uppercase tracking-[0.15em] text-[#f1b26d]">
+          mK
+        </div>
+      </div>
+
+      <p className="mt-3 text-sm leading-7 text-[#d7c2aa]">{item.description}</p>
+
+      <div className="mt-4 flex gap-3">
+        <button
+          onClick={onListen}
+          className="rounded-full bg-[#f0b16a] px-4 py-2 font-bold text-[#2d1809]"
+        >
+          Hear
+        </button>
+        <button
+          onClick={onChoose}
+          className="rounded-full border border-[#c98e57] px-4 py-2 font-bold text-[#fff2de]"
+        >
+          Use This
+        </button>
+      </div>
     </div>
   );
+}
+
+function parseDuration(value: string) {
+  const [m, s] = value.split(":").map(Number);
+  return (m || 0) * 60 + (s || 0);
 }

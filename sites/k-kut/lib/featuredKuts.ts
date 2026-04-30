@@ -3,6 +3,23 @@ import { createClient } from '@supabase/supabase-js';
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const SUPABASE_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
+const SAMPLE_AUDIO_BASE = 'https://gputnammusic.com/pix';
+const SAMPLE_AUDIO = {
+  loveRenews: `${SAMPLE_AUDIO_BASE}/kleigh--solace.mp3`,
+  loveRenewsReprise: `${SAMPLE_AUDIO_BASE}/kleigh--nightfall.mp3`,
+  loveRenewsHook: `${SAMPLE_AUDIO_BASE}/kleigh--waterfall.mp3`,
+  midnightJazz: `${SAMPLE_AUDIO_BASE}/new-orleans-piano-trio-1.mp3`,
+  woundedWilling: `${SAMPLE_AUDIO_BASE}/i-am-a-fighter--el-mix-instro.mp3`,
+  highEnergy: `${SAMPLE_AUDIO_BASE}/dance-party.mp3`,
+  deepFocus: `${SAMPLE_AUDIO_BASE}/perfect-day.mp3`,
+  sunriseVibes: `${SAMPLE_AUDIO_BASE}/going-outside.mp3`,
+  lateNightSoul: `${SAMPLE_AUDIO_BASE}/nighttime.mp3`,
+  heartTap: `${SAMPLE_AUDIO_BASE}/wanna-know-you.mp3`,
+  melancholyBlues: `${SAMPLE_AUDIO_BASE}/why-does-life-gotta-be-this-hard.mp3`,
+  dreamyState: `${SAMPLE_AUDIO_BASE}/kleigh--reflections.mp3`,
+  cloudNine: `${SAMPLE_AUDIO_BASE}/kleigh--a-calm-evening.mp3`,
+} as const;
+
 /**
  * The three co-equal K-KUT inventions — ALL deliver exact audio snippets:
  *
@@ -79,19 +96,19 @@ export async function getFeaturedKuts(): Promise<KutItem[]> {
 
 /** Static fallback — K-KUT audio excerpts from original PIX. "Love Renews" leads. */
 export const FALLBACK_KUTS: KutItem[] = [
-  { id: 'lr-01', title: 'Love Renews', artist: 'KLEIGH', url: '', type: 'K-KUT', tags: 'love_renews' },
-  { id: 'lr-02', title: 'Love Renews (Reprise)', artist: 'KLEIGH', url: '', type: 'K-KUT', tags: 'love_renews' },
-  { id: 'lr-03', title: 'Love Renews (Hook)', artist: 'KLEIGH', url: '', type: 'K-KUT', tags: 'love_renews' },
-  { id: 'kk-01', title: 'Midnight Jazz', artist: 'G Putnam Music', url: '', type: 'K-KUT', tags: 'jazz' },
-  { id: 'kk-02', title: 'Wounded & Willing', artist: 'G Putnam Music', url: '', type: 'K-KUT', tags: 'healing' },
-  { id: 'kk-03', title: 'High Energy', artist: 'G Putnam Music', url: '', type: 'K-KUT', tags: 'energy' },
-  { id: 'kk-04', title: 'Deep Focus', artist: 'G Putnam Music', url: '', type: 'K-KUT', tags: 'focus' },
-  { id: 'kk-05', title: 'Sunrise Vibes', artist: 'G Putnam Music', url: '', type: 'K-KUT', tags: 'uplifting' },
-  { id: 'kk-06', title: 'Late Night Soul', artist: 'G Putnam Music', url: '', type: 'K-KUT', tags: 'night' },
-  { id: 'kk-07', title: 'Heart Tap', artist: 'KLEIGH', url: '', type: 'K-KUT', tags: 'emotional' },
-  { id: 'kk-08', title: 'Melancholy Blues', artist: 'G Putnam Music', url: '', type: 'K-KUT', tags: 'melancholy' },
-  { id: 'kk-09', title: 'Dreamy State', artist: 'G Putnam Music', url: '', type: 'K-KUT', tags: 'dreamy' },
-  { id: 'kk-10', title: 'Cloud Nine', artist: 'KLEIGH', url: '', type: 'K-KUT', tags: 'uplifting' },
+  { id: 'lr-01', title: 'Love Renews', artist: 'KLEIGH', url: SAMPLE_AUDIO.loveRenews, type: 'K-KUT', tags: 'love_renews' },
+  { id: 'lr-02', title: 'Love Renews (Reprise)', artist: 'KLEIGH', url: SAMPLE_AUDIO.loveRenewsReprise, type: 'K-KUT', tags: 'love_renews' },
+  { id: 'lr-03', title: 'Love Renews (Hook)', artist: 'KLEIGH', url: SAMPLE_AUDIO.loveRenewsHook, type: 'K-KUT', tags: 'love_renews' },
+  { id: 'kk-01', title: 'Midnight Jazz', artist: 'G Putnam Music', url: SAMPLE_AUDIO.midnightJazz, type: 'K-KUT', tags: 'jazz' },
+  { id: 'kk-02', title: 'Wounded & Willing', artist: 'G Putnam Music', url: SAMPLE_AUDIO.woundedWilling, type: 'K-KUT', tags: 'healing' },
+  { id: 'kk-03', title: 'High Energy', artist: 'G Putnam Music', url: SAMPLE_AUDIO.highEnergy, type: 'K-KUT', tags: 'energy' },
+  { id: 'kk-04', title: 'Deep Focus', artist: 'G Putnam Music', url: SAMPLE_AUDIO.deepFocus, type: 'K-KUT', tags: 'focus' },
+  { id: 'kk-05', title: 'Sunrise Vibes', artist: 'G Putnam Music', url: SAMPLE_AUDIO.sunriseVibes, type: 'K-KUT', tags: 'uplifting' },
+  { id: 'kk-06', title: 'Late Night Soul', artist: 'G Putnam Music', url: SAMPLE_AUDIO.lateNightSoul, type: 'K-KUT', tags: 'night' },
+  { id: 'kk-07', title: 'Heart Tap', artist: 'KLEIGH', url: SAMPLE_AUDIO.heartTap, type: 'K-KUT', tags: 'emotional' },
+  { id: 'kk-08', title: 'Melancholy Blues', artist: 'G Putnam Music', url: SAMPLE_AUDIO.melancholyBlues, type: 'K-KUT', tags: 'melancholy' },
+  { id: 'kk-09', title: 'Dreamy State', artist: 'G Putnam Music', url: SAMPLE_AUDIO.dreamyState, type: 'K-KUT', tags: 'dreamy' },
+  { id: 'kk-10', title: 'Cloud Nine', artist: 'KLEIGH', url: SAMPLE_AUDIO.cloudNine, type: 'K-KUT', tags: 'uplifting' },
 ];
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -130,19 +147,19 @@ export async function getFeaturedMKuts(): Promise<KutItem[]> {
 
 /** Static fallback — mini-KUT audio snippets, ASCAP-tied per PIX-PCK title. */
 export const FALLBACK_MKUTS: KutItem[] = [
-  { id: 'mk-01', title: 'Love Renews', artist: 'KLEIGH', url: '', type: 'mK', tags: 'love_renews mkut' },
-  { id: 'mk-02', title: 'Love Renews', artist: 'KLEIGH', url: '', type: 'mK', tags: 'love_renews mkut' },
-  { id: 'mk-03', title: 'Love Renews', artist: 'KLEIGH', url: '', type: 'mK', tags: 'love_renews mkut' },
-  { id: 'mk-04', title: 'Love Renews', artist: 'KLEIGH', url: '', type: 'mK', tags: 'love_renews mkut' },
-  { id: 'mk-05', title: 'Wounded & Willing', artist: 'G Putnam Music', url: '', type: 'mK', tags: 'healing mkut' },
-  { id: 'mk-06', title: 'Wounded & Willing', artist: 'G Putnam Music', url: '', type: 'mK', tags: 'healing mkut' },
-  { id: 'mk-07', title: 'Wounded & Willing', artist: 'G Putnam Music', url: '', type: 'mK', tags: 'healing mkut' },
-  { id: 'mk-08', title: 'Midnight Jazz', artist: 'G Putnam Music', url: '', type: 'mK', tags: 'jazz mkut' },
-  { id: 'mk-09', title: 'Midnight Jazz', artist: 'G Putnam Music', url: '', type: 'mK', tags: 'jazz mkut' },
-  { id: 'mk-10', title: 'Heart Tap', artist: 'KLEIGH', url: '', type: 'mK', tags: 'emotional mkut' },
-  { id: 'mk-11', title: 'Heart Tap', artist: 'KLEIGH', url: '', type: 'mK', tags: 'emotional mkut' },
-  { id: 'mk-12', title: 'High Energy', artist: 'G Putnam Music', url: '', type: 'mK', tags: 'energy mkut' },
-  { id: 'mk-13', title: 'Cloud Nine', artist: 'KLEIGH', url: '', type: 'mK', tags: 'uplifting mkut' },
+  { id: 'mk-01', title: 'Love Renews', artist: 'KLEIGH', url: SAMPLE_AUDIO.loveRenews, type: 'mK', tags: 'love_renews mkut' },
+  { id: 'mk-02', title: 'Love Renews', artist: 'KLEIGH', url: SAMPLE_AUDIO.loveRenewsReprise, type: 'mK', tags: 'love_renews mkut' },
+  { id: 'mk-03', title: 'Love Renews', artist: 'KLEIGH', url: SAMPLE_AUDIO.loveRenewsHook, type: 'mK', tags: 'love_renews mkut' },
+  { id: 'mk-04', title: 'Love Renews', artist: 'KLEIGH', url: SAMPLE_AUDIO.loveRenews, type: 'mK', tags: 'love_renews mkut' },
+  { id: 'mk-05', title: 'Wounded & Willing', artist: 'G Putnam Music', url: SAMPLE_AUDIO.woundedWilling, type: 'mK', tags: 'healing mkut' },
+  { id: 'mk-06', title: 'Wounded & Willing', artist: 'G Putnam Music', url: SAMPLE_AUDIO.woundedWilling, type: 'mK', tags: 'healing mkut' },
+  { id: 'mk-07', title: 'Wounded & Willing', artist: 'G Putnam Music', url: SAMPLE_AUDIO.woundedWilling, type: 'mK', tags: 'healing mkut' },
+  { id: 'mk-08', title: 'Midnight Jazz', artist: 'G Putnam Music', url: SAMPLE_AUDIO.midnightJazz, type: 'mK', tags: 'jazz mkut' },
+  { id: 'mk-09', title: 'Midnight Jazz', artist: 'G Putnam Music', url: SAMPLE_AUDIO.midnightJazz, type: 'mK', tags: 'jazz mkut' },
+  { id: 'mk-10', title: 'Heart Tap', artist: 'KLEIGH', url: SAMPLE_AUDIO.heartTap, type: 'mK', tags: 'emotional mkut' },
+  { id: 'mk-11', title: 'Heart Tap', artist: 'KLEIGH', url: SAMPLE_AUDIO.heartTap, type: 'mK', tags: 'emotional mkut' },
+  { id: 'mk-12', title: 'High Energy', artist: 'G Putnam Music', url: SAMPLE_AUDIO.highEnergy, type: 'mK', tags: 'energy mkut' },
+  { id: 'mk-13', title: 'Cloud Nine', artist: 'KLEIGH', url: SAMPLE_AUDIO.cloudNine, type: 'mK', tags: 'uplifting mkut' },
 ];
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -196,19 +213,19 @@ export async function getFeaturedKPDs(): Promise<KutItem[]> {
 
 /** Static fallback — K-kUpId audio excerpts, one per romance level (+ multiples for Love). */
 export const FALLBACK_KPDS: KutItem[] = [
-  { id: 'kpd-01', title: 'Love Renews', artist: 'KLEIGH', url: '', type: 'KPD', tags: 'interest kupid', romance_level: 'Interest' },
-  { id: 'kpd-02', title: 'Love Renews', artist: 'KLEIGH', url: '', type: 'KPD', tags: 'date kupid', romance_level: 'Date' },
-  { id: 'kpd-03', title: 'Love Renews', artist: 'KLEIGH', url: '', type: 'KPD', tags: 'love kupid', romance_level: 'Love' },
-  { id: 'kpd-04', title: 'Love Renews', artist: 'KLEIGH', url: '', type: 'KPD', tags: 'love kupid', romance_level: 'Love' },
-  { id: 'kpd-05', title: 'Love Renews', artist: 'KLEIGH', url: '', type: 'KPD', tags: 'love kupid', romance_level: 'Love' },
-  { id: 'kpd-06', title: 'Heart Tap', artist: 'KLEIGH', url: '', type: 'KPD', tags: 'sex kupid', romance_level: 'Sex' },
-  { id: 'kpd-07', title: 'Heart Tap', artist: 'KLEIGH', url: '', type: 'KPD', tags: 'sex kupid', romance_level: 'Sex' },
-  { id: 'kpd-08', title: 'Cloud Nine', artist: 'KLEIGH', url: '', type: 'KPD', tags: 'forever kupid', romance_level: 'Forever' },
-  { id: 'kpd-09', title: 'Cloud Nine', artist: 'KLEIGH', url: '', type: 'KPD', tags: 'forever kupid', romance_level: 'Forever' },
-  { id: 'kpd-10', title: 'Wounded & Willing', artist: 'G Putnam Music', url: '', type: 'KPD', tags: 'interest kupid', romance_level: 'Interest' },
-  { id: 'kpd-11', title: 'Wounded & Willing', artist: 'G Putnam Music', url: '', type: 'KPD', tags: 'date kupid', romance_level: 'Date' },
-  { id: 'kpd-12', title: 'Midnight Jazz', artist: 'G Putnam Music', url: '', type: 'KPD', tags: 'love kupid', romance_level: 'Love' },
-  { id: 'kpd-13', title: 'Deep Focus', artist: 'G Putnam Music', url: '', type: 'KPD', tags: 'forever kupid', romance_level: 'Forever' },
+  { id: 'kpd-01', title: 'Love Renews', artist: 'KLEIGH', url: SAMPLE_AUDIO.loveRenews, type: 'KPD', tags: 'interest kupid', romance_level: 'Interest' },
+  { id: 'kpd-02', title: 'Love Renews', artist: 'KLEIGH', url: SAMPLE_AUDIO.loveRenewsReprise, type: 'KPD', tags: 'date kupid', romance_level: 'Date' },
+  { id: 'kpd-03', title: 'Love Renews', artist: 'KLEIGH', url: SAMPLE_AUDIO.loveRenewsHook, type: 'KPD', tags: 'love kupid', romance_level: 'Love' },
+  { id: 'kpd-04', title: 'Love Renews', artist: 'KLEIGH', url: SAMPLE_AUDIO.loveRenews, type: 'KPD', tags: 'love kupid', romance_level: 'Love' },
+  { id: 'kpd-05', title: 'Love Renews', artist: 'KLEIGH', url: SAMPLE_AUDIO.loveRenewsReprise, type: 'KPD', tags: 'love kupid', romance_level: 'Love' },
+  { id: 'kpd-06', title: 'Heart Tap', artist: 'KLEIGH', url: SAMPLE_AUDIO.heartTap, type: 'KPD', tags: 'sex kupid', romance_level: 'Sex' },
+  { id: 'kpd-07', title: 'Heart Tap', artist: 'KLEIGH', url: SAMPLE_AUDIO.heartTap, type: 'KPD', tags: 'sex kupid', romance_level: 'Sex' },
+  { id: 'kpd-08', title: 'Cloud Nine', artist: 'KLEIGH', url: SAMPLE_AUDIO.cloudNine, type: 'KPD', tags: 'forever kupid', romance_level: 'Forever' },
+  { id: 'kpd-09', title: 'Cloud Nine', artist: 'KLEIGH', url: SAMPLE_AUDIO.cloudNine, type: 'KPD', tags: 'forever kupid', romance_level: 'Forever' },
+  { id: 'kpd-10', title: 'Wounded & Willing', artist: 'G Putnam Music', url: SAMPLE_AUDIO.woundedWilling, type: 'KPD', tags: 'interest kupid', romance_level: 'Interest' },
+  { id: 'kpd-11', title: 'Wounded & Willing', artist: 'G Putnam Music', url: SAMPLE_AUDIO.woundedWilling, type: 'KPD', tags: 'date kupid', romance_level: 'Date' },
+  { id: 'kpd-12', title: 'Midnight Jazz', artist: 'G Putnam Music', url: SAMPLE_AUDIO.midnightJazz, type: 'KPD', tags: 'love kupid', romance_level: 'Love' },
+  { id: 'kpd-13', title: 'Deep Focus', artist: 'G Putnam Music', url: SAMPLE_AUDIO.deepFocus, type: 'KPD', tags: 'forever kupid', romance_level: 'Forever' },
 ];
 
 /** All romance levels in order — used for KPD level filter UI */

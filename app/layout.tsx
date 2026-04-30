@@ -1,34 +1,11 @@
-import './globals.css';
-import type { Metadata, Viewport } from 'next';
-import { Analytics } from '@vercel/analytics/react';
-import FPPixBar from '@/components/FPPixBar';
-import TrafficBeacon from '@/components/TrafficBeacon';
+// sites/k-kut/app/layout.tsx
+
+import "./globals.css";
+import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: 'G Putnam Music',
-  description: 'Dream The Stream',
-  metadataBase: new URL('https://www.gputnammusic.com'),
-  icons: {
-    icon: '/gpm_logo.jpg',
-    apple: '/gpm_logo.jpg',
-  },
-  appleWebApp: {
-    capable: true,
-    statusBarStyle: 'black-translucent',
-    title: 'G Putnam Music',
-  },
-  formatDetection: {
-    telephone: false,
-  },
-};
-
-export const viewport: Viewport = {
-  width: 'device-width',
-  initialScale: 1,
-  maximumScale: 5,
-  userScalable: true,
-  viewportFit: 'cover',
-  themeColor: '#1a1207',
+  title: "K-KUT",
+  description: "K-KUT – Support & Experience Platform",
 };
 
 export default function RootLayout({
@@ -38,16 +15,79 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body
-        className="bg-[#1a1207] text-[#F5e6c8] antialiased min-h-screen"
-        style={{ backgroundColor: '#1a1207', color: '#F5e6c8' }}
-      >
-        <main className="relative w-full overflow-x-hidden">
-          {children}
-        </main>
-        <TrafficBeacon />
-        <FPPixBar />
-        <Analytics />
+      <body>
+        {children}
+
+        {/* === GLOBAL TELEMETRY: PAGE VIEW === */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+(function(){
+  try {
+    fetch('/api/public/audio-event', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        event: 'page_view',
+        source: 'k-kut',
+        url: window.location.pathname,
+        ts: Date.now()
+      })
+    }).catch(function(){});
+  } catch(e){}
+})();
+`,
+          }}
+        />
+
+        {/* === GLOBAL TELEMETRY: CLICK + CHECKOUT TRACKING === */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+(function(){
+  try {
+
+    function sendEvent(type){
+      fetch('/api/public/audio-event', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          event: type,
+          source: 'k-kut',
+          url: window.location.pathname,
+          ts: Date.now()
+        })
+      }).catch(function(){});
+    }
+
+    document.addEventListener('click', function(e){
+      try {
+        var el = e.target;
+
+        if (!el) return;
+
+        var text = (el.innerText || '').toLowerCase();
+        var href = (el.href || '').toLowerCase();
+
+        // BUY / DONATE BUTTON DETECTION
+        if (
+          text.includes('buy') ||
+          text.includes('donate') ||
+          text.includes('support') ||
+          href.includes('checkout') ||
+          href.includes('stripe')
+        ) {
+          sendEvent('checkout_click');
+        }
+
+      } catch(err){}
+    }, true);
+
+  } catch(e){}
+})();
+`,
+          }}
+        />
       </body>
     </html>
   );
