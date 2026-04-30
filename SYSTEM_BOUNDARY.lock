@@ -31,3 +31,10 @@ PIX PROCESSING ORDER RULE:
 - If a lyric, structure, rights, audio, or classification challenge appears:
   alert admin, mark needs_admin_dispensation, and set aside.
 - Do not force-fit difficult PIX into the standard path.
+
+DOMAIN ROLE RULE:
+- k-kut.com = HUG send/receive/forward experience.
+- gputnammusic.com = PIX retail downloads.
+- mmmm-songs.com = SUPE, licensing, and professional access point.
+- mmmm-songs.com presents music as moments, hooks, phrases, and sections, not internal system terms.
+- Cross-link domains appropriately based on user intent.
