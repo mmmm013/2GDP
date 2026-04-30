@@ -37,6 +37,11 @@ body {
   font-feature-settings: "kern" 1, "liga" 1;
 }
 
+/* ─── Safe-area bottom padding for KutAudioPlayer fixed bar ── */
+.pb-safe {
+  padding-bottom: calc(80px + env(safe-area-inset-bottom, 0px));
+}
+
 /* ─── Utility Classes ─────────────────────────────────── */
 @layer utilities {
   .accent-glow {

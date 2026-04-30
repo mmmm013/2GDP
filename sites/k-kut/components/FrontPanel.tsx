@@ -1,8 +1,9 @@
 'use client';
 
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { FALLBACK_KUTS, FALLBACK_MKUTS, FALLBACK_KPDS } from '@/lib/featuredKuts';
 import type { KutItem } from '@/lib/featuredKuts';
+import type { KkutPlayDetail } from '@/components/KutAudioPlayer';
 
 // ─── Top-5 emotion tags steered toward across KKs, mKs, KPDs ───────────────
 const FP_EMOTIONS = [
@@ -45,7 +46,19 @@ export default function FrontPanel() {
   const [playlist, setPlaylist] = useState<KutItem[]>([]);
   const [activeIdx, setActiveIdx] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  // Dispatch a kkut-play event for an item — KutAudioPlayer takes over audio
+  const dispatchPlay = useCallback((item: KutItem) => {
+    if (!item?.url) return;
+    const detail: KkutPlayDetail = {
+      url:          item.url,
+      title:        item.title,
+      artist:       item.artist,
+      type:         item.type,
+      romanceLevel: item.romance_level,
+    };
+    window.dispatchEvent(new CustomEvent('kkut-play', { detail }));
+  }, []);
 
   // Select an emotion and build playlist
   const chooseEmotion = useCallback((tag: EmotionTag) => {
@@ -61,35 +74,51 @@ export default function FrontPanel() {
     chooseEmotion('healing');
   }, [chooseEmotion]);
 
-  // When playlist/index changes, load audio
+  // Sync isPlaying state from KutAudioPlayer events
   useEffect(() => {
-    const item = playlist[activeIdx];
-    if (!item) return;
-    if (!audioRef.current) {
-      audioRef.current = new Audio();
-      audioRef.current.addEventListener('ended', () => {
-        setActiveIdx((i) => (i + 1) % playlist.length);
-      });
-    }
-    if (item.url) {
-      audioRef.current.src = item.url;
-      if (isPlaying) audioRef.current.play().catch(() => {});
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [playlist, activeIdx]);
+    const onPlaying = (e: Event) => {
+      const { url } = (e as CustomEvent<{ url: string }>).detail;
+      const item = playlist[activeIdx];
+      setIsPlaying(!!item?.url && item.url === url);
+    };
+    const onPaused = (e: Event) => {
+      const { url } = (e as CustomEvent<{ url: string }>).detail;
+      const item = playlist[activeIdx];
+      if (item?.url === url) setIsPlaying(false);
+    };
+    const onEnded = (e: Event) => {
+      const { url } = (e as CustomEvent<{ url: string }>).detail;
+      const item = playlist[activeIdx];
+      if (item?.url === url) {
+        setIsPlaying(false);
+        // Auto-advance to next track in FrontPanel playlist
+        setActiveIdx((i) => {
+          const next = (i + 1) % playlist.length;
+          if (playlist[next]?.url) {
+            dispatchPlay(playlist[next]);
+          }
+          return next;
+        });
+      }
+    };
+
+    window.addEventListener('kkut-playing', onPlaying);
+    window.addEventListener('kkut-paused',  onPaused);
+    window.addEventListener('kkut-ended',   onEnded);
+    return () => {
+      window.removeEventListener('kkut-playing', onPlaying);
+      window.removeEventListener('kkut-paused',  onPaused);
+      window.removeEventListener('kkut-ended',   onEnded);
+    };
+  }, [playlist, activeIdx, dispatchPlay]);
 
   const togglePlay = () => {
-    const audio = audioRef.current;
-    if (!audio) return;
     const item = playlist[activeIdx];
     if (!item?.url) return;
     if (isPlaying) {
-      audio.pause();
-      setIsPlaying(false);
+      window.dispatchEvent(new CustomEvent('kkut-pause-request'));
     } else {
-      if (audio.src !== item.url) audio.src = item.url;
-      audio.play().catch(() => {});
-      setIsPlaying(true);
+      dispatchPlay(item);
     }
   };
 
@@ -174,7 +203,11 @@ export default function FrontPanel() {
           {playlist.map((_, i) => (
             <button
               key={i}
-              onClick={() => { setActiveIdx(i); setIsPlaying(false); }}
+              onClick={() => {
+                setActiveIdx(i);
+                const item = playlist[i];
+                if (item?.url) dispatchPlay(item);
+              }}
               className={[
                 'w-2 h-2 rounded-full transition-all',
                 i === activeIdx ? 'bg-amber-400 scale-125' : 'bg-white/20 hover:bg-white/40',
