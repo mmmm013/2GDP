@@ -16,17 +16,17 @@ export default function Home() {
       </header>
 
       {/* Hero */}
-      <section className="max-w-4xl mx-auto px-6 py-16">
+      <section className="max-w-4xl mx-auto px-6 py-14">
         <h1 className="text-4xl font-bold">
           Find the exact moment you need.
         </h1>
 
         <p className="mt-4 text-[#E8CFA8] max-w-2xl">
-          Vocal hooks, phrases, emotional moments, and song sections—ready for film, TV, ads, and branded content.
+          Vocal hooks, phrases, emotional moments, and song sections—ready for film, TV, ads, and content.
         </p>
 
         {/* Actions */}
-        <div className="mt-10 space-y-6">
+        <div className="mt-10 space-y-8">
 
           {/* Browse */}
           <div>
@@ -34,9 +34,8 @@ export default function Home() {
             <p className="text-sm text-[#C8A882]">
               Discover precise emotional moments: lead-ins, hooks, phrases, and sections.
             </p>
-
             <Link href="/find">
-              <button className="mt-3 px-6 py-3 border border-[#D4A017] text-[#D4A017] rounded-lg hover:bg-[#D4A017]/10 transition">
+              <button className="mt-3 px-6 py-3 border border-[#D4A017] rounded text-[#D4A017] hover:bg-[#D4A017]/10">
                 Browse Moments
               </button>
             </Link>
@@ -48,17 +47,14 @@ export default function Home() {
             <p className="text-sm text-[#C8A882]">
               Tell us what you need:
             </p>
-
             <div className="text-sm mt-2 text-[#E8CFA8]">
               <div>“warm romantic lead-in”</div>
               <div>“nostalgic couple moment”</div>
               <div>“intimate vocal phrase”</div>
             </div>
 
-            <a
-              href="mailto:hello@gputnammusic.com?subject=K-KUT Request&body=Describe what you need:"
-            >
-              <button className="mt-3 px-6 py-3 border border-[#D4A017] text-[#D4A017] rounded-lg hover:bg-[#D4A017]/10 transition">
+            <a href="mailto:hello@gputnammusic.com?subject=K-KUT Request">
+              <button className="mt-3 px-6 py-3 border border-[#D4A017] rounded text-[#D4A017] hover:bg-[#D4A017]/10">
                 Start a Request
               </button>
             </a>
@@ -72,30 +68,49 @@ export default function Home() {
             </p>
 
             <Link href="/supe">
-              <button className="mt-3 px-6 py-3 border border-[#D4A017] text-[#D4A017] rounded-lg hover:bg-[#D4A017]/10 transition">
-                Start a Request
+              <button className="mt-3 px-6 py-3 border border-[#D4A017] rounded text-[#D4A017] hover:bg-[#D4A017]/10">
+                Work with SUPE
               </button>
             </Link>
           </div>
         </div>
 
-        {/* Divider */}
-        <div className="mt-10 border-t border-[#D4A017]/20" />
+        {/* TRUST BLOCK (CRITICAL) */}
+        <div className="mt-14 p-6 border border-[#D4A017]/30 rounded bg-[#120C07]">
+          <h3 className="text-lg font-semibold text-[#D4A017]">
+            Built for Trust by Design
+          </h3>
 
-        {/* Footer */}
-        <div className="mt-6 text-sm text-[#C8A882]">
-          Powered by GPM 4PE music operations.
-        </div>
+          <p className="mt-3 text-sm text-[#E8CFA8] leading-relaxed">
+            4PE never accesses non-public or proprietary data unless explicitly directed by the Owner.
+            By default, the system operates with zero visibility into your business data.
+          </p>
 
-        <div className="mt-4 text-[#E8CFA8]">
-          Send as a HUG | Download full songs
+          <p className="mt-3 text-sm text-[#E8CFA8] leading-relaxed">
+            GPEx does not store or operate on client data. Access is limited to discovery,
+            troubleshooting, or admin support—and only when required.
+          </p>
+
+          <p className="mt-3 text-sm text-[#E8CFA8] leading-relaxed">
+            The platform improves how you work—not what you own. Your data remains yours,
+            fully isolated.
+          </p>
+
+          <p className="mt-3 text-sm text-[#C8A882] italic">
+            Love. Care. Share. Every interaction follows the GP Experience standard.
+          </p>
         </div>
 
         {/* BB BOT */}
-        <div className="mt-16">
+        <div className="mt-14">
           <BBBotDemo />
         </div>
 
+        <div className="mt-10 text-sm text-[#C8A882]">
+          Powered by GPM 4PE music operations.
+          <br />
+          Send as a HUG | Download full songs
+        </div>
       </section>
     </main>
   );
