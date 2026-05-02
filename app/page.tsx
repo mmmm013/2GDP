@@ -17,6 +17,29 @@ export default function HomePage() {
     <>
       <PromoBar />
       <Header />
+
+      <section className="px-4 pt-4">
+        <div className="mx-auto flex max-w-7xl flex-col gap-4 rounded-2xl border border-[#FFD54F]/50 bg-[#2A1506] p-5 shadow-xl sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.28em] text-[#FFD54F]">
+              Mother’s Day GPM HUG is live
+            </p>
+            <h1 className="mt-2 text-2xl font-black text-[#F5e6c8] sm:text-3xl">
+              FIND THE RIGHT WORDS.
+            </h1>
+            <p className="mt-2 max-w-2xl text-sm leading-relaxed text-[#E8CFA8]">
+              Send Mom something she has never, ever received: a real-audio K-KUT HUG.
+              Not AI. Not a greeting card. A new G Putnam Music invention gift.
+            </p>
+          </div>
+          <a
+            href="https://k-kut.com"
+            className="inline-flex items-center justify-center rounded-full bg-[#FFD54F] px-6 py-3 text-sm font-black uppercase tracking-wider text-[#2A1506] hover:bg-[#FFE082]"
+          >
+            Order at k-kut.com →
+          </a>
+        </div>
+      </section>
       <CashSprintBanner endIso="2026-04-15T23:59:59Z" source="home_countdown" />
 
       <section className="px-4 pt-3">
