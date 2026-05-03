@@ -127,6 +127,73 @@ export default function HomePage() {
         </div>
       </section>
 
+
+      <section className="px-4 pb-8">
+        <div className="max-w-7xl mx-auto rounded-2xl border border-[#5C3A1E]/60 bg-[#2A1506] p-6 md:p-8">
+          <p className="text-[#FFD54F] text-xs font-black uppercase tracking-[0.24em]">
+            Fair 4PE Review Path
+          </p>
+
+          <h2 className="mt-4 max-w-3xl text-3xl md:text-4xl font-black text-[#F5e6c8]">
+            Initial interest is free. Deeper 4PE review is selected, fair, and transparent.
+          </h2>
+
+          <p className="mt-5 max-w-4xl text-[#E8CFA8] leading-relaxed">
+            GPM does not charge artists for a promise of placement, sales, licensing, acceptance, or release.
+            If a work is selected for deeper 4PE review, review fees cover real intake labor: file review,
+            title normalization, credits and rights notes, structure review, catalog preparation, and
+            K-KUT / HUG / placement-fit assessment.
+          </p>
+
+          <div className="mt-6 grid gap-4 md:grid-cols-4">
+            <div className="rounded-xl border border-[#D4A017]/25 bg-[#1A1207] p-4">
+              <p className="text-[#FFD54F] font-black">Interest Form</p>
+              <p className="mt-1 text-2xl font-black text-[#F5e6c8]">Free</p>
+              <p className="mt-2 text-sm text-[#C8A882]">A simple first look for selected artist opportunity fit.</p>
+            </div>
+
+            <div className="rounded-xl border border-[#D4A017]/25 bg-[#1A1207] p-4">
+              <p className="text-[#FFD54F] font-black">Selected Song Review</p>
+              <p className="mt-1 text-2xl font-black text-[#F5e6c8]">$250</p>
+              <p className="mt-2 text-sm text-[#C8A882]">Focused 4PE review for one work or song-section opportunity.</p>
+            </div>
+
+            <div className="rounded-xl border border-[#D4A017]/25 bg-[#1A1207] p-4">
+              <p className="text-[#FFD54F] font-black">Expanded Review</p>
+              <p className="mt-1 text-2xl font-black text-[#F5e6c8]">$750</p>
+              <p className="mt-2 text-sm text-[#C8A882]">Multiple files, structure review, deeper catalog preparation.</p>
+            </div>
+
+            <div className="rounded-xl border border-[#D4A017]/25 bg-[#1A1207] p-4">
+              <p className="text-[#FFD54F] font-black">Catalog / Major Artist</p>
+              <p className="mt-1 text-2xl font-black text-[#F5e6c8]">Custom</p>
+              <p className="mt-2 text-sm text-[#C8A882]">Labels, publishers, estates, and major artists receive custom proposals.</p>
+            </div>
+          </div>
+
+          <p className="mt-5 max-w-4xl text-sm leading-relaxed text-[#C8A882]">
+            GPM may waive or reduce review fees for invited artists, legacy collaborators, hardship cases,
+            strategic partners, or works with exceptional fit. Nothing becomes public, released, converted
+            into PIX, K-KUT, HUG, or catalog material until GPM reviews and approves it.
+          </p>
+
+          <div className="mt-6 flex flex-wrap gap-3">
+            <a
+              href="/kreator-intake"
+              className="rounded-full bg-[#FFD54F] px-5 py-3 text-xs font-black uppercase tracking-wider text-[#2A1506] hover:bg-[#FFE082]"
+            >
+              Start Free Interest Review
+            </a>
+            <a
+              href="https://k-kut.com"
+              className="rounded-full border border-[#C8A882]/70 px-5 py-3 text-xs font-black uppercase tracking-wider text-[#C8A882] hover:bg-[#C8A882]/10"
+            >
+              Explore K-KUTs
+            </a>
+          </div>
+        </div>
+      </section>
+
       <div className="flex justify-end px-4 pt-3 pb-1">
         <GpmBot bot="MC-BOT" startCollapsed={false} className="w-full max-w-xs" />
       </div>

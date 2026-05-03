@@ -124,6 +124,23 @@ export default function KreatorIntakePage() {
           </div>
         </div>
 
+
+        <div className="mt-8 rounded-3xl border border-[#D4A017]/25 bg-[#1A1207] p-6">
+          <p className="text-sm font-black uppercase tracking-[0.24em] text-[#FFD54F]">
+            Fair review policy
+          </p>
+          <p className="mt-3 text-[#E8CFA8] leading-relaxed">
+            Initial interest is free. If a work is selected for deeper 4PE review, GPM may offer a paid review path.
+            Review fees cover real intake labor and do not guarantee acceptance, public release, sales, licensing,
+            placement, or use.
+          </p>
+          <p className="mt-3 text-sm text-[#C8A882] leading-relaxed">
+            GPM may waive or reduce fees for invited artists, legacy collaborators, hardship cases, strategic partners,
+            or works with exceptional fit. Major artists, labels, publishers, estates, and catalog owners should request
+            a direct review call for a custom proposal.
+          </p>
+        </div>
+
         <form onSubmit={submit} className="mt-8 space-y-5 rounded-3xl border border-[#5C3A1E]/70 bg-[#2A1506] p-6 shadow-2xl">
           <div className="grid gap-5 sm:grid-cols-2">
             <label className="block">
