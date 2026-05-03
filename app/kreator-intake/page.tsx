@@ -50,7 +50,7 @@ export default function KreatorIntakePage() {
     }
 
     setSending(true);
-    setStatus("Uploading intake package…");
+    setStatus("Submitting intake package…");
 
     const form = new FormData();
     form.set("kreator_name", kreatorName);
@@ -95,11 +95,11 @@ export default function KreatorIntakePage() {
         </p>
 
         <h1 className="mt-4 text-4xl font-black sm:text-5xl">
-          GPM Kreator Upload Portal
+          GPM Artist & Kreator Intake
         </h1>
 
         <p className="mt-4 max-w-2xl text-lg leading-relaxed text-[#E8CFA8]">
-          Upload songs, demos, stems, lyrics, artwork, credits, notes, and reference files here.
+          Submit songs, demos, stems, lyrics, artwork, credits, notes, and reference files for GPM / 4PE review.
           Everything enters 4PE intake first. Nothing becomes public PIX, K-KUT, HUG, or catalog material until admin review.
         </p>
 
@@ -194,7 +194,7 @@ export default function KreatorIntakePage() {
               className="mt-2 w-full rounded-xl border border-[#5C3A1E] bg-[#160d08] px-4 py-3 text-[#F5e6c8]"
             />
             <p className="mt-2 text-xs text-[#C8A882]">
-              Choose files from your computer. Multiple files are allowed.
+              Choose files from your computer. Multiple files are allowed. Submissions enter review before any public use.
             </p>
           </label>
 
@@ -214,7 +214,7 @@ export default function KreatorIntakePage() {
             disabled={sending}
             className="w-full rounded-full bg-[#FFD54F] px-6 py-4 text-sm font-black uppercase tracking-wider text-[#2A1506] hover:bg-[#FFE082] disabled:opacity-60"
           >
-            {sending ? "Uploading…" : "Submit to 4PE Intake"}
+            {sending ? "Submitting…" : "Submit Catalog for Review"}
           </button>
 
           {status && (

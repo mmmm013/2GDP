@@ -11,11 +11,10 @@ import GlobalPlayer from '@/components/GlobalPlayer';
 import CashSprintBanner from '@/components/CashSprintBanner';
 
 export default function HomePage() {
-  const checkoutHref = '/api/checkout-attribution?utm_source=home_strip&utm_medium=site&utm_campaign=cash_sprint_apr2026&utm_content=primary';
-
   return (
     <>
       <PromoBar />
+
       <Header />
 
       <section className="px-4 pt-4">
@@ -43,24 +42,86 @@ export default function HomePage() {
       <CashSprintBanner endIso="2026-04-15T23:59:59Z" source="home_countdown" />
 
       <section className="px-4 pt-3">
-        <div className="max-w-7xl mx-auto rounded-xl border border-[#5C3A1E]/50 bg-[#2A1506] p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-          <p className="text-[#F5e6c8] text-sm font-semibold tracking-wide">
-            Pre-made K-KUT access is live. No custom wait, no setup friction.
-          </p>
+        <div className="max-w-7xl mx-auto rounded-xl border border-[#5C3A1E]/50 bg-[#2A1506] p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <p className="text-[#FFD54F] text-xs font-black uppercase tracking-[0.22em]">
+              G Putnam Music · GPEx · 4PE
+            </p>
+            <p className="mt-2 text-[#F5e6c8] text-base font-semibold tracking-wide">
+              GPM is the home base for Kreator intake, PIX source material, and the K-KUT invention family.
+            </p>
+            <p className="mt-1 text-[#C8A882] text-sm leading-relaxed">
+              Interested in K-KUTs? Visit the dedicated K-KUT site for the Mother’s Day HUG promo, real KK song-section samples, and ordering.
+            </p>
+          </div>
+
           <div className="flex flex-wrap items-center gap-2">
             <a
-              href={checkoutHref}
-              target="_blank"
-              rel="noopener noreferrer"
+              href="https://k-kut.com"
               className="px-4 py-2 rounded-full bg-[#FFD54F] text-[#2A1506] text-xs font-extrabold tracking-wider hover:bg-[#FFE082] transition-colors"
             >
-              BUY K-KUT NOW
+              EXPLORE K-KUTs
             </a>
             <a
-              href="/gift"
+              href="/kreator-intake"
               className="px-4 py-2 rounded-full border border-[#C8A882]/70 text-[#C8A882] text-xs font-bold tracking-wider hover:bg-[#C8A882]/10 transition-colors"
             >
-              SEND A GIFT
+              4PE KREATOR INTAKE
+            </a>
+          </div>
+        </div>
+      </section>
+
+
+      <section className="px-4 py-8">
+        <div className="max-w-7xl mx-auto rounded-2xl border border-[#D4A017]/25 bg-[#1A1207] p-6 md:p-8">
+          <p className="text-[#FFD54F] text-xs font-black uppercase tracking-[0.24em]">
+            Artist Opportunity
+          </p>
+
+          <h2 className="mt-4 max-w-3xl text-3xl md:text-4xl font-black text-[#F5e6c8]">
+            Your songs may hold more than one future.
+          </h2>
+
+          <div className="mt-5 grid gap-4 md:grid-cols-4">
+            <div className="rounded-xl border border-[#5C3A1E]/60 bg-[#2A1506] p-4">
+              <p className="text-[#FFD54F] font-black">A full track</p>
+              <p className="mt-1 text-sm text-[#C8A882]">can be a release.</p>
+            </div>
+            <div className="rounded-xl border border-[#5C3A1E]/60 bg-[#2A1506] p-4">
+              <p className="text-[#FFD54F] font-black">A section</p>
+              <p className="mt-1 text-sm text-[#C8A882]">can become a K-KUT.</p>
+            </div>
+            <div className="rounded-xl border border-[#5C3A1E]/60 bg-[#2A1506] p-4">
+              <p className="text-[#FFD54F] font-black">A message</p>
+              <p className="mt-1 text-sm text-[#C8A882]">can become a HUG.</p>
+            </div>
+            <div className="rounded-xl border border-[#5C3A1E]/60 bg-[#2A1506] p-4">
+              <p className="text-[#FFD54F] font-black">A moment</p>
+              <p className="mt-1 text-sm text-[#C8A882]">can become a placement.</p>
+            </div>
+          </div>
+
+          <p className="mt-6 max-w-4xl text-[#E8CFA8] leading-relaxed">
+            G Putnam Music is opening a 4PE intake path for selected artists, writers, and rights holders who want their songs considered for K-KUTs, HUGs, mini-KUTs, curated gift products, licensing, placement, and future fan-engagement uses.
+          </p>
+
+          <p className="mt-3 max-w-4xl text-[#C8A882] leading-relaxed">
+            This is not a public dump folder. Every submission enters review first. Nothing becomes public, released, converted into PIX, K-KUT, HUG, or catalog material until GPM reviews and approves it.
+          </p>
+
+          <div className="mt-6 flex flex-wrap gap-3">
+            <a
+              href="/kreator-intake"
+              className="rounded-full bg-[#FFD54F] px-5 py-3 text-xs font-black uppercase tracking-wider text-[#2A1506] hover:bg-[#FFE082]"
+            >
+              Submit Catalog for Review
+            </a>
+            <a
+              href="https://k-kut.com"
+              className="rounded-full border border-[#C8A882]/70 px-5 py-3 text-xs font-black uppercase tracking-wider text-[#C8A882] hover:bg-[#C8A882]/10"
+            >
+              Explore K-KUTs
             </a>
           </div>
         </div>
