@@ -40,7 +40,7 @@ export default function CashSprintBanner({ endIso, source }: CashSprintBannerPro
     return () => clearInterval(iv);
   }, [endTime]);
 
-  const checkoutHref = `/api/checkout-attribution?utm_source=${encodeURIComponent(source)}&utm_medium=site&utm_campaign=cash_sprint_apr2026&utm_content=countdown`;
+  const checkoutHref = `/api/k-kut-referral?utm_source=${encodeURIComponent(source)}&utm_medium=site&utm_campaign=gpm_artist_opportunity_2026&utm_content=countdown`;
 
   return (
     <section className="px-4 pt-3">
@@ -56,7 +56,7 @@ export default function CashSprintBanner({ endIso, source }: CashSprintBannerPro
             rel="noopener noreferrer"
             className="px-4 py-2 rounded-full bg-[#FFD54F] text-[#2A1506] text-xs font-extrabold tracking-wider hover:bg-[#FFE082] transition-colors"
           >
-            BUY K-KUT NOW
+            EXPLORE K-KUTs
           </a>
           <Link
             href="/gift"

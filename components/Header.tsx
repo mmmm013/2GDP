@@ -63,7 +63,7 @@ export default function Header() {
   const menuTT = asMenuLabel(templateSlots.menu_item_tells_tale, 'tt', 'TT');
   const menuMsj = asText(templateSlots.menu_item_msj, 'MSJ');
   const menuJoin = asText(templateSlots.menu_item_sponsorships, 'JOIN');
-  const checkoutHref = '/api/checkout-attribution?utm_source=header&utm_medium=site&utm_campaign=cash_sprint_apr2026&utm_content=buy_kk_now';
+  const checkoutHref = '/api/checkout-attribution?utm_source=header&utm_medium=site&utm_campaign=cash_sprint_apr2026&utm_content=explore_kkuts';
 
   return (
     <nav className="w-full bg-[#2A1506] shadow-lg border-b border-[#5C3A1E]/40 relative z-50">

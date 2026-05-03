@@ -27,8 +27,8 @@ const FLASH_SPECIALS = [
   {
     emoji: '⚡',
     title: 'K-KUT Sovereign Pass',
-    desc: 'Pre-made K-KUT access is live. Tap once and complete checkout instantly.',
-    href: '/api/checkout-attribution?utm_source=join_flash&utm_medium=site&utm_campaign=cash_sprint_apr2026&utm_content=sovereign_pass',
+    desc: 'Explore K-KUTs, HUGs, and real song-section products at the dedicated K-KUT site.',
+    href: 'https://k-kut.com',
     cta: 'BUY NOW'
   },
   { 
@@ -66,7 +66,7 @@ export default function JoinPage() {
   const founderClaimed = useFounderCount();
   const remaining = FOUNDER_TOTAL - founderClaimed;
   const [flash, setFlash] = useState(FLASH_SPECIALS[0]);
-  const CHECKOUT_URL = '/api/checkout-attribution?utm_source=join_page&utm_medium=site&utm_campaign=cash_sprint_apr2026&utm_content=tier_cta';
+  const CHECKOUT_URL = 'https://k-kut.com';
 
   useEffect(() => {
     setFlash(FLASH_SPECIALS[Math.floor(Math.random() * FLASH_SPECIALS.length)]);

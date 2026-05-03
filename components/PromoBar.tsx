@@ -10,7 +10,7 @@ const PROMOS = [
     text: 'text-black',
     label: '⚡ PRE-MADE K-KUT ACCESS IS LIVE — One tap to secure Sovereign Pass and start sending feelings now.',
     cta: 'BUY KK NOW →',
-    href: '/api/checkout-attribution?utm_source=promobar&utm_medium=site&utm_campaign=cash_sprint_apr2026&utm_content=kk_buy',
+    href: 'https://k-kut.com',
   },
   {
     id: 'kub-founder',
