@@ -1,106 +1,72 @@
 import Link from "next/link";
 
-const primaryLanes = [
+const accessPaths = [
   {
-    lane: "BUYER",
-    title: "I want to send a music gift",
-    body: "Pick a feeling, hear real music samples, choose a K-KUT HUG, and order a private link.",
+    label: "Consumer path",
+    title: "Send a K-KUT HUG",
+    body: "Gift buyers enter the live K-KUT product path: pick a feeling, hear samples, choose a HUG, and order a private link.",
     href: "https://www.k-kut.com/mom",
-    cta: "Send a HUG",
+    cta: "Open HUG path",
   },
   {
-    lane: "ARTIST",
-    title: "I make music",
-    body: "Start a controlled review before any song, section, hook, or moment becomes public or productized.",
+    label: "Creator path",
+    title: "Submit catalog for review",
+    body: "Artists, writers, and rights holders can start a controlled 4PE review before anything becomes public or productized.",
     href: "/kreator-intake",
     cta: "Start intake",
   },
   {
-    lane: "RIGHTS HOLDER",
-    title: "I control catalog",
-    body: "Review how GPMx can evaluate source music, song sections, and future product uses without dumping assets publicly.",
-    href: "/kreator-intake",
-    cta: "Review catalog path",
+    label: "Partner path",
+    title: "Review GPMx inventions",
+    body: "Partners, attorneys, and investors can review how GPMx turns source music into controlled, rights-aware music products.",
+    href: "https://www.k-kut.com/som",
+    cta: "View live proof",
   },
   {
-    lane: "PARTNER / IP",
-    title: "I need the invention view",
-    body: "See GPMx as the control hub for K-KUT, HUG, TUG, SOM, PIX, STI, STI-Slots, BTIs, and 4PE.",
-    href: "/contact",
-    cta: "Start conversation",
-  },
-];
-
-const secondaryLanes = [
-  {
-    lane: "TESTER",
-    title: "Test the buyer path",
-    href: "https://www.k-kut.com/find",
-  },
-  {
-    lane: "BUSINESS",
-    title: "Campaigns and promo uses",
-    href: "/commercial",
-  },
-  {
-    lane: "SUPERVISOR",
-    title: "Music moments for scenes",
-    href: "/commercial",
-  },
-  {
-    lane: "FAN",
-    title: "Listen, follow, support",
-    href: "/who",
-  },
-  {
-    lane: "LEGAL",
-    title: "Patent / IP review",
-    href: "/contact",
+    label: "Music path",
+    title: "Explore source music",
+    body: "Listeners can enter the GPM music world while the platform preserves separation between songs, sections, products, and behaviors.",
+    href: "#music-behaviors",
+    cta: "See behaviors",
   },
 ];
 
 const behaviorStack = [
   {
-    key: "STI",
-    title: "Song-to-intent behavior",
-    body: "Source music mapped to user purpose, emotional use, and product direction.",
+    title: "STI",
+    body: "Song-to-intent behavior: source music mapped to user purpose, emotional use, and product direction.",
   },
   {
-    key: "STI-Slots",
-    title: "Controlled use slots",
-    body: "Where a song, section, phrase, or moment can serve a defined user need.",
+    title: "STI-Slots",
+    body: "Controlled placement slots for where a song, section, phrase, or moment can serve a defined user need.",
   },
   {
-    key: "BTIs",
-    title: "Behavior-triggered inventory",
-    body: "Assets organized by what a user is trying to do, send, feel, prove, or place.",
+    title: "BTIs",
+    body: "Behavior-triggered inventory: moments and assets organized by what a user is trying to do, send, feel, or prove.",
   },
   {
-    key: "PIX",
-    title: "Source music objects",
-    body: "Original human-made songs and catalog objects feeding review and future product life.",
+    title: "PIX",
+    body: "Original source songs and catalog objects that feed GPMx review, sectioning, and future product life.",
   },
   {
-    key: "K-KUT",
-    title: "Song-section products",
-    body: "Controlled real-audio sections derived from approved source music.",
+    title: "K-KUT",
+    body: "A controlled song-section product derived from real music and routed through defined use, access, and delivery rules.",
   },
   {
-    key: "HUG / TUG",
-    title: "Private-link music gifts",
-    body: "Sendable music moments built for personal or targeted-use delivery.",
+    title: "HUG / TUG",
+    body: "Private-link music gifts and targeted-use gifts built from approved K-KUT moments.",
   },
 ];
 
-const crmFields = [
-  "Client lane",
-  "Relationship",
-  "Current ask",
-  "Best link",
-  "Status",
-  "Next follow-up",
-  "Pain point",
-  "Offer fit",
+const controls = [
+  "Domain behavior routing",
+  "Creator intake",
+  "Rights-aware review",
+  "Song-section productization",
+  "Private-link delivery",
+  "No raw-download gift flow",
+  "Live product proof",
+  "Patent/invention support trail",
 ];
 
 export default function HomePage() {
@@ -108,20 +74,20 @@ export default function HomePage() {
     <main className="min-h-screen bg-[#100804] text-[#F7E7C8]">
       <section className="mx-auto max-w-7xl px-6 py-10 sm:px-10 sm:py-14">
         <div className="overflow-hidden rounded-[2rem] border border-[#D4A017]/35 bg-[#201106] shadow-2xl shadow-black/45">
-          <div className="grid lg:grid-cols-[1.06fr_0.94fr]">
+          <div className="grid lg:grid-cols-[1.05fr_0.95fr]">
             <div className="p-7 sm:p-10 lg:p-12">
               <p className="text-sm font-black uppercase tracking-[0.34em] text-[#FFD36A]">
                 GPMx Flagship
               </p>
 
               <h1 className="mt-5 max-w-5xl text-5xl font-black leading-[0.92] text-[#FFD36A] sm:text-7xl">
-                One music platform. Many client lanes.
+                Music behavior infrastructure.
               </h1>
 
               <p className="mt-6 max-w-4xl text-xl font-bold leading-relaxed text-[#F7E7C8]/82">
-                G Putnam Music is the central hub for GPMx: music behavior
-                infrastructure, creator intake, domain routing, STI, STI-Slots,
-                BTIs, PIX, K-KUTs, HUGs, TUGs, and 4PE-controlled product life.
+                G Putnam Music is the central hub for GPMx: source music,
+                creator intake, STI, STI-Slots, BTIs, PIX, K-KUTs, HUGs,
+                TUGs, and 4PE-controlled music product behavior.
               </p>
 
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
@@ -138,47 +104,26 @@ export default function HomePage() {
                 >
                   Creator intake
                 </Link>
-
-                <Link
-                  href="/contact"
-                  className="inline-flex items-center justify-center rounded-full border border-[#F7E7C8]/25 px-7 py-4 text-base font-black uppercase tracking-wide text-[#F7E7C8]/80 transition hover:bg-white/10"
-                >
-                  Partner / IP
-                </Link>
               </div>
 
               <p className="mt-6 max-w-3xl text-sm font-bold leading-relaxed text-[#F7E7C8]/62">
-                K-KUT is a live product domain. GPMx is the flagship control
-                system behind source, behavior, access, review, delivery, and
-                future use.
+                K-KUT is one product domain. GPMx is the flagship system that
+                controls source, behavior, access, review, and delivery.
               </p>
             </div>
 
-            <div className="relative min-h-[450px] border-t border-[#D4A017]/25 bg-black/25 lg:border-l lg:border-t-0">
+            <div className="relative min-h-[430px] border-t border-[#D4A017]/25 bg-black/25 lg:border-l lg:border-t-0">
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_35%,rgba(255,211,106,0.22),transparent_34%),radial-gradient(circle_at_72%_75%,rgba(212,160,23,0.16),transparent_32%)]" />
-
-              <div className="relative z-10 flex h-full min-h-[450px] items-center justify-center p-8">
-                <div className="w-full max-w-md rounded-[2rem] border border-[#FFD36A]/30 bg-[#100804]/80 p-6 shadow-2xl">
+              <div className="relative z-10 flex h-full min-h-[430px] items-center justify-center p-8">
+                <div className="w-full max-w-md rounded-[2rem] border border-[#FFD36A]/30 bg-[#100804]/78 p-6 shadow-2xl">
                   <p className="text-sm font-black uppercase tracking-[0.26em] text-[#FFD36A]">
-                    CRM routing model
+                    Domain control
                   </p>
-
                   <h2 className="mt-4 text-3xl font-black leading-tight text-[#F7E7C8]">
-                    Users rule by choosing their lane.
+                    One flagship. Multiple behavior domains.
                   </h2>
-
                   <div className="mt-5 grid gap-2">
-                    {[
-                      "Buyer",
-                      "Tester",
-                      "Artist",
-                      "Rights Holder",
-                      "Business Client",
-                      "Partner / Investor",
-                      "Legal / IP",
-                      "Supervisor / License",
-                      "Fan / Supporter",
-                    ].map((item) => (
+                    {["GPMx", "STI", "STI-Slots", "BTIs", "PIX", "K-KUT", "HUG/TUG", "4PE"].map((item) => (
                       <div
                         key={item}
                         className="rounded-xl border border-[#D4A017]/20 bg-black/25 px-4 py-3 text-sm font-black text-[#FFD36A]"
@@ -194,18 +139,18 @@ export default function HomePage() {
 
           <div className="border-t border-[#D4A017]/25 p-7 sm:p-10">
             <p className="text-sm font-black uppercase tracking-[0.3em] text-[#FFD36A]">
-              Primary doors
+              Users choose the doorway
             </p>
 
             <div className="mt-6 grid gap-4 lg:grid-cols-4">
-              {primaryLanes.map((path) => (
+              {accessPaths.map((path) => (
                 <a
                   key={path.title}
                   href={path.href}
                   className="rounded-[1.5rem] border border-[#D4A017]/25 bg-black/20 p-5 transition hover:border-[#FFD36A]/70 hover:bg-[#FFD36A]/10"
                 >
                   <p className="text-xs font-black uppercase tracking-[0.2em] text-[#D4A017]">
-                    {path.lane}
+                    {path.label}
                   </p>
                   <h2 className="mt-3 text-2xl font-black leading-tight text-[#FFD36A]">
                     {path.title}
@@ -219,27 +164,13 @@ export default function HomePage() {
                 </a>
               ))}
             </div>
-
-            <div className="mt-7 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-              {secondaryLanes.map((path) => (
-                <a
-                  key={path.lane}
-                  href={path.href}
-                  className="rounded-2xl border border-[#D4A017]/20 bg-[#100804]/50 p-4 transition hover:border-[#FFD36A]/60 hover:bg-[#FFD36A]/10"
-                >
-                  <p className="text-xs font-black uppercase tracking-[0.2em] text-[#D4A017]">
-                    {path.lane}
-                  </p>
-                  <p className="mt-2 text-sm font-black leading-5 text-[#F7E7C8]/86">
-                    {path.title}
-                  </p>
-                </a>
-              ))}
-            </div>
           </div>
         </div>
 
-        <section className="mt-10 rounded-[2rem] border border-[#D4A017]/30 bg-[#201106] p-7 sm:p-10">
+        <section
+          id="music-behaviors"
+          className="mt-10 rounded-[2rem] border border-[#D4A017]/30 bg-[#201106] p-7 sm:p-10"
+        >
           <p className="text-sm font-black uppercase tracking-[0.3em] text-[#FFD36A]">
             Behavior stack
           </p>
@@ -257,13 +188,10 @@ export default function HomePage() {
           <div className="mt-7 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {behaviorStack.map((item) => (
               <div
-                key={item.key}
+                key={item.title}
                 className="rounded-[1.5rem] border border-[#D4A017]/25 bg-black/20 p-5"
               >
-                <p className="text-xs font-black uppercase tracking-[0.22em] text-[#D4A017]">
-                  {item.key}
-                </p>
-                <h3 className="mt-2 text-2xl font-black text-[#FFD36A]">
+                <h3 className="text-2xl font-black text-[#FFD36A]">
                   {item.title}
                 </h3>
                 <p className="mt-3 text-sm font-bold leading-6 text-[#F7E7C8]/72">
@@ -280,12 +208,12 @@ export default function HomePage() {
               Live product proof
             </p>
             <h2 className="mt-4 text-4xl font-black leading-tight text-[#F7E7C8]">
-              HUGs are featured proof, not the whole flagship.
+              HUGs are featured, not the whole flagship.
             </h2>
             <p className="mt-5 text-base font-bold leading-8 text-[#F7E7C8]/72">
               The Mother’s Day K-KUT HUG path proves that GPMx can route a user
-              from emotional intent to real music samples, a selected HUG,
-              checkout, and private-link delivery.
+              from emotional intent to a real music moment, private delivery
+              link, and checkout.
             </p>
             <a
               href="https://www.k-kut.com/mom"
@@ -297,11 +225,11 @@ export default function HomePage() {
 
           <div className="rounded-[2rem] border border-[#D4A017]/30 bg-[#201106] p-7 sm:p-10">
             <p className="text-sm font-black uppercase tracking-[0.3em] text-[#FFD36A]">
-              CRM control fields
+              Control layer
             </p>
 
             <div className="mt-6 grid gap-3 sm:grid-cols-2">
-              {crmFields.map((item) => (
+              {controls.map((item) => (
                 <div
                   key={item}
                   className="rounded-2xl border border-[#D4A017]/20 bg-black/20 px-4 py-4 text-sm font-black text-[#F7E7C8]/82"
