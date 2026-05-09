@@ -125,12 +125,12 @@ export default function HomePage() {
               </p>
 
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-                <a
-                  href="https://www.k-kut.com/mom"
+                <Link
+                  href="/hugs"
                   className="inline-flex items-center justify-center rounded-full bg-[#FFD36A] px-7 py-4 text-base font-black uppercase tracking-wide text-[#201106] transition hover:bg-[#FFE7A3]"
                 >
-                  Live HUG proof →
-                </a>
+                  HUGs by K-KUT →
+                </Link>
 
                 <Link
                   href="/kreator-intake"
