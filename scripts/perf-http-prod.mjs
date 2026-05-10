@@ -65,7 +65,6 @@ const checks = [
     locationIncludesAny: [
       'https://buy.stripe.com/',
       'https://k-kut.com/pricing?checkout=not-configured',
-      'https://k-kut.com/api/checkout/sovereign',
       'https://www.k-kut.com/api/checkout/sovereign',
     ],
     maxTtfbMs: 1800,
